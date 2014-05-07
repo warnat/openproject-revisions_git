@@ -1,20 +1,19 @@
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'font_awesome',                     :plugin => 'openproject_git_hosting' %>
-  <%= stylesheet_link_tag 'git_urls',                         :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'font_awesome',                     :plugin => 'redmine_bootstrap_kit' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_custom',       :plugin => 'redmine_bootstrap_kit' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_label',        :plugin => 'redmine_bootstrap_kit' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_switch',       :plugin => 'redmine_bootstrap_kit' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_tables',       :plugin => 'redmine_bootstrap_kit' %>
 
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_custom',       :plugin => 'openproject_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_label',        :plugin => 'openproject_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_switch',       :plugin => 'openproject_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_tables',       :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'git_urls',                         :plugin => 'redmine_git_hosting' %>
+  <%= stylesheet_link_tag 'tag_it/jquery_tagit',              :plugin => 'redmine_git_hosting' %>
 
-  <%= stylesheet_link_tag 'tag_it/jquery_tagit',              :plugin => 'openproject_git_hosting' %>
+  <%= javascript_include_tag 'plugins/bootstrap_switch',      :plugin => 'redmine_bootstrap_kit' %>
+  <%= javascript_include_tag 'plugins/bootstrap_transitions', :plugin => 'redmine_bootstrap_kit' %>
+  <%= javascript_include_tag 'bootstrap',                     :plugin => 'redmine_bootstrap_kit' %>
 
-  <%= javascript_include_tag 'plugins/bootstrap_switch',      :plugin => 'openproject_git_hosting' %>
-  <%= javascript_include_tag 'plugins/bootstrap_transitions', :plugin => 'openproject_git_hosting' %>
-  <%= javascript_include_tag 'plugins/tag_it',                :plugin => 'openproject_git_hosting' %>
-  <%= javascript_include_tag 'plugins/zero_clipboard_min',    :plugin => 'openproject_git_hosting' %>
-
-  <%= javascript_include_tag 'bootstrap',                     :plugin => 'openproject_git_hosting' %>
+  <%= javascript_include_tag 'plugins/tag_it',                :plugin => 'redmine_git_hosting' %>
+  <%= javascript_include_tag 'plugins/zero_clipboard_min',    :plugin => 'redmine_git_hosting' %>
 
   <%= javascript_tag do %>
     $(document).ready(function() {
@@ -102,7 +101,7 @@
 
       <%
         selected = "false"
-        if @repository.extra[:git_daemon] == 1
+        if @repository.extra[:git_daemon]
           selected = "true"
         elsif @project.is_public && RedmineGitolite::ConfigRedmine.get_setting(:gitolite_daemon_by_default, true)
           selected = "true"
@@ -122,7 +121,7 @@
           <label><%= l(:label_enable_git_notify) %></label>
           <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
             <%= hidden_field_tag "extra[git_notify]", "false" %>
-            <%= check_box_tag "extra[git_notify]", (@repository.extra[:git_notify] == 1 ? 'true' : 'false'), (@repository.extra[:git_notify] == 1 ? true : false) %>
+            <%= check_box_tag "extra[git_notify]", @repository.extra[:git_notify], @repository.extra[:git_notify] %>
           </span>
         </p>
       <% end %>

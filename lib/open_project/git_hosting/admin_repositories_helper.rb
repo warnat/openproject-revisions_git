@@ -98,10 +98,10 @@ module OpenProject::GitHosting
       # Set post-receive hook params
       repo_conf.set_git_config("redminegitolite.projectid", repository.project.identifier.to_s)
       repo_conf.set_git_config("redminegitolite.repositoryid", "#{repository.identifier || ''}")
-      repo_conf.set_git_config("redminegitolite.repositorykey", repository.extra.key)
+      repo_conf.set_git_config("redminegitolite.repositorykey", repository.extra[:key])
 
       if project.active?
-        if User.anonymous.allowed_to?(:view_changesets, project) || repository.extra.git_http != 0
+        if User.anonymous.allowed_to?(:view_changesets, project) || repository.extra[:git_http] != 0
           repo_conf.set_git_config("http.uploadpack", 'true')
         else
           repo_conf.set_git_config("http.uploadpack", 'false')
@@ -110,7 +110,7 @@ module OpenProject::GitHosting
         # Set mail-notifications hook params
         mailing_list = repository.mailing_list_params[:mailing_list]
 
-        if repository.extra.git_notify == 1 && !mailing_list.empty?
+        if repository.extra[:git_notify] && !mailing_list.empty?
           email_prefix   = repository.mailing_list_params[:email_prefix]
           sender_address = repository.mailing_list_params[:sender_address]
 
@@ -300,8 +300,8 @@ module OpenProject::GitHosting
         end
 
         read << "DUMMY_REDMINE_KEY" if read.empty? && write.empty? && rewind.empty?
-        read << "gitweb" if User.anonymous.allowed_to?(:browse_repository, project) && repository.extra.git_http != 0
-        read << "daemon" if User.anonymous.allowed_to?(:view_changesets, project) && repository.extra.git_daemon == 1
+        read << "gitweb" if User.anonymous.allowed_to?(:browse_repository, project) && repository.extra[:git_http] != 0
+        read << "daemon" if User.anonymous.allowed_to?(:view_changesets, project) && repository.extra[:git_daemon]
       elsif project.archived?
         read << "REDMINE_ARCHIVED_PROJECT"
       else
