@@ -1,4 +1,5 @@
-RedmineApp::Application.routes.draw do
+OpenProject::Application.routes.draw do
+
   # Handle the public keys plugin to my/account.
   scope "/my" do
     resources :public_keys, :controller => 'gitolite_public_keys'
@@ -20,8 +21,8 @@ RedmineApp::Application.routes.draw do
     end
   end
 
-  # SMART HTTP
-  match ':repo_path/*git_params', :prefix => RedmineGitolite::ConfigRedmine.get_setting(:http_server_subdir), :repo_path => /([^\/]+\/)*?[^\/]+\.git/, :to => 'smart_http#index'
+  # SMART http_server_subdirP
+  match ':repo_path/*git_params', :prefix => OpenProject::GitHosting::ConfigRedmine.get_setting(:http_server_subdir), :repo_path => /([^\/]+\/)*?[^\/]+\.git/, :to => 'smart_http#index'
 
   # POST RECEIVE
   match 'githooks/post-receive/:type/:projectid',  :to => 'gitolite_hooks#post_receive', :via => [:post]

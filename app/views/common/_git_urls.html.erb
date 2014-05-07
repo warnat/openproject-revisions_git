@@ -12,7 +12,7 @@
     <input id="git_url_text" readonly="readonly" />
 
     <div id="clipboard_button" data-clipboard-target="git_url_text">
-      <%= image_tag 'paste.png', :plugin => 'redmine_git_hosting' %>
+      <%= image_tag 'paste.png', :plugin => 'openproject_git_hosting' %>
     </div>
 
   </div>
@@ -25,12 +25,12 @@
 <% end %>
 
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag    'git_urls',                    :plugin => 'redmine_git_hosting' %>
-  <%= stylesheet_link_tag    'bootstrap/bootstrap_tooltip', :plugin => 'redmine_git_hosting' %>
+  <%= stylesheet_link_tag    'git_urls',                    :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag    'bootstrap/bootstrap_tooltip', :plugin => 'openproject_git_hosting' %>
 
-  <%= javascript_include_tag 'plugins/bootstrap_tooltip',  :plugin => 'redmine_git_hosting' %>
-  <%= javascript_include_tag 'plugins/zero_clipboard_min', :plugin => 'redmine_git_hosting' %>
-  <%= javascript_include_tag 'set_zero_clipboard',         :plugin => 'redmine_git_hosting' %>
+  <%= javascript_include_tag 'plugins/bootstrap_tooltip',  :plugin => 'openproject_git_hosting' %>
+  <%= javascript_include_tag 'plugins/zero_clipboard_min', :plugin => 'openproject_git_hosting' %>
+  <%= javascript_include_tag 'set_zero_clipboard',         :plugin => 'openproject_git_hosting' %>
 
   <%= javascript_tag do %>
     var access_list = [];

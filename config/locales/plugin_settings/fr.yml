@@ -3,8 +3,8 @@ fr:
   # Global
   label_need_help: Besoin d'aide?
   label_open_issue: Ouvrir une demande
-  label_redmine_git_hosting_wiki: Redmine Git Hosting - Wiki
-  label_redmine_git_hosting_issue: Redmine Git Hosting - Ouvrir une demande
+  label_openproject_git_hosting_wiki: Redmine Git Hosting - Wiki
+  label_openproject_git_hosting_issue: Redmine Git Hosting - Ouvrir une demande
 
   # Gitolite SSH Config
   label_tab_ssh: SSH

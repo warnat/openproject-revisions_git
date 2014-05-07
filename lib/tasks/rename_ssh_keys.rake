@@ -1,4 +1,4 @@
-namespace :redmine_git_hosting do
+namespace :openproject_git_hosting do
 
   desc "Rename SSH keys"
   task :rename_ssh_keys => [:environment] do

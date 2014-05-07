@@ -47,7 +47,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration
 
     begin
       # Add some new settings to settings page, if they don't exist
-      valuehash = (Setting.plugin_redmine_git_hosting).clone
+      valuehash = (Setting.plugin_openproject_git_hosting).clone
       if ((Repository.all.map(&:identifier).inject(Hash.new(0)) do |h,x|
           h[x]+=1 unless x.blank?
           h
@@ -59,9 +59,9 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration
         valuehash['gitRepositoryIdentUnique'] ||= 'true'
       end
 
-      if (Setting.plugin_redmine_git_hosting != valuehash)
-        say "Added redmine_git_hosting settings: 'gitRepositoryIdentUnique' => #{valuehash['gitRepositoryIdentUnique']}"
-        Setting.plugin_redmine_git_hosting = valuehash
+      if (Setting.plugin_openproject_git_hosting != valuehash)
+        say "Added openproject_git_hosting settings: 'gitRepositoryIdentUnique' => #{valuehash['gitRepositoryIdentUnique']}"
+        Setting.plugin_openproject_git_hosting = valuehash
       end
     rescue => e
       say "Error: #{e.message}"
@@ -116,12 +116,12 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration
 
     begin
       # Remove above settings from plugin page
-      valuehash = (Setting.plugin_redmine_git_hosting).clone
+      valuehash = (Setting.plugin_openproject_git_hosting).clone
       valuehash.delete('gitRepositoryIdentUnique')
 
-      if (Setting.plugin_redmine_git_hosting != valuehash)
-        say "Removed redmine_git_hosting settings: 'gitRepositoryIdentUnique'"
-        Setting.plugin_redmine_git_hosting = valuehash
+      if (Setting.plugin_openproject_git_hosting != valuehash)
+        say "Removed openproject_git_hosting settings: 'gitRepositoryIdentUnique'"
+        Setting.plugin_openproject_git_hosting = valuehash
       end
     rescue => e
       say "Error: #{e.message}"

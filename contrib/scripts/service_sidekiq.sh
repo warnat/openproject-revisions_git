@@ -3,7 +3,7 @@
 
 function start () {
   echo "Start Sidekiq..."
-  cd "$HOME/redmine/" && sidekiq -C plugins/redmine_git_hosting/sidekiq.yml
+  cd "$HOME/redmine/" && sidekiq -C plugins/openproject_git_hosting/sidekiq.yml
   echo "Done"
 }
 

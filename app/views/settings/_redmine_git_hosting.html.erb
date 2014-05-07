@@ -1,14 +1,14 @@
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'application',                :plugin => 'redmine_git_hosting' %>
-  <%= stylesheet_link_tag 'tag_it/jquery_tagit',        :plugin => 'redmine_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_alert',  :plugin => 'redmine_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_label' , :plugin => 'redmine_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_switch', :plugin => 'redmine_git_hosting' %>
-  <%= stylesheet_link_tag 'bootstrap/bootstrap_tables', :plugin => 'redmine_git_hosting' %>
+  <%= stylesheet_link_tag 'application',                :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'tag_it/jquery_tagit',        :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_alert',  :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_label' , :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_switch', :plugin => 'openproject_git_hosting' %>
+  <%= stylesheet_link_tag 'bootstrap/bootstrap_tables', :plugin => 'openproject_git_hosting' %>
 
-  <%= javascript_include_tag 'plugins/tag_it',           :plugin => 'redmine_git_hosting' %>
-  <%= javascript_include_tag 'plugins/bootstrap_switch', :plugin => 'redmine_git_hosting' %>
-  <%= javascript_include_tag 'bootstrap',                :plugin => 'redmine_git_hosting' %>
+  <%= javascript_include_tag 'plugins/tag_it',           :plugin => 'openproject_git_hosting' %>
+  <%= javascript_include_tag 'plugins/bootstrap_switch', :plugin => 'openproject_git_hosting' %>
+  <%= javascript_include_tag 'bootstrap',                :plugin => 'openproject_git_hosting' %>
 <% end %>
 
 <% settings_tabs = [
@@ -27,11 +27,11 @@
                     {:name => 'gitolite_rescue',            :partial => 'settings/gitolite_rescue',            :label => :label_tab_gitolite_rescue},
                    ] %>
 
-<span><%= l(:label_need_help) %> : <%= link_to l(:label_redmine_git_hosting_wiki), RedmineGitolite::Config::GITHUB_WIKI, :target => '_blank' %></span>
+<span><%= l(:label_need_help) %> : <%= link_to l(:label_openproject_git_hosting_wiki), RedmineGitolite::Config::GITHUB_WIKI, :target => '_blank' %></span>
 
 <br />
 
-<span><%= l(:label_open_issue) %> : <%= link_to l(:label_redmine_git_hosting_issue), RedmineGitolite::Config::GITHUB_ISSUE, :target => '_blank' %></span>
+<span><%= l(:label_open_issue) %> : <%= link_to l(:label_openproject_git_hosting_issue), RedmineGitolite::Config::GITHUB_ISSUE, :target => '_blank' %></span>
 
 <br />
 <br />
@@ -45,7 +45,7 @@
     $.each(groups, function(key, elem) {
       $(elem).on('click', function(){
         if ("replaceState" in window.history) {
-          window.history.replaceState(null, document.title, 'redmine_git_hosting?tab=' + $(this).attr('id').replace('tab-', ''));
+          window.history.replaceState(null, document.title, 'openproject_git_hosting?tab=' + $(this).attr('id').replace('tab-', ''));
         }
       });
     });

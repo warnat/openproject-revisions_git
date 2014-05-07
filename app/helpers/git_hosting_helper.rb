@@ -58,7 +58,7 @@ module GitHostingHelper
 
 
   def plugin_asset_link(asset_name)
-    File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'redmine_git_hosting', 'images', asset_name)
+    File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'openproject_git_hosting', 'images', asset_name)
   end
 
 
