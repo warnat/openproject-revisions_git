@@ -25,7 +25,7 @@ class GitoliteHooksController < ApplicationController
 
   def post_receive_redmine
     ## Clear existing cache
-    RedmineGitolite::Cache.clear_cache_for_repository(@repository)
+    OpenProject::GitHosting::Cache.clear_cache_for_repository(@repository)
 
     self.response.headers["Content-Type"] = "text/plain;"
 
@@ -141,7 +141,7 @@ class GitoliteHooksController < ApplicationController
 
 
   def logger
-    RedmineGitolite::Log.get_logger(:git_hooks)
+    OpenProject::GitHosting::GitHosting.logger
   end
 
 

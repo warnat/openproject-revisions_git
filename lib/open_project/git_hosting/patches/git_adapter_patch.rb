@@ -12,7 +12,6 @@ module OpenProject::GitHosting::Patches::GitAdapterPatch
 
       alias_method_chain :scm_cmd, :git_hosting
     end
-
   end
 
 

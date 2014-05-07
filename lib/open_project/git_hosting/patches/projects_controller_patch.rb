@@ -12,8 +12,6 @@ module OpenProject::GitHosting
           alias_method_chain :destroy,   :git_hosting
           alias_method_chain :archive,   :git_hosting
           alias_method_chain :unarchive, :git_hosting
-          alias_method_chain :close,     :git_hosting
-          alias_method_chain :reopen,    :git_hosting
 
           helper :git_hosting
         end
@@ -41,8 +39,8 @@ module OpenProject::GitHosting
             # Hm... something about parent hierarchy changed.  Update us and our children
             update = false
 
-            RedmineGitolite::GitHosting.logger.info { "Move repositories of project : '#{@project}'" }
-            RedmineGitolite::GitHosting.resync_gitolite({ :command => :move_repositories, :object => @project.id })
+            OpenProject::GitHosting::GitHosting.logger.info("Move repositories of project : '#{@project}'")
+            OpenProject::GitHosting::GitoliteWrapper.(:move_repositories, @project.id)
           end
 
           # Adjust daemon status
@@ -70,7 +68,7 @@ module OpenProject::GitHosting
           destroy_without_git_hosting(&block)
 
           if api_request? || params[:confirm]
-            RedmineGitolite::GitHosting.resync_gitolite({ :command => :delete_repositories, :object => destroy_repositories })
+            OpenProject::GitHosting::GitoliteWrapper.update(:delete_repositories, destroy_repositories)
           end
         end
 
@@ -84,20 +82,8 @@ module OpenProject::GitHosting
         def unarchive_with_git_hosting(&block)
           unarchive_without_git_hosting(&block)
 
-          RedmineGitolite::GitHosting.logger.info { "Project has been unarchived, update it : '#{@project}'" }
-          RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_project, :object => @project.id })
-        end
-
-
-        def close_with_git_hosting(&block)
-          close_without_git_hosting(&block)
-          update_projects("Project has been closed, update it : '#{@project}'")
-        end
-
-
-        def reopen_with_git_hosting(&block)
-          reopen_without_git_hosting(&block)
-          update_projects("Project has been reopened, update it : '#{@project}'")
+          OpenProject::GitHosting::GitHosting.logger.info("Project has been unarchived, update it : '#{@project}'")
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_project, @project.id)
         end
 
 
@@ -110,22 +96,23 @@ module OpenProject::GitHosting
           # Only take projects that have Git repos.
           git_projects = projects.uniq.select{|p| p.gitolite_repos.any?}.map{|project| project.id}
 
-          RedmineGitolite::GitHosting.logger.info { message }
-          RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_projects, :object => git_projects })
+          OpenProject::GitHosting::GitHosting.logger.info(message)
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, git_projects)
         end
 
 
         def git_repo_init
-          if @project.module_enabled?('repository') && RedmineGitolite::ConfigRedmine.get_setting(:all_projects_use_git, true)
+          if @project.module_enabled?('repository') && OpenProject::GitHosting::GitoliteWrapper.true?(:all_projects_use_git)
             # Create new repository
             repository = Repository.factory("Git")
             repository.is_default = true
             @project.repositories << repository
 
-            options = { :create_readme_file => RedmineGitolite::ConfigRedmine.get_setting(:init_repositories_on_create, true) }
+            options = { :create_readme_file => OpenProject::GitHosting::GitoliteWrapper.true?(:init_repositories_on_create) }
 
-            RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' created a new repository '#{repository.gitolite_repository_name}'" }
-            RedmineGitolite::GitHosting.resync_gitolite({ :command => :add_repository, :object => repository.id, :options => options })
+
+            OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{repository.gitolite_repository_name}'" )
+            OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, @project.id)
           end
         end
 
@@ -138,16 +125,14 @@ module OpenProject::GitHosting
               repository.extra.save
             end
           end
-          RedmineGitolite::GitHosting.logger.info { "Set Git daemon for repositories of project : '#{@project}'" }
-          RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_project, :object => @project.id })
+          OpenProject::GitHosting::GitHosting.logger.info("Set Git daemon for repositories of project : '#{@project}'" )
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, @project.id)
         end
-
       end
-
     end
   end
 end
 
-unless ProjectsController.included_modules.include?(RedmineGitHosting::Patches::ProjectsControllerPatch)
-  ProjectsController.send(:include, RedmineGitHosting::Patches::ProjectsControllerPatch)
+unless ProjectsController.included_modules.include?(OpenProject::GitHosting::Patches::ProjectsControllerPatch)
+  ProjectsController.send(:include, OpenProject::GitHosting::Patches::ProjectsControllerPatch)
 end

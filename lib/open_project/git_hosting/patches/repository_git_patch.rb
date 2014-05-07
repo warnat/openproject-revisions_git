@@ -16,8 +16,9 @@ module OpenProject::GitHosting
           has_many :repository_deployment_credentials, :dependent => :destroy, :foreign_key => 'repository_id'
           has_many :repository_git_config_keys,        :dependent => :destroy, :foreign_key => 'repository_id'
 
-          alias_method_chain :report_last_commit,       :git_hosting
-          alias_method_chain :extra_report_last_commit, :git_hosting
+          # TODO
+          # alias_method_chain :report_last_commit,       :git_hosting
+          # alias_method_chain :extra_report_last_commit, :git_hosting
 
           # Place additional constraints on repository identifiers
           # because of multi repos
@@ -34,7 +35,7 @@ module OpenProject::GitHosting
 
         # Repo ident unique
         def repo_ident_unique?
-          RedmineGitolite::ConfigRedmine.get_setting(:unique_repo_identifier, true)
+          OpenProject::GitHosting::GitoliteWrapper.true?(:unique_repo_identifier)
         end
 
 
@@ -162,12 +163,12 @@ module OpenProject::GitHosting
 
 
         def gitolite_repository_path
-          "#{RedmineGitolite::ConfigRedmine.get_setting(:gitolite_global_storage_dir)}#{gitolite_repository_name}.git"
+          "#{Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir]}#{gitolite_repository_name}.git"
         end
 
 
         def gitolite_repository_name
-          File.expand_path(File.join("./", RedmineGitolite::ConfigRedmine.get_setting(:gitolite_redmine_storage_dir), get_full_parent_path, redmine_name), "/")[1..-1]
+          File.expand_path(File.join("./", Setting.plugin_openproject_git_hosting[:gitolite_redmine_storage_dir], get_full_parent_path, redmine_name), "/")[1..-1]
         end
 
 
@@ -182,7 +183,7 @@ module OpenProject::GitHosting
 
 
         def old_repository_name
-          "#{self.url.gsub(RedmineGitolite::ConfigRedmine.get_setting(:gitolite_global_storage_dir), '').gsub('.git', '')}"
+          "#{self.url.gsub(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir], '').gsub('.git', '')}"
         end
 
 
@@ -197,27 +198,27 @@ module OpenProject::GitHosting
 
 
         def http_access_path
-          "#{RedmineGitolite::ConfigRedmine.get_setting(:http_server_subdir)}#{redmine_repository_path}.git"
+          "#{Setting.plugin_openproject_git_hosting[:http_server_subdir]}#{redmine_repository_path}.git"
         end
 
 
         def ssh_url
-          "ssh://#{RedmineGitolite::ConfigRedmine.get_setting(:gitolite_user)}@#{RedmineGitolite::ConfigRedmine.get_setting(:ssh_server_domain)}/#{git_access_path}"
+          "ssh://#{Setting.plugin_openproject_git_hosting[:gitolite_user]}@#{Setting.plugin_openproject_git_hosting[:ssh_server_domain]}/#{git_access_path}"
         end
 
 
         def git_url
-          "git://#{RedmineGitolite::ConfigRedmine.get_setting(:ssh_server_domain)}/#{git_access_path}"
+          "git://#{Setting.plugin_openproject_git_hosting[:ssh_server_domain]}/#{git_access_path}"
         end
 
 
         def http_url
-          "http://#{http_user_login}#{RedmineGitolite::ConfigRedmine.get_setting(:http_server_domain)}/#{http_access_path}"
+          "http://#{http_user_login}#{Setting.plugin_openproject_git_hosting[:http_server_domain]}/#{http_access_path}"
         end
 
 
         def https_url
-          "https://#{http_user_login}#{RedmineGitolite::ConfigRedmine.get_setting(:https_server_domain)}/#{http_access_path}"
+          "https://#{http_user_login}#{Setting.plugin_openproject_git_hosting[:https_server_domain]}/#{http_access_path}"
         end
 
 
@@ -293,8 +294,8 @@ module OpenProject::GitHosting
           end
 
           # Then add global include list
-          if !RedmineGitolite::ConfigRedmine.get_setting(:gitolite_notify_global_include).empty?
-            RedmineGitolite::ConfigRedmine.get_setting(:gitolite_notify_global_include).sort.each do |mail|
+          if !Setting.plugin_openproject_git_hosting[:gitolite_notify_global_include].empty?
+            Setting.plugin_openproject_git_hosting[:gitolite_notify_global_include].sort.each do |mail|
               mailing_list[mail] = :global
             end
           end
@@ -317,13 +318,13 @@ module OpenProject::GitHosting
           if !git_notification.nil? && !git_notification.prefix.empty?
             email_prefix = git_notification.prefix
           else
-            email_prefix = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_notify_global_prefix)
+            email_prefix = Setting.plugin_openproject_git_hosting[:gitolite_notify_global_prefix]
           end
 
           if !git_notification.nil? && !git_notification.sender_address.empty?
             sender_address = git_notification.sender_address
           else
-            sender_address = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_notify_global_sender_address)
+            sender_address = Setting.plugin_openproject_git_hosting[:gitolite_notify_global_sender_address]
           end
 
           params = {
@@ -337,7 +338,7 @@ module OpenProject::GitHosting
 
 
         def get_full_parent_path
-          return "" if !RedmineGitolite::ConfigRedmine.get_setting(:hierarchical_organisation, true)
+          return "" if !OpenProject::GitHosting::GitoliteWrapper.true?(:hierarchical_organisation)
 
           if self.is_default?
             parent_parts = []
@@ -357,7 +358,7 @@ module OpenProject::GitHosting
 
 
         def exists_in_gitolite?
-          RedmineGitolite::GitHosting.dir_exists?(gitolite_repository_path)
+          OpenProject::GitHosting.dir_exists?(gitolite_repository_path)
         end
 
 
@@ -374,8 +375,8 @@ module OpenProject::GitHosting
           exclude_list = []
 
           # Build exclusion list
-          if !RedmineGitolite::ConfigRedmine.get_setting(:gitolite_notify_global_exclude).empty?
-            exclude_list = exclude_list + RedmineGitolite::ConfigRedmine.get_setting(:gitolite_notify_global_exclude)
+          if !Setting.plugin_openproject_git_hosting[:gitolite_notify_global_exclude].empty?
+            exclude_list = exclude_list + Setting.plugin_openproject_git_hosting[:gitolite_notify_global_exclude]
           end
 
           if !git_notification.nil? && !git_notification.exclude_list.empty?
@@ -436,8 +437,8 @@ module OpenProject::GitHosting
 
 
         def clean_cache
-          RedmineGitolite::Log.get_logger(:global).info { "Clean cache before delete repository '#{gitolite_repository_name}'" }
-          RedmineGitolite::Cache.clear_cache_for_repository(self)
+          OpenProject::GitHosting::GitHosting.logger.info { "Clean cache before delete repository '#{gitolite_repository_name}'" }
+          OpenProject::GitHosting::Cache.clear_cache_for_repository(self)
         end
 
       end
@@ -446,6 +447,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless Repository::Git.included_modules.include?(RedmineGitHosting::Patches::RepositoryGitPatch)
-  Repository::Git.send(:include, RedmineGitHosting::Patches::RepositoryGitPatch)
+unless Repository::Git.included_modules.include?(OpenProject::GitHosting::Patches::RepositoryGitPatch)
+  Repository::Git.send(:include, OpenProject::GitHosting::Patches::RepositoryGitPatch)
 end

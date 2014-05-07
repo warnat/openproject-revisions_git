@@ -1,54 +1,27 @@
-module OpenProject::GitHosting
-  class AdminProjects < Admin
-
-    include GitHosting::AdminRepositoriesHelper
-
-
-    def update_project
-      object = Project.find_by_id(@object_id)
-      do_update_projects(object)
-    end
-
+module OpenProject::GitHosting::GitoliteWrapper
+  class Projects < Admin
 
     def update_projects
-      object = []
-
-      @object_id.each do |project_id|
-        project = Project.find_by_id(project_id)
-        if !project.nil?
-          object.push(project)
-        end
-      end
-
-      do_update_projects(object)
+      # Reduce list to available projects
+      filtered = [*@object_id].map { |id| Project.find_by_id(id) }.compact
+      perform_update(filtered)
     end
 
-
     def update_all_projects
-      object = []
       projects = Project.active_or_archived.includes(:repositories).all
-      if projects.length > 0
-        object = projects
-      end
-
-      do_update_projects(object)
+      perform_update(projects)
     end
 
 
     def update_all_projects_forced
-      object = []
       projects = Project.active_or_archived.includes(:repositories).all
-      if projects.length > 0
-        object = projects
-      end
-
-      update_projects_forced(object)
+      update_projects_forced(projects)
     end
 
 
     def update_members
-      object = Project.find_by_id(@object_id)
-      do_update_projects(object)
+      project = Project.find_by_id(@object_id)
+      perform_update(project)
     end
 
 
@@ -62,14 +35,14 @@ module OpenProject::GitHosting
         end
       end
 
-      do_update_projects(object)
+      perform_update(object)
     end
 
 
     def move_repositories
       project = Project.find_by_id(@object_id)
 
-      wrapped_transaction do
+      @admin.transaction do
         @delete_parent_path = []
         handle_repositories_move(project)
         clean_path(@delete_parent_path)
@@ -80,7 +53,7 @@ module OpenProject::GitHosting
     def move_repositories_tree
       projects = Project.active_or_archived.includes(:repositories).all.select { |x| x.parent_id.nil? }
 
-      wrapped_transaction do
+      @admin.transaction do
         @delete_parent_path = []
 
         projects.each do |project|
@@ -95,11 +68,11 @@ module OpenProject::GitHosting
     private
 
 
-    def do_update_projects(projects)
+    def perform_update(projects)
       projects = (projects.is_a?(Array) ? projects : [projects])
 
       if projects.detect{|p| p.repositories.detect{|r| r.is_a?(Repository::Git)}}
-        wrapped_transaction do
+        @admin.transaction do
           projects.each do |project|
             handle_project_update(project)
             gitolite_admin_repo_commit("#{project.identifier}")
@@ -113,7 +86,7 @@ module OpenProject::GitHosting
       projects = (projects.is_a?(Array) ? projects : [projects])
 
       if projects.detect{|p| p.repositories.detect{|r| r.is_a?(Repository::Git)}}
-        wrapped_transaction do
+        @admin.transaction do
           projects.each do |project|
             handle_project_update(project, true)
             gitolite_admin_repo_commit("#{project.identifier}")
@@ -125,13 +98,8 @@ module OpenProject::GitHosting
 
     def handle_project_update(project, force = false)
       project.gitolite_repos.each do |repository|
-        if force == true
-          handle_repository_add(repository, :force => true)
-        else
-          handle_repository_update(repository)
-        end
+        handle_repository_add(repository, :force => force)
       end
     end
-
   end
 end

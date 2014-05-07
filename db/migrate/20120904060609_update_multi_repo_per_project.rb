@@ -38,34 +38,11 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration
       end
     end
 
-    add_index :projects, [:identifier]
     if columns("repositories").index{|x| x.name=="identifier"}
       add_index :repositories, [:identifier]
       add_index :repositories, [:identifier, :project_id]
     end
     rename_column :git_caches, :proj_identifier, :repo_identifier
-
-    begin
-      # Add some new settings to settings page, if they don't exist
-      valuehash = (Setting.plugin_openproject_git_hosting).clone
-      if ((Repository.all.map(&:identifier).inject(Hash.new(0)) do |h,x|
-          h[x]+=1 unless x.blank?
-          h
-        end.values.max) || 0) > 1
-        # Oops -- have duplication.      Force to false.
-        valuehash['gitRepositoryIdentUnique'] = "false"
-      else
-        # If no duplication -- set to true only if it doesn't already exist
-        valuehash['gitRepositoryIdentUnique'] ||= 'true'
-      end
-
-      if (Setting.plugin_openproject_git_hosting != valuehash)
-        say "Added openproject_git_hosting settings: 'gitRepositoryIdentUnique' => #{valuehash['gitRepositoryIdentUnique']}"
-        Setting.plugin_openproject_git_hosting = valuehash
-      end
-    rescue => e
-      say "Error: #{e.message}"
-    end
 
   end
 
@@ -107,25 +84,11 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration
       end
     end
 
-    remove_index :projects, [:identifier]
     if columns("repositories").index{|x| x.name=="identifier"}
       remove_index :repositories, [:identifier]
       remove_index :repositories, [:identifier, :project_id]
     end
     rename_column :git_caches, :repo_identifier, :proj_identifier
-
-    begin
-      # Remove above settings from plugin page
-      valuehash = (Setting.plugin_openproject_git_hosting).clone
-      valuehash.delete('gitRepositoryIdentUnique')
-
-      if (Setting.plugin_openproject_git_hosting != valuehash)
-        say "Removed openproject_git_hosting settings: 'gitRepositoryIdentUnique'"
-        Setting.plugin_openproject_git_hosting = valuehash
-      end
-    rescue => e
-      say "Error: #{e.message}"
-    end
 
   end
 

@@ -1,5 +1,5 @@
-module OpenProject::GitHosting
-  module AdminRepositoriesHelper
+module OpenProject::GitHosting::GitoliteWrapper
+  module RepositoriesHelper
 
     def handle_repository_add(repository, opts = {})
       force = (opts.has_key?(:force) && opts[:force] == true) || false
@@ -96,9 +96,9 @@ module OpenProject::GitHosting
       repo_conf = Gitolite::Config::Repo.new(repo_name)
 
       # Set post-receive hook params
-      repo_conf.set_git_config("redminegitolite.projectid", repository.project.identifier.to_s)
-      repo_conf.set_git_config("redminegitolite.repositoryid", "#{repository.identifier || ''}")
-      repo_conf.set_git_config("redminegitolite.repositorykey", repository.extra[:key])
+      repo_conf.set_git_config("OpenProject::GitHosting.projectid", repository.project.identifier.to_s)
+      repo_conf.set_git_config("OpenProject::GitHosting.repositoryid", "#{repository.identifier || ''}")
+      repo_conf.set_git_config("OpenProject::GitHosting.repositorykey", repository.extra[:key])
 
       if project.active?
         if User.anonymous.allowed_to?(:view_changesets, project) || repository.extra[:git_http] != 0
@@ -359,7 +359,7 @@ module OpenProject::GitHosting
       end
 
       ## CASE 1
-      if GitHosting.file_exists?(new_path) && GitHosting.file_exists?(old_path)
+      if GitoliteWrapper.file_exists?(new_path) && GitoliteWrapper.file_exists?(old_path)
 
         if is_repository_empty?(new_path)
           logger.warn { "#{@action} : target repository '#{new_path}' already exists and is empty, remove it ..." }
@@ -387,21 +387,21 @@ module OpenProject::GitHosting
         end
 
       ## CASE 2
-      elsif !GitHosting.file_exists?(new_path) && !GitHosting.file_exists?(old_path)
+      elsif !GitoliteWrapper.file_exists?(new_path) && !GitoliteWrapper.file_exists?(old_path)
         logger.error { "#{@action} : both old repository '#{old_path}' and new repository '#{new_path}' does not exist, cannot move it, exit but let Gitolite create the new repo !" }
         return true
 
       ## CASE 3
-      elsif GitHosting.file_exists?(new_path) && !GitHosting.file_exists?(old_path)
+      elsif GitoliteWrapper.file_exists?(new_path) && !GitoliteWrapper.file_exists?(old_path)
         logger.error { "#{@action} : old repository '#{old_path}' does not exist, but the new one does, use it !" }
         return true
 
       ## CASE 4
-      elsif !GitHosting.file_exists?(new_path) && GitHosting.file_exists?(old_path)
+      elsif !GitoliteWrapper.file_exists?(new_path) && GitoliteWrapper.file_exists?(old_path)
 
         logger.debug { "#{@action} : really moving Gitolite repository from '#{old_path}' to '#{new_path}'" }
 
-        if !GitHosting.file_exists? new_parent_path
+        if !GitoliteWrapper.file_exists? new_parent_path
           begin
             GitHosting.execute_command(:shell_cmd, "mkdir -p '#{new_parent_path}'")
           rescue GitHosting::GitHostingException => e
@@ -426,12 +426,12 @@ module OpenProject::GitHosting
       temp_dir = Dir.mktmpdir
 
       command = ""
-      command << "env GIT_SSH=#{Config.gitolite_admin_ssh_script_path} git clone #{repository.ssh_url} #{temp_dir} 2>&1"
+      command << "env GIT_SSH=#{ConfigGitolite.gitolite_admin_ssh_script_path} git clone #{repository.ssh_url} #{temp_dir} 2>&1"
       command << " && cd #{temp_dir}"
       command << " && echo '## #{repository.gitolite_repository_name}' >> README.md"
       command << " && git add README.md"
       command << " && git commit README.md -m 'Initialize repository'"
-      command << " && env GIT_SSH=#{Config.gitolite_admin_ssh_script_path} git push -u origin #{repository.extra[:default_branch]}"
+      command << " && env GIT_SSH=#{ConfigGitolite.gitolite_admin_ssh_script_path} git push -u origin #{repository.extra[:default_branch]}"
 
       begin
         output = GitHosting.execute_command(:local_cmd, command)

@@ -63,6 +63,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless UsersController.included_modules.include?(RedmineGitHosting::Patches::UsersControllerPatch)
-  UsersController.send(:include, RedmineGitHosting::Patches::UsersControllerPatch)
+unless UsersController.included_modules.include?(OpenProject::GitHosting::Patches::UsersControllerPatch)
+  UsersController.send(:include, OpenProject::GitHosting::Patches::UsersControllerPatch)
 end

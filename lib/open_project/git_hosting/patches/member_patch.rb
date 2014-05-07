@@ -16,8 +16,8 @@ module OpenProject::GitHosting
         private
 
         def update_member
-          RedmineGitolite::GitHosting.logger.info { "Membership changes on project '#{self.project}', update!" }
-          RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_members, :object => self.project.id })
+          OpenProject::GitHosting::GitHosting.logger.info("Membership changes on project '#{self.project}', update!")
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_members, self.project.id)
         end
 
       end
@@ -26,6 +26,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless Member.included_modules.include?(RedmineGitHosting::Patches::MemberPatch)
-  Member.send(:include, RedmineGitHosting::Patches::MemberPatch)
+unless Member.included_modules.include?(OpenProject::GitHosting::Patches::MemberPatch)
+  Member.send(:include, OpenProject::GitHosting::Patches::MemberPatch)
 end

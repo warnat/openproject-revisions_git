@@ -8,10 +8,6 @@ module OpenProject::GitHosting
           unloadable
 
           scope :active_or_archived, -> { where "status = #{Project::STATUS_ACTIVE} OR status = #{Project::STATUS_ARCHIVED}" }
-
-          # Place additional constraints on repository identifiers
-          # because of multi repos
-          validate :additional_ident_constraints
         end
       end
 
@@ -30,19 +26,12 @@ module OpenProject::GitHosting
 
         private
 
-        # Make sure that identifier does not match existing repository identifier
-        def additional_ident_constraints
-          if new_record? && !identifier.blank? && Repository.find_by_identifier_and_type(identifier, "Repository::Git")
-            errors.add(:identifier, :ident_not_unique)
-          end
-        end
-
       end
 
     end
   end
 end
 
-unless Project.included_modules.include?(RedmineGitHosting::Patches::ProjectPatch)
-  Project.send(:include, RedmineGitHosting::Patches::ProjectPatch)
+unless Project.included_modules.include?(OpenProject::GitHosting::Patches::ProjectPatch)
+  Project.send(:include, OpenProject::GitHosting::Patches::ProjectPatch)
 end

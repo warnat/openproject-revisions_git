@@ -4,14 +4,13 @@ module OpenProject::GitHosting
 
 
     def self.settings 
-      { 
-        :partial => 'settings/openproject_git_hosting',
+      { :partial => 'settings/openproject_git_hosting',
         :default => {
         # Gitolite SSH Config
         :gitolite_user                  => 'git',
         :gitolite_server_port           => '22',
-        :gitolite_ssh_private_key       => '', #Rails.root.join('plugins', 'openproject_git_hosting', 'ssh_keys', 'redmine_gitolite_admin_id_rsa').to_s,
-        :gitolite_ssh_public_key        => '', #Rails.root.join('plugins', 'openproject_git_hosting', 'ssh_keys', 'redmine_gitolite_admin_id_rsa.pub').to_s,
+        :gitolite_ssh_private_key       => File.join(Dir.home, '.ssh', 'id_rsa').to_s,
+        :gitolite_ssh_public_key        => File.join(Dir.home, '.ssh', 'id_rsa.pub').to_s,
 
         # Gitolite Storage Config
         :gitolite_global_storage_dir    => 'repositories/',
@@ -19,22 +18,20 @@ module OpenProject::GitHosting
         :gitolite_recycle_bin_dir       => 'recycle_bin/',
 
         # Gitolite Config File
-        :gitolite_config_file                  => 'gitolite.conf',
-        :gitolite_config_has_admin_key         => true,
-        :gitolite_identifier_prefix            => 'redmine_',
+        :gitolite_admin_dir                    => File.join(Dir.home, 'gitolite-admin'),
+        :gitolite_identifier_prefix            => 'openproject_',
 
         # Gitolite Global Config
-        :gitolite_temp_dir                     => '', # Rails.root.join('tmp', 'openproject_git_hosting').to_s,
-        :gitolite_scripts_dir                  => './',
+        :gitolite_temp_dir                     => Dir.mktmpdir('gitolite_tmp').to_s,
+        :gitolite_scripts_dir                  => File.join(Dir.home, 'bin'),
         :gitolite_timeout                      => 10,
         :gitolite_recycle_bin_expiration_time  => 24.0,
         :gitolite_log_level                    => 'info',
         :gitolite_log_split                    => false,
-        :git_config_username                   => 'Redmine Git Hosting',
-        :git_config_email                      => 'redmine@example.com',
+        :git_config_username                   => 'OpenProject Git Hosting',
+        :git_config_email                      => 'openproject@localhost',
 
         # Gitolite Hooks Config
-        :gitolite_hooks_are_asynchronous  => false,
         :gitolite_force_hooks_update      => true,
         :gitolite_hooks_debug             => false,
 
@@ -69,8 +66,6 @@ module OpenProject::GitHosting
         :gitolite_notify_global_include        => [],
         :gitolite_notify_global_exclude        => [],
 
-        # Sidekiq Config
-        :gitolite_use_sidekiq                  => false,
         }
       }
     end
@@ -109,22 +104,37 @@ module OpenProject::GitHosting
         end
 
 
-        menu :admin_menu,
-          :openproject_git_hosting, 
-          { :controller => 'settings', :action => 'plugin', :id => 'openproject_git_hosting' }, 
-          :caption => :module_name
-
         menu :top_menu,
           :archived_repositories,
-          { :controller => 'archived_repositories', :action => 'plugin' }, 
-          :caption => :label_archived_repositories, 
+          { :controller => 'archived_repositories', :action => 'plugin' },
+          :caption => :label_archived_repositories,
           :after => :administration,
           :if => proc { User.current.logged? && User.current.admin? }
       end
 
-    initializer 'git_hosting.patch_git_adapter' do
+    initializer 'git_hosting.patches' do
       require 'open_project/git_hosting/patches/git_adapter_patch'
+      require 'open_project/git_hosting/patches/member_patch'
+      require 'open_project/git_hosting/patches/my_controller_patch'
+      require 'open_project/git_hosting/patches/project_patch'
+      require 'open_project/git_hosting/patches/projects_controller_patch'
+      require 'open_project/git_hosting/patches/repositories_controller_patch'
+      require 'open_project/git_hosting/patches/repositories_helper_patch'
+      require 'open_project/git_hosting/patches/repository_git_patch'
+      require 'open_project/git_hosting/patches/repository_patch'
+      require 'open_project/git_hosting/patches/roles_controller_patch'
+      require 'open_project/git_hosting/patches/setting_patch'
+      require 'open_project/git_hosting/patches/settings_controller_patch'
+      require 'open_project/git_hosting/patches/user_patch'
+      require 'open_project/git_hosting/patches/users_controller_patch'
+      require 'open_project/git_hosting/patches/users_helper_patch'
     end
+
+    initializer 'git_hosting.hooks' do
+      require_relative 'hooks'
+    end
+
+
       #patches [:GitAdapter]
       # patches [:GitAdapter, :MyController, :RepositoryGit, :SettingsController,
       # :Issue, :Project, :Repository, :User, :Journal, :ProjectsController, :RolesController,

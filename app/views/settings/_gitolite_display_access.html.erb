@@ -1,17 +1,17 @@
 <%
   # Gitolite Display Access
-  gitolite_user                = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_user)
-  ssh_server_domain            = RedmineGitolite::ConfigRedmine.get_setting(:ssh_server_domain)
+  gitolite_user                = Setting.plugin_openproject_git_hosting[:gitolite_user]
+  ssh_server_domain            = Setting.plugin_openproject_git_hosting[:ssh_server_domain]
 
-  gitolite_global_storage_dir  = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_global_storage_dir)
-  gitolite_redmine_storage_dir = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_redmine_storage_dir)
+  gitolite_global_storage_dir  = Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir]
+  gitolite_redmine_storage_dir = Setting.plugin_openproject_git_hosting[:gitolite_redmine_storage_dir]
 
-  http_server_subdir           = RedmineGitolite::ConfigRedmine.get_setting(:http_server_subdir)
+  http_server_subdir           = Setting.plugin_openproject_git_hosting[:http_server_subdir]
 
-  http_server_domain           = RedmineGitolite::Config.http_root_url
-  https_server_domain          = RedmineGitolite::Config.https_root_url
+  http_server_domain           = OpenProject::GitHosting::GitoliteWrapper.http_root_url
+  https_server_domain          = OpenProject::GitHosting::GitoliteWrapper.https_root_url
 
-  hierarchical_organisation    = RedmineGitolite::ConfigRedmine.get_setting(:hierarchical_organisation, true)
+  hierarchical_organisation    = OpenProject::GitHosting::GitoliteWrapper.true?(:hierarchical_organisation)
 %>
 
 <div class="git_hosting_access_box">
@@ -34,7 +34,7 @@
     <br/>
 
     <label><%= l(:label_ssh_access) %> :</label>
-    <% gitSHP = ssh_server_domain.match(/:\d+$/) %>
+    <% gitSHP = ssh_server_domain =~ /:\d+$/ %>
     <%= raw "#{gitSHP ? 'ssh://' : ''}#{gitolite_user}@#{ssh_server_domain}#{gitSHP ? '/' : ':'}#{gitolite_redmine_storage_dir}<em>#{hierarchical_organisation ? 'project1/project2/' : ''}project3.git</em>" %>
 
     <br/>
@@ -58,7 +58,7 @@
     <br/>
 
     <label><%= l(:label_ssh_access) %> :</label>
-    <% gitSHP = ssh_server_domain.match(/:\d+$/) %>
+    <% gitSHP = ssh_server_domain =~ /:\d+$/ %>
     <%= raw "#{gitSHP ? 'ssh://' : ''}#{gitolite_user}@#{ssh_server_domain}#{gitSHP ? '/' : ':'}#{gitolite_redmine_storage_dir}<em>#{hierarchical_organisation ? 'project1/project2/project3/' : ''}example.git</em>" %>
 
     <br/>

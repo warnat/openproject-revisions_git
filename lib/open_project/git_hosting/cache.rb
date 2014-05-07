@@ -24,7 +24,7 @@ module OpenProject::GitHosting
 
 
     def self.logger
-      RedmineGitolite::Log.get_logger(:git_cache)
+      OpenProject::GitHosting::GitHosting.logger
     end
 
 
@@ -326,17 +326,17 @@ module OpenProject::GitHosting
     ###############################################
 
     def self.max_cache_time
-      RedmineGitolite::ConfigRedmine.get_setting(:gitolite_cache_max_time).to_i
+      Setting.plugin_openproject_git_hosting[:gitolite_cache_max_time].to_i
     end
 
 
     def self.max_cache_elements
-      RedmineGitolite::ConfigRedmine.get_setting(:gitolite_cache_max_elements).to_i
+      Setting.plugin_openproject_git_hosting[:gitolite_cache_max_elements].to_i
     end
 
 
     def self.max_cache_size
-      RedmineGitolite::ConfigRedmine.get_setting(:gitolite_cache_max_size).to_i*1024*1024
+      Setting.plugin_openproject_git_hosting[:gitolite_cache_max_size].to_i*1024*1024
     end
 
 

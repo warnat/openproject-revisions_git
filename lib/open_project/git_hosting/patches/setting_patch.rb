@@ -1,3 +1,4 @@
+require 'fileutils'
 module OpenProject::GitHosting
   module Patches
     module SettingPatch
@@ -26,19 +27,10 @@ module OpenProject::GitHosting
           if self.name == 'plugin_openproject_git_hosting'
             valuehash = self.value
 
-            if !RedmineGitolite::Config.scripts_dir_writeable?
-              # If bin directory not alterable, don't allow changes to
-              # Script directory, Git Username, or Gitolite public or private keys
-              valuehash[:gitolite_scripts_dir] = @@old_valuehash[:gitolite_scripts_dir]
-              valuehash[:gitolite_user] = @@old_valuehash[:gitolite_user]
-              valuehash[:gitolite_ssh_private_key] = @@old_valuehash[:gitolite_ssh_private_key]
-              valuehash[:gitolite_ssh_public_key] = @@old_valuehash[:gitolite_ssh_public_key]
-              valuehash[:gitolite_server_port] = @@old_valuehash[:gitolite_server_port]
-
-            elsif valuehash[:gitolite_scripts_dir] && (valuehash[:gitolite_scripts_dir] != @@old_valuehash[:gitolite_scripts_dir])
+            if valuehash[:gitolite_scripts_dir] && (valuehash[:gitolite_scripts_dir] != @@old_valuehash[:gitolite_scripts_dir])
 
               # Remove old bin directory and scripts, since about to change directory
-              %x[ rm -rf '#{ RedmineGitolite::Config.get_scripts_dir_path }' ]
+              FileUtils.rm_rf(OpenProject::GitHosting::GitoliteWrapper.get_scripts_dir_path)
 
               # Script directory either absolute or relative to redmine root
               stripped = valuehash[:gitolite_scripts_dir].lstrip.rstrip
@@ -63,30 +55,9 @@ module OpenProject::GitHosting
               valuehash[:gitolite_server_port] != @@old_valuehash[:gitolite_server_port]
 
               # Remove old scripts, since about to change content (leave directory alone)
-              %x[ rm -f '#{ RedmineGitolite::Config.get_scripts_dir_path }'* ]
+              Pathname.new(OpenProject::GitHosting::GitoliteWrapper.get_scripts_dir_path)
+                .children.each { |p| p.unlink }
             end
-
-
-            # Temp directory must be absolute and not-empty
-            if valuehash[:gitolite_temp_dir] && (valuehash[:gitolite_temp_dir] != @@old_valuehash[:gitolite_temp_dir])
-              # Remove old tmp directory, since about to change
-              %x[ rm -rf '#{ RedmineGitolite::Config.get_temp_dir_path }' ]
-
-              stripped = valuehash[:gitolite_temp_dir].lstrip.rstrip
-
-              # Get rid of extra path components
-              normalizedFile = File.expand_path(stripped, "/")
-
-              if (normalizedFile == "/" || stripped[0,1] != "/")
-                # Don't allow either root-level (absolute) or relative
-                valuehash[:gitolite_temp_dir] = RedmineGitolite::Config.get_temp_dir_path
-              else
-                # Add trailing '/'
-                valuehash[:gitolite_temp_dir] = normalizedFile + "/"
-              end
-
-            end
-
 
             # Server domain should not include any path components. Also, ports should be numeric.
             [ :ssh_server_domain, :http_server_domain ].each do |setting|
@@ -138,13 +109,13 @@ module OpenProject::GitHosting
                 # Clobber leading '/'
                 valuehash[:gitolite_config_file] = normalizedFile[1..-1]
               else
-                valuehash[:gitolite_config_file] = RedmineGitolite::Config::GITOLITE_DEFAULT_CONFIG_FILE
+                valuehash[:gitolite_config_file] = OpenProject::GitHosting::GitoliteWrapper::GITOLITE_DEFAULT_CONFIG_FILE
               end
 
               # Repair key must be true if default path
-              if valuehash[:gitolite_config_file] == RedmineGitolite::Config::GITOLITE_DEFAULT_CONFIG_FILE
+              if valuehash[:gitolite_config_file] == OpenProject::GitHosting::GitoliteWrapper::GITOLITE_DEFAULT_CONFIG_FILE
                 valuehash[:gitolite_config_has_admin_key] = 'true'
-                valuehash[:gitolite_identifier_prefix] = RedmineGitolite::Config::GITOLITE_IDENTIFIER_DEFAULT_PREFIX
+                valuehash[:gitolite_identifier_prefix] = OpenProject::GitHosting::GitoliteWrapper::GITOLITE_IDENTIFIER_DEFAULT_PREFIX
               end
             end
 
@@ -179,7 +150,7 @@ module OpenProject::GitHosting
             if valuehash[:unique_repo_identifier] == 'true'
               if Repository::Git.have_duplicated_identifier?
                 # Oops -- have duplication.  Force to false.
-                RedmineGitolite::GitHosting.logger.error { "Detected non-unique repository identifiers. Cannot switch to unique_repo_identifier, setting unique_repo_identifier => 'false'" }
+                OpenProject::GitHosting::GitHosting.logger.error("Detected non-unique repository identifiers. Cannot switch to unique_repo_identifier, setting unique_repo_identifier => 'false'")
                 valuehash[:unique_repo_identifier] = 'false'
               end
             end
@@ -188,7 +159,7 @@ module OpenProject::GitHosting
             if @@old_valuehash[:hierarchical_organisation] == 'true' && valuehash[:hierarchical_organisation] == 'false'
               if Repository::Git.have_duplicated_identifier?
                 # Oops -- have duplication.  Force to true.
-                RedmineGitolite::GitHosting.logger.error { "Detected non-unique repository identifiers. Cannot switch to flat mode, setting hierarchical_organisation => 'true'" }
+                OpenProject::GitHosting::GitHosting.logger.error("Detected non-unique repository identifiers. Cannot switch to flat mode, setting hierarchical_organisation => 'true'")
                 valuehash[:hierarchical_organisation] = 'true'
               end
             end
@@ -323,7 +294,8 @@ module OpenProject::GitHosting
                @@old_valuehash[:gitolite_ssh_public_key] != valuehash[:gitolite_ssh_public_key] ||
                @@old_valuehash[:gitolite_server_port] != valuehash[:gitolite_server_port]
                 # Need to update scripts
-                RedmineGitolite::Config.update_scripts
+                # TODO?
+                #OpenProject::GitHosting::GitoliteWrapper.update_scripts
             end
 
 
@@ -334,9 +306,9 @@ module OpenProject::GitHosting
                 # Need to update everyone!
                 projects = Project.active_or_archived.includes(:repositories).all.select { |x| x if x.parent_id.nil? }
                 if projects.length > 0
-                  RedmineGitolite::GitHosting.logger.info { "Gitolite configuration has been modified : repositories hierarchy" }
-                  RedmineGitolite::GitHosting.logger.info { "Resync all projects (root projects : '#{projects.length}')..." }
-                  RedmineGitolite::GitHosting.resync_gitolite({ :command => :move_repositories_tree, :object => projects.length, :options => {:flush_cache => true} })
+                  OpenProject::GitHosting::GitHosting.logger.info("Gitolite configuration has been modified : repositories hierarchy")
+                  OpenProject::GitHosting::GitHosting.logger.info("Resync all projects (root projects : '#{projects.length}')...")
+                  OpenProject::GitHosting::GitoliteWrapper.update(:move_repositories_tree, projects.length, {:flush_cache => true})
                 end
             end
 
@@ -351,15 +323,16 @@ module OpenProject::GitHosting
                 # Need to update everyone!
                 projects = Project.active_or_archived.includes(:repositories).all
                 if projects.length > 0
-                  RedmineGitolite::GitHosting.logger.info { "Gitolite configuration has been modified, resync all projects..." }
-                  RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_all_projects, :object => projects.length })
+                  OpenProject::GitHosting::GitHosting.logger.info("Gitolite configuration has been modified, resync all projects...")
+                  OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects, projects.length)
                 end
             end
 
 
             ## Gitolite user has changed, check if this new one has our hooks!
             if @@old_valuehash[:gitolite_user] != valuehash[:gitolite_user]
-              hooks = RedmineGitolite::Hooks.new
+              # TODO
+              hooks = OpenProject::GitHosting::Hooks.new
               hooks.check_install
             end
 
@@ -369,8 +342,8 @@ module OpenProject::GitHosting
               # Need to update everyone!
               projects = Project.active_or_archived.includes(:repositories).all
               if projects.length > 0
-                RedmineGitolite::GitHosting.logger.info { "Forced resync of all projects (#{projects.length})..." }
-                RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_all_projects_forced, :object => projects.length })
+                OpenProject::GitHosting::GitHosting.logger.info("Forced resync of all projects (#{projects.length})...")
+                OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects_forced, projects.length)
               end
 
               @@resync_projects = false
@@ -382,8 +355,8 @@ module OpenProject::GitHosting
               # Need to update everyone!
               users = User.all
               if users.length > 0
-                RedmineGitolite::GitHosting.logger.info { "Forced resync of all ssh keys (#{users.length})..." }
-                RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_all_ssh_keys_forced, :object => users.length })
+                OpenProject::GitHosting::GitHosting.logger.info("Forced resync of all ssh keys (#{users.length})...")
+                OpenProject::GitHosting::GitoliteWrapper.update(:update_all_ssh_keys_forced, users.length)
               end
 
               @@resync_ssh_keys = false
@@ -397,19 +370,20 @@ module OpenProject::GitHosting
                @@old_valuehash[:gitolite_force_hooks_update] != valuehash[:gitolite_force_hooks_update] ||
                @@old_valuehash[:gitolite_hooks_are_asynchronous] != valuehash[:gitolite_hooks_are_asynchronous]
                 # Need to update our .gitconfig
-                hooks = RedmineGitolite::Hooks.new
+                # TODO
+                hooks = OpenProject::GitHosting::Hooks.new
                 hooks.hook_params_installed?
             end
 
 
             ## Gitolite cache has changed, clear cache entries!
             if @@old_valuehash[:gitolite_cache_max_time] != valuehash[:gitolite_cache_max_time]
-              RedmineGitolite::Cache.clear_obsolete_cache_entries
+              OpenProject::GitHosting::Cache.clear_obsolete_cache_entries
             end
 
 
             if !@@delete_trash_repo.empty?
-              RedmineGitolite::GitHosting.resync_gitolite({ :command => :purge_recycle_bin, :object => @@delete_trash_repo })
+              OpenProject::GitHosting.update(:purge_recycle_bin, @@delete_trash_repo)
               @@delete_trash_repo = []
             end
 
@@ -424,6 +398,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless Setting.included_modules.include?(RedmineGitHosting::Patches::SettingPatch)
-  Setting.send(:include, RedmineGitHosting::Patches::SettingPatch)
+unless Setting.included_modules.include?(OpenProject::GitHosting::Patches::SettingPatch)
+  Setting.send(:include, OpenProject::GitHosting::Patches::SettingPatch)
 end

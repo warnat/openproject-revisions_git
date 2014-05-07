@@ -6,7 +6,7 @@ require 'uri'
 module GitoliteHooksHelper
 
   def logger
-    RedmineGitolite::Log.get_logger(:git_hooks)
+    OpenProject::GitHosting::GitHosting.logger
   end
 
 
@@ -58,7 +58,7 @@ module GitoliteHooksHelper
       end
 
       # Grab the repository path
-      revisions_in_range = RedmineGitolite::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' rev-list --reverse #{range}")
+      revisions_in_range = OpenProject::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' rev-list --reverse #{range}")
       logger.debug { "Revisions in range : #{revisions_in_range.split().join(' ')}" }
 
       commits = []

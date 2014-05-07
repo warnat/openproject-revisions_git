@@ -26,6 +26,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless UsersHelper.included_modules.include?(RedmineGitHosting::Patches::UsersHelperPatch)
-  UsersHelper.send(:include, RedmineGitHosting::Patches::UsersHelperPatch)
+unless UsersHelper.included_modules.include?(OpenProject::GitHosting::Patches::UsersHelperPatch)
+  UsersHelper.send(:include, OpenProject::GitHosting::Patches::UsersHelperPatch)
 end

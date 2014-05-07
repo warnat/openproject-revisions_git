@@ -1,7 +1,7 @@
-module OpenProject::GitHosting
-  class AdminUsers < Admin
+module OpenProject::GitHosting::GitoliteWrapper
+  class Users < Admin
 
-    include RedmineGitolite::AdminUsersHelper
+    include OpenProject::GitHosting::GitoliteWrapper::UsersHelper
 
 
     def add_ssh_key

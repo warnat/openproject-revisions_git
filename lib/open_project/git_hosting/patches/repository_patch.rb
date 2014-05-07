@@ -22,7 +22,7 @@ module OpenProject::GitHosting
           if new_repo.is_a?(Repository::Git)
             if new_repo.extra.nil?
               # Note that this autoinitializes default values and hook key
-              RedmineGitolite::GitHosting.logger.error { "Automatic initialization of RepositoryGitExtra failed for #{self.project.to_s}" }
+              OpenProject::GitHosting::GitHosting.logger.error { "Automatic initialization of RepositoryGitExtra failed for #{self.project.to_s}" }
             end
           end
           return new_repo
@@ -230,6 +230,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless Repository.included_modules.include?(RedmineGitHosting::Patches::RepositoryPatch)
-  Repository.send(:include, RedmineGitHosting::Patches::RepositoryPatch)
+unless Repository.included_modules.include?(OpenProject::GitHosting::Patches::RepositoryPatch)
+  Repository.send(:include, OpenProject::GitHosting::Patches::RepositoryPatch)
 end

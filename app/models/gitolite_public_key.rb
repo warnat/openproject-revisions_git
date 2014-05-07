@@ -113,13 +113,13 @@ class GitolitePublicKey < ActiveRecord::Base
 
 
   def add_ssh_key
-    RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' has added a SSH key" }
-    RedmineGitolite::GitHosting.resync_gitolite({ :command => :add_ssh_key, :object => self.user.id })
+    OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has added a SSH key")
+    OpenProject::GitHosting::GitoliteWrapper.update(:add_ssh_key, self.user.id)
   end
 
 
   def destroy_ssh_key
-    RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' has deleted a SSH key" }
+    OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has deleted a SSH key")
 
     repo_key = {}
     repo_key['title']    = self.identifier
@@ -127,8 +127,8 @@ class GitolitePublicKey < ActiveRecord::Base
     repo_key['location'] = self.location
     repo_key['owner']    = self.owner
 
-    RedmineGitolite::GitHosting.logger.info { "Delete SSH key #{self.identifier}" }
-    RedmineGitolite::GitHosting.resync_gitolite({ :command => :delete_ssh_key, :object => repo_key })
+    OpenProject::GitHosting::GitHosting.logger.info("Delete SSH key #{self.identifier}")
+    OpenProject::GitHosting::GitoliteWrapper.update(:delete_ssh_key, repo_key)
   end
 
 
@@ -188,9 +188,10 @@ class GitolitePublicKey < ActiveRecord::Base
     begin
       file.write(key)
       file.close
-      RedmineGitolite::GitHosting.execute_command(:local_cmd, "ssh-keygen -l -f #{file.path}")
+      # This will throw if exitcode != 0
+      OpenProject::GitHosting.capture("ssh-keygen", "-l", "-f", file.path)
       valid = true
-    rescue RedmineGitolite::GitHosting::GitHostingException => e
+    rescue GitHostingException => e
       errors.add(:key, l(:error_key_corrupted))
       valid = false
     ensure
@@ -211,7 +212,7 @@ class GitolitePublicKey < ActiveRecord::Base
     # Check against the gitolite administrator key file (owned by noone).
     all_keys = []
 
-    all_keys.push GitolitePublicKey.new({ :user => nil, :key => File.read(RedmineGitolite::ConfigRedmine.get_setting(:gitolite_ssh_public_key)) })
+    all_keys.push GitolitePublicKey.new({ :user => nil, :key => File.read(Setting.plugin_openproject_git_hosting[:gitolite_ssh_public_key]) })
 
     # Check all active keys
     all_keys += (GitolitePublicKey.active.all)

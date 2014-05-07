@@ -9,7 +9,8 @@ module OpenProject::GitHosting
           alias_method_chain :create,      :git_hosting
           alias_method_chain :update,      :git_hosting
           alias_method_chain :destroy,     :git_hosting
-          alias_method_chain :permissions, :git_hosting
+          # TODO
+          # alias_method_chain :permissions, :git_hosting
         end
       end
 
@@ -53,8 +54,8 @@ module OpenProject::GitHosting
         def resync_gitolite(message)
           projects = Project.active_or_archived.includes(:repositories).all
           if projects.length > 0
-            RedmineGitolite::GitHosting.logger.info { "Role has been #{message}, resync all projects..." }
-            RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_all_projects, :object => projects.length })
+            OpenProject::GitHosting::GitHosting.logger.info("Role has been #{message}, resync all projects...")
+            OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects, projects.length)
           end
         end
 
@@ -64,6 +65,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless RolesController.included_modules.include?(RedmineGitHosting::Patches::RolesControllerPatch)
-  RolesController.send(:include, RedmineGitHosting::Patches::RolesControllerPatch)
+unless RolesController.included_modules.include?(OpenProject::GitHosting::Patches::RolesControllerPatch)
+  RolesController.send(:include, OpenProject::GitHosting::Patches::RolesControllerPatch)
 end

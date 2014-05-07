@@ -24,7 +24,7 @@ module OpenProject::GitHosting
 
 
         def gitolite_identifier
-          "#{RedmineGitolite::ConfigRedmine.get_setting(:gitolite_identifier_prefix)}#{self.login.underscore}".gsub(/[^0-9a-zA-Z\-]/, '_')
+          "#{Setting.plugin_openproject_git_hosting[:gitolite_identifier_prefix]}#{self.login.underscore}".gsub(/[^0-9a-zA-Z\-]/, '_')
         end
 
 
@@ -35,8 +35,8 @@ module OpenProject::GitHosting
           if status_has_changed
             git_projects = self.projects.uniq.select{|p| p.gitolite_repos.any?}.map{|project| project.id}
 
-            RedmineGitolite::GitHosting.logger.info { "User status has changed, update projects" }
-            RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_projects, :object => git_projects })
+            OpenProject::GitHosting::GitHosting.logger.info { "User status has changed, update projects" }
+            OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, git_projects)
           end
         end
 
@@ -45,7 +45,7 @@ module OpenProject::GitHosting
 
 
         def delete_ssh_keys
-          RedmineGitolite::GitHosting.logger.info { "User '#{self.login}' has been deleted from Redmine delete membership and SSH keys !" }
+          OpenProject::GitHosting::GitHosting.logger.info("User '#{self.login}' has been deleted from Redmine delete membership and SSH keys !")
         end
 
 
@@ -64,6 +64,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless User.included_modules.include?(RedmineGitHosting::Patches::UserPatch)
-  User.send(:include, RedmineGitHosting::Patches::UserPatch)
+unless User.included_modules.include?(OpenProject::GitHosting::Patches::UserPatch)
+  User.send(:include, OpenProject::GitHosting::Patches::UserPatch)
 end

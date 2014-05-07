@@ -29,10 +29,10 @@ class DownloadGitRevisionController < ApplicationController
 
     # is the revision a tag?
     if commit.nil?
-      tags = RedmineGitolite::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' tag").split
+      tags = OpenProject::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' tag").split
       tags.each do |x|
         if x == rev
-          commit = RedmineGitolite::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' rev-list #{rev}").split[0]
+          commit = OpenProject::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' rev-list #{rev}").split[0]
           break
         end
       end
@@ -43,7 +43,7 @@ class DownloadGitRevisionController < ApplicationController
       commit = rev
     end
 
-    valid_commit = RedmineGitolite::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' rev-parse --quiet --verify #{commit}")
+    valid_commit = OpenProject::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' rev-parse --quiet --verify #{commit}")
 
     if valid_commit == ''
       flash.now[:error] = l(:error_download_revision_no_such_commit, :commit => commit)
@@ -77,7 +77,7 @@ class DownloadGitRevisionController < ApplicationController
     end
 
     begin
-      content = RedmineGitolite::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' archive #{cmd_args} #{valid_commit}")
+      content = OpenProject::GitHosting.execute_command(:git_cmd, "--git-dir='#{@repository.gitolite_repository_path}' archive #{cmd_args} #{valid_commit}")
     rescue => e
       flash.now[:error] = l(:git_archive_timeout, :timeout => e.message)
       render_404

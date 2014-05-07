@@ -47,8 +47,8 @@ class RepositoryGitConfigKey < ActiveRecord::Base
 
 
   def update_repository(options)
-    RedmineGitolite::GitHosting.logger.info { "Rebuild Git config keys respository : '#{repository.gitolite_repository_name}'" }
-    RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_repository, :object => repository.id, :options => options })
+    OpenProject::GitHosting::GitHosting.logger.info("Rebuilding Git config keys respository : '#{repository.gitolite_repository_name}'")
+    OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, repository.id, options)
   end
 
 end

@@ -1,5 +1,5 @@
 module OpenProject::GitHosting
-  class Recycle
+    class Recycle
 
     # This class implements a basic recycle bit for repositories deleted from the gitolite repository
     #
@@ -15,10 +15,10 @@ module OpenProject::GitHosting
 
 
     def initialize
-      @recycle_bin_dir     = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_recycle_bin_dir)
-      @global_storage_dir  = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_global_storage_dir)
-      @redmine_storage_dir = RedmineGitolite::ConfigRedmine.get_setting(:gitolite_redmine_storage_dir)
-      @recycle_bin_expiration_time = (RedmineGitolite::ConfigRedmine.get_setting(:gitolite_recycle_bin_expiration_time).to_f*60).to_i
+      @recycle_bin_dir     = Setting.plugin_openproject_git_hosting[:gitolite_recycle_bin_dir]
+      @global_storage_dir  = Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir]
+      @redmine_storage_dir = Setting.plugin_openproject_git_hosting[:gitolite_redmine_storage_dir]
+      @recycle_bin_expiration_time = (Setting.plugin_openproject_git_hosting[:gitolite_recycle_bin_expiration_time].to_f*60).to_i
     end
 
 
@@ -26,8 +26,8 @@ module OpenProject::GitHosting
       return {} if !file_exists?(@recycle_bin_dir)
 
       begin
-        directories = RedmineGitolite::GitHosting.execute_command(:shell_cmd, "find '#{@recycle_bin_dir}' -type d -regex '.*\.git' -prune -print").chomp.split("\n")
-      rescue RedmineGitolite::GitHosting::GitHostingException => e
+        directories = GitHosting.execute_command(:shell_cmd, "find '#{@recycle_bin_dir}' -type d -regex '.*\.git' -prune -print").chomp.split("\n")
+      rescue GitHostingException => e
         directories = {}
       end
 
@@ -49,7 +49,7 @@ module OpenProject::GitHosting
         result = repositories_array
       else
         begin
-          result = RedmineGitolite::GitHosting.execute_command(:shell_cmd, "find '#{@recycle_bin_dir}' -type d -regex '.*\.git' -cmin +#{@recycle_bin_expiration_time} -prune -print").chomp.split("\n")
+          result = GitHosting.execute_command(:shell_cmd, "find '#{@recycle_bin_dir}' -type d -regex '.*\.git' -cmin +#{@recycle_bin_expiration_time} -prune -print").chomp.split("\n")
         rescue => e
           result = []
         end
@@ -61,8 +61,8 @@ module OpenProject::GitHosting
         result.each do |filename|
           logger.info { "Deleting '#{filename}'" }
           begin
-            RedmineGitolite::GitHosting.execute_command(:shell_cmd, "rm -rf '#{filename}'")
-          rescue RedmineGitolite::GitHosting::GitHostingException => e
+            GitHosting.execute_command(:shell_cmd, "rm -rf '#{filename}'")
+          rescue GitHosting::GitHostingException => e
             logger.error { "GitoliteRecycle.delete_expired_files() failed trying to delete repository '#{filename}' !" }
           end
         end
@@ -93,8 +93,8 @@ module OpenProject::GitHosting
 
       if create_recycle_bin
         begin
-          RedmineGitolite::GitHosting.execute_command(:shell_cmd, "mv '#{repo_path}' '#{trash_path}'")
-        rescue RedmineGitolite::GitHosting::GitHostingException => e
+          GitHosting.execute_command(:shell_cmd, "mv '#{repo_path}' '#{trash_path}'")
+        rescue GitHosting::GitHostingException => e
           logger.error { "Attempt to move repository '#{repo_path}' to Recycle Bin failed !" }
           return false
         end
@@ -121,7 +121,7 @@ module OpenProject::GitHosting
 
       # Pull up any matching repositories. Sort them (beginning is representation of time)
       begin
-        files = RedmineGitolite::GitHosting.execute_command(:shell_cmd, "find '#{@recycle_bin_dir}' -type d -regex '#{myregex}' -prune -print 2> /dev/null").chomp.split("\n").sort {|x, y| y <=> x }
+        files = GitHosting.execute_command(:shell_cmd, "find '#{@recycle_bin_dir}' -type d -regex '#{myregex}' -prune -print 2> /dev/null").chomp.split("\n").sort {|x, y| y <=> x }
       rescue Exception => e
         files = []
       end
@@ -137,14 +137,14 @@ module OpenProject::GitHosting
           if prefix
             repo_prefix = File.join(@global_storage_dir, prefix)
             # Has subdirectory.  Must reconstruct directory
-            RedmineGitolite::GitHosting.execute_command(:shell_cmd, "mkdir -p '#{repo_prefix}'")
+            GitHosting.execute_command(:shell_cmd, "mkdir -p '#{repo_prefix}'")
           end
 
           logger.info { "Moving '#{files.first}' to '#{repo_path}'" }
 
-          RedmineGitolite::GitHosting.execute_command(:shell_cmd, "mv '#{files.first}' '#{repo_path}'")
+          GitHosting.execute_command(:shell_cmd, "mv '#{files.first}' '#{repo_path}'")
           restored = true
-        rescue RedmineGitolite::GitHosting::GitHostingException => e
+        rescue GitHosting::GitHostingException => e
           logger.error { "Attempt to recover '#{repo_name}.git' from recycle bin failed" }
           restored = false
         end
@@ -163,21 +163,21 @@ module OpenProject::GitHosting
 
 
     def logger
-      RedmineGitolite::Log.get_logger(:recycle_bin)
+      OpenProject::GitHosting::GitHosting.logger
     end
 
 
     def file_exists?(file)
-      RedmineGitolite::GitHosting.file_exists?(file)
+      GitoliteWrapper.file_exists?(file)
     end
 
 
     def create_recycle_bin
       begin
-        RedmineGitolite::GitHosting.execute_command(:shell_cmd, "mkdir -p '#{@recycle_bin_dir}'")
-        RedmineGitolite::GitHosting.execute_command(:shell_cmd, "chmod 770 '#{@recycle_bin_dir}'")
+        GitHosting.execute_command(:shell_cmd, "mkdir -p '#{@recycle_bin_dir}'")
+        GitHosting.execute_command(:shell_cmd, "chmod 770 '#{@recycle_bin_dir}'")
         return true
-      rescue RedmineGitolite::GitHosting::GitHostingException => e
+      rescue GitHosting::GitHostingException => e
         logger.error { "Attempt to create recycle bin directory '#{@recycle_bin_dir}' failed !" }
         return false
       end
@@ -186,9 +186,9 @@ module OpenProject::GitHosting
 
     def delete_recycle_bin_dir
       begin
-        RedmineGitolite::GitHosting.execute_command(:shell_cmd, "rmdir '#{@recycle_bin_dir}'")
+        GitHosting.execute_command(:shell_cmd, "rmdir '#{@recycle_bin_dir}'")
         return true
-      rescue RedmineGitolite::GitHosting::GitHostingException => e
+      rescue GitHosting::GitHostingException => e
         return false
       end
     end
@@ -208,10 +208,10 @@ module OpenProject::GitHosting
       end
 
       begin
-        result = RedmineGitolite::GitHosting.execute_command(:shell_cmd, "find '#{repo_subpath}' -depth -type d ! -regex '.*\.git/.*' -empty -delete -print").chomp.split("\n")
+        result = GitHosting.execute_command(:shell_cmd, "find '#{repo_subpath}' -depth -type d ! -regex '.*\.git/.*' -empty -delete -print").chomp.split("\n")
         result.each { |dir| logger.info { "Removed empty repository subdirectory : #{dir}" } }
         return true
-      rescue RedmineGitolite::GitHosting::GitHostingException => e
+      rescue GitHosting::GitHostingException => e
         logger.error { "Attempt to clean path '#{repo_subpath}' failed" }
         return false
       end
@@ -221,10 +221,9 @@ module OpenProject::GitHosting
     def get_directories_size(directories)
       data = {}
       directories.sort.each do |directory|
-        data[directory] = { :size => (RedmineGitolite::GitHosting.execute_command(:shell_cmd, "du -sh '#{directory}'").split(" ")[0] rescue '') }
+        data[directory] = { :size => (GitHosting.execute_command(:shell_cmd, "du -sh '#{directory}'").split(" ")[0] rescue '') }
       end
       return data
     end
-
   end
 end

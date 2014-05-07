@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe  RedmineGitolite::Config do
+describe  OpenProject::GitHosting::GitoliteWrapper do
 
   GITOLITE_VERSION_2 = [
     'hello redmine_gitolite_admin_id_rsa, this is gitolite v2.3.1-0-g912a8bd-dt running on git 1.7.2.5',
@@ -15,14 +15,14 @@ describe  RedmineGitolite::Config do
 
   it "should recognize Gitolite2" do
     GITOLITE_VERSION_2.each do |gitolite_version|
-      version = RedmineGitolite::Config.compute_gitolite_version(gitolite_version)
+      version = OpenProject::GitHosting::GitoliteWrapper.compute_gitolite_version(gitolite_version)
       expect(version).to eq 2
     end
   end
 
   it "should recognize Gitolite3" do
     GITOLITE_VERSION_3.each do |gitolite_version|
-      version = RedmineGitolite::Config.compute_gitolite_version(gitolite_version)
+      version = OpenProject::GitHosting::GitoliteWrapper.compute_gitolite_version(gitolite_version)
       expect(version).to eq 3
     end
   end

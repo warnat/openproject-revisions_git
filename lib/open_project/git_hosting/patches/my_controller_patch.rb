@@ -53,6 +53,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless MyController.included_modules.include?(RedmineGitHosting::Patches::MyControllerPatch)
-  MyController.send(:include, RedmineGitHosting::Patches::MyControllerPatch)
+unless MyController.included_modules.include?(OpenProject::GitHosting::Patches::MyControllerPatch)
+  MyController.send(:include, OpenProject::GitHosting::Patches::MyControllerPatch)
 end

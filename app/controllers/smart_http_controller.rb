@@ -331,7 +331,7 @@ class SmartHttpController < ApplicationController
 
   ## Note: command must be started with a quote!
   def run_git_prefix
-    return "#{RedmineGitolite::Config.shell_cmd_runner} 'cd #{@repository.gitolite_repository_path}"
+    return "#{OpenProject::GitHosting::GitoliteWrapper.shell_cmd_runner} 'cd #{@repository.gitolite_repository_path}"
   end
 
 
@@ -444,7 +444,7 @@ class SmartHttpController < ApplicationController
 
 
   def logger
-    RedmineGitolite::Log.get_logger(:smart_http)
+    OpenProject::GitHosting::GitHosting.logger
   end
 
 end

@@ -22,7 +22,8 @@ OpenProject::Application.routes.draw do
   end
 
   # SMART http_server_subdirP
-  match ':repo_path/*git_params', :prefix => OpenProject::GitHosting::ConfigRedmine.get_setting(:http_server_subdir), :repo_path => /([^\/]+\/)*?[^\/]+\.git/, :to => 'smart_http#index'
+  match ':repo_path/*git_params', #:prefix => Setting.plugin_openproject_git_hosting[:http_server_subdir], 
+    :repo_path => /([^\/]+\/)*?[^\/]+\.git/, :to => 'smart_http#index'
 
   # POST RECEIVE
   match 'githooks/post-receive/:type/:projectid',  :to => 'gitolite_hooks#post_receive', :via => [:post]

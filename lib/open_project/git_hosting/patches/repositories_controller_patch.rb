@@ -8,8 +8,9 @@ module OpenProject::GitHosting
           unloadable
 
           alias_method_chain :show,    :git_hosting
-          alias_method_chain :create,  :git_hosting
-          alias_method_chain :update,  :git_hosting
+          # TODO
+          # alias_method_chain :create,  :git_hosting
+          # alias_method_chain :update,  :git_hosting
           alias_method_chain :destroy, :git_hosting
 
           before_filter :set_current_tab, :only => :edit
@@ -44,8 +45,8 @@ module OpenProject::GitHosting
 
               options = params[:repository][:create_readme] == 'true' ? {:create_readme_file => true} : {:create_readme_file => false}
 
-              RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' created a new repository '#{@repository.gitolite_repository_name}'" }
-              RedmineGitolite::GitHosting.resync_gitolite({ :command => :add_repository, :object => @repository.id, :options => options })
+              OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{@repository.gitolite_repository_name}'")
+              OpenProject::GitHosting::GitoliteWrapper.update(:add_repository, @repository.id, options)
             end
           end
         end
@@ -70,13 +71,13 @@ module OpenProject::GitHosting
               @repository.extra.update_attributes(params[:extra])
 
               ## Update repository
-              RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' has modified repository '#{@repository.gitolite_repository_name}'" }
-              RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_repository, :object => @repository.id })
+              OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has modified repository '#{@repository.gitolite_repository_name}'")
+              OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @repository.id)
 
               ## Update repository default branch
               if update_default_branch
-                RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' has modified default_branch of '#{@repository.gitolite_repository_name}' ('#{@repository.extra[:default_branch]}')" }
-                RedmineGitolite::GitHosting.resync_gitolite({ :command => :update_repository_default_branch, :object => @repository.id })
+                OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has modified default_branch of '#{@repository.gitolite_repository_name}' ('#{@repository.extra[:default_branch]}')")
+                OpenProject::GitHosting::GitoliteWrapper.update(:update_repository_default_branch, @repository.id)
               end
             end
           end
@@ -88,11 +89,11 @@ module OpenProject::GitHosting
 
           if @repository.is_a?(Repository::Git)
             if !@repository.errors.any?
-              RedmineGitolite::GitHosting.logger.info { "User '#{User.current.login}' has removed repository '#{@repository.gitolite_repository_name}'" }
+              OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has removed repository '#{@repository.gitolite_repository_name}'")
               repository_data = {}
               repository_data['repo_name'] = @repository.gitolite_repository_name
               repository_data['repo_path'] = @repository.gitolite_repository_path
-              RedmineGitolite::GitHosting.resync_gitolite({ :command => :delete_repositories, :object => [repository_data] })
+              OpenProject::GitHosting::GitoliteWrapper.update(:delete_repositories, [repository_data])
             end
           end
         end
@@ -111,6 +112,6 @@ module OpenProject::GitHosting
   end
 end
 
-unless RepositoriesController.included_modules.include?(RedmineGitHosting::Patches::RepositoriesControllerPatch)
-  RepositoriesController.send(:include, RedmineGitHosting::Patches::RepositoriesControllerPatch)
+unless RepositoriesController.included_modules.include?(OpenProject::GitHosting::Patches::RepositoriesControllerPatch)
+  RepositoriesController.send(:include, OpenProject::GitHosting::Patches::RepositoriesControllerPatch)
 end

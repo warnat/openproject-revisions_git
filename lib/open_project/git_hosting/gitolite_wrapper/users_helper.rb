@@ -1,5 +1,5 @@
-module OpenProject::GitHosting
-  module AdminUsersHelper
+module OpenProject::GitHosting::GitoliteWrapper
+  module UsersHelper
 
     def handle_user_update(user)
       add_active_keys(user.gitolite_public_keys.active)

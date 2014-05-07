@@ -24,12 +24,12 @@ def load_gitolite_vars
   git_config = {}
 
   redmine_vars = [
-    "redminegitolite.redmineurl",
-    "redminegitolite.projectid",
-    "redminegitolite.repositoryid",
-    "redminegitolite.repositorykey",
-    "redminegitolite.debugmode",
-    "redminegitolite.asyncmode",
+    "OpenProject::GitHosting.redmineurl",
+    "OpenProject::GitHosting.projectid",
+    "OpenProject::GitHosting.repositoryid",
+    "OpenProject::GitHosting.repositorykey",
+    "OpenProject::GitHosting.debugmode",
+    "OpenProject::GitHosting.asyncmode",
   ]
 
   redmine_vars.each do |var_name|
@@ -37,7 +37,7 @@ def load_gitolite_vars
 
     if var_value.to_s == ""
       # Allow blank repositoryid (as default)
-      if var_name != "redminegitolite.repositoryid"
+      if var_name != "OpenProject::GitHosting.repositoryid"
         logger("", false, true)
         logger("Repository does not have '#{var_name}' set, exiting...", false, true)
         logger("", false, true)
