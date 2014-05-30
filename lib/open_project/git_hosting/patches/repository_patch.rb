@@ -3,11 +3,11 @@ module OpenProject::GitHosting
     module RepositoryPatch
 
       def self.included(base)
-        base.send(:extend, ClassMethods)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
 
+          include InstanceMethods
+          extend ClassMethods
           class << self
             alias_method_chain :factory, :git_hosting
           end
@@ -22,12 +22,11 @@ module OpenProject::GitHosting
           if new_repo.is_a?(Repository::Git)
             if new_repo.extra.nil?
               # Note that this autoinitializes default values and hook key
-              OpenProject::GitHosting::GitHosting.logger.error { "Automatic initialization of RepositoryGitExtra failed for #{self.project.to_s}" }
+              OpenProject::GitHosting::GitHosting.logger.error { "Automatic initialization of RepositoryGitExtra failed." }
             end
           end
           return new_repo
         end
-
       end
 
 
@@ -230,6 +229,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless Repository.included_modules.include?(OpenProject::GitHosting::Patches::RepositoryPatch)
-  Repository.send(:include, OpenProject::GitHosting::Patches::RepositoryPatch)
-end
+Repository.send(:include, OpenProject::GitHosting::Patches::RepositoryPatch)

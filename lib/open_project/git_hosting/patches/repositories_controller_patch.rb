@@ -3,17 +3,16 @@ module OpenProject::GitHosting
     module RepositoriesControllerPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
 
+          include InstanceMethods
+
           alias_method_chain :show,    :git_hosting
           # TODO
-          # alias_method_chain :create,  :git_hosting
+          alias_method_chain :edit,  :git_hosting
           # alias_method_chain :update,  :git_hosting
           alias_method_chain :destroy, :git_hosting
-
-          before_filter :set_current_tab, :only => :edit
 
           helper :git_hosting
         end
@@ -32,22 +31,22 @@ module OpenProject::GitHosting
         end
 
 
-        def create_with_git_hosting(&block)
-          create_without_git_hosting(&block)
+        def edit_with_git_hosting
 
-          if @repository.is_a?(Repository::Git)
-            if !@repository.errors.any?
+          # Check if repository has been created before
+          @repository = @project.repository
+          if !@repository
+            @repository = Repository.factory(params[:repository_scm])
+            @repository.project = @project if @repository
+          end
 
-              params[:extra][:git_daemon] = params[:extra][:git_daemon] == 'true' ? true : false
-              params[:extra][:git_notify] = params[:extra][:git_notify] == 'true' ? true : false
+          edit_without_git_hosting
 
-              @repository.extra.update_attributes(params[:extra])
-
-              options = params[:repository][:create_readme] == 'true' ? {:create_readme_file => true} : {:create_readme_file => false}
+          # Create Gitolite Repository after completed edit
+          if request.post? && @repository.is_a?(Repository::Git) && !@repository.errors.any?
 
               OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{@repository.gitolite_repository_name}'")
-              OpenProject::GitHosting::GitoliteWrapper.update(:add_repository, @repository.id, options)
-            end
+              OpenProject::GitHosting::GitoliteWrapper.update(:add_repository, @repository.id)
           end
         end
 
@@ -99,19 +98,9 @@ module OpenProject::GitHosting
         end
 
 
-        private
-
-
-        def set_current_tab
-          @tab = params[:tab] || ""
-        end
-
       end
-
     end
   end
 end
 
-unless RepositoriesController.included_modules.include?(OpenProject::GitHosting::Patches::RepositoriesControllerPatch)
-  RepositoriesController.send(:include, OpenProject::GitHosting::Patches::RepositoriesControllerPatch)
-end
+RepositoriesController.send(:include, OpenProject::GitHosting::Patches::RepositoriesControllerPatch)

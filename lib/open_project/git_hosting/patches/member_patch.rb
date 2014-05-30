@@ -3,9 +3,10 @@ module OpenProject::GitHosting
     module MemberPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          include InstanceMethods
 
           after_commit  :update_member
         end
@@ -26,6 +27,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless Member.included_modules.include?(OpenProject::GitHosting::Patches::MemberPatch)
-  Member.send(:include, OpenProject::GitHosting::Patches::MemberPatch)
-end
+Member.send(:include, OpenProject::GitHosting::Patches::MemberPatch)

@@ -1,4 +1,5 @@
-require 'byebug'
+require 'gitolite'
+
 module OpenProject::GitHosting
   module GitoliteWrapper
 
@@ -92,11 +93,6 @@ module OpenProject::GitHosting
       ['true', '1'].include?(Setting.plugin_openproject_git_hosting[setting])
     end
 
-    def self.gitolite_admin_dir
-      File.join(get_temp_dir_path, GITOLITE_ADMIN_REPO)
-    end
-
-
     def self.gitolite_commit_author
       "#{git_config_username} <#{git_config_email}>"
     end
@@ -187,11 +183,12 @@ module OpenProject::GitHosting
     #                        #
     ##########################
 
+    @admin = nil
     def self.admin
-      Rails.cache.fetch(GitHosting.cache_key('gitolite_admin')) do
-        logger.info { "Accessing gitolite-admin.git : '#{@gitolite_admin_dir}'" }
-        Gitolite::GitoliteAdmin.new(@gitolite_admin_dir, gitolite_admin_settings)
-      end
+      admin_dir = Setting.plugin_openproject_git_hosting[:gitolite_admin_dir]
+      logger.info { "Acessing gitolite-admin.git at '#{admin_dir}'" }
+      @admin unless @admin.nil?
+      Gitolite::GitoliteAdmin.new(admin_dir, gitolite_admin_settings)
     end
 
     WRAPPERS = [GitoliteWrapper::Admin, GitoliteWrapper::Repositories, 
@@ -207,12 +204,13 @@ module OpenProject::GitHosting
       end
 
       WRAPPERS.each do |wrappermod|
-        if wrappermod.respond_to?(action)
-          return wrappermod.new(object,options).send(action)
+        if wrappermod.method_defined?(action)
+          byebug
+          return wrappermod.new(action,object,options).send(action)
         end
       end
 
-      raise GitHostingException.new("No available Wrapper for action '#{action}' found.")
+      raise GitHostingException.new(action, "No available Wrapper for action '#{action}' found.")
     end
 
     def purge_recycle_bin

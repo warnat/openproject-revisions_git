@@ -16,7 +16,7 @@ module OpenProject::GitHosting
         # Add a public_keys tab to the user administration page
         def user_settings_tabs_with_git_hosting(&block)
           tabs = user_settings_tabs_without_git_hosting(&block)
-          tabs << { :name => 'keys', :partial => 'gitolite_public_keys/view', :label => :label_public_keys }
+          tabs << { :name => 'keys', :partial => 'gitolite_public_keys/form', :label => :label_public_keys }
           return tabs
         end
 
@@ -26,6 +26,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless UsersHelper.included_modules.include?(OpenProject::GitHosting::Patches::UsersHelperPatch)
-  UsersHelper.send(:include, OpenProject::GitHosting::Patches::UsersHelperPatch)
-end
+UsersHelper.send(:include, OpenProject::GitHosting::Patches::UsersHelperPatch)

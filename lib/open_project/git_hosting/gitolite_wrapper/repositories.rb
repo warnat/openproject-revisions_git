@@ -7,31 +7,12 @@ module OpenProject::GitHosting::GitoliteWrapper
     def add_repository
       repository = Repository.find_by_id(@object_id)
 
-      if @options.has_key?(:create_readme_file) && (@options[:create_readme_file] == 'true' || @options[:create_readme_file] == true)
-        create_readme = true
-      else
-        create_readme = false
-      end
-
-      wrapped_transaction do
+      @admin.transaction do
 
         handle_repository_add(repository)
 
         gitolite_admin_repo_commit("#{repository.gitolite_repository_name}")
-
-        recycle = OpenProject::GitHosting::Recycle.new
-
-        @recovered = recycle.recover_repository_if_present?(repository)
-
-        if !@recovered
-          logger.info { "#{@action} : let Gitolite create empty repository '#{repository.gitolite_repository_path}'" }
-        else
-          logger.info { "#{@action} : restored existing Gitolite repository '#{repository.gitolite_repository_path}' for update" }
-        end
-      end
-
-      if create_readme && !@recovered
-        create_readme_file(repository)
+        logger.info { "#{@action} : let Gitolite create empty repository '#{repository.gitolite_repository_path}'" }
       end
     end
 
@@ -39,7 +20,7 @@ module OpenProject::GitHosting::GitoliteWrapper
     def update_repository
       repository = Repository.find_by_id(@object_id)
 
-      wrapped_transaction do
+      @admin.transaction do
         handle_repository_update(repository)
         gitolite_admin_repo_commit("#{repository.gitolite_repository_name}")
       end
@@ -54,7 +35,7 @@ module OpenProject::GitHosting::GitoliteWrapper
     def delete_repositories
       repositories_array = @object_id
 
-      wrapped_transaction do
+      @admin.transaction do
         repositories_array.each do |repository_data|
           handle_repository_delete(repository_data)
 

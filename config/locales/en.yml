@@ -167,6 +167,7 @@ en:
 
   # User SSH keys (labels)
   label_public_keys: Public keys
+  label_gitolite_public_key: Public keys
   label_public_key: Public key
   label_public_key_edit: Edit existing public key
   label_current_public_keys: Current public keys

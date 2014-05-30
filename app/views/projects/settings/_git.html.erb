@@ -1,0 +1,20 @@
+<p>
+	<%# TODO show only admin? %>
+	<%= form.text_field(:url, :size => 100, :value => repository.gitolite_repository_path, :disabled => true) %>
+	<br />
+	<em>The repository path for Gitolite this project resides under.</em>
+	<p>
+	    <%#label_tag "create_readme", l() %>
+	</p>
+</p>
+<%= form.fields_for :extra_attributes do |e| %>
+	<p>
+		<%= e.check_box(:git_daemon, :label => :label_enable_git_daemon,
+		:checked => repository.project.is_public?) %>
+	</p>
+	<p>
+		<%= e.check_box(:git_http, :label => :label_enable_smart_http, 
+			:checked => Setting.plugin_openproject_git_hosting[:gitolite_http_by_default]) %>
+	</p>
+<% end %>
+

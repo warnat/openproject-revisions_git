@@ -1,14 +1,19 @@
+require_dependency 'repository/git'
+
 module OpenProject::GitHosting
   module Patches
     module RepositoryGitPatch
 
       def self.included(base)
-        base.send(:extend, ClassMethods)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
 
-          has_one  :git_extra,        :foreign_key => 'repository_id', :class_name => 'RepositoryGitExtra', :dependent => :destroy
+          include InstanceMethods
+          extend ClassMethods
+
+          has_one  :extra, :foreign_key => 'repository_id', :class_name => 'RepositoryGitExtra', :dependent => :destroy
+          accepts_nested_attributes_for :extra
+
           has_one  :git_notification, :foreign_key => 'repository_id', :class_name => 'RepositoryGitNotification', :dependent => :destroy
 
           has_many :repository_mirrors,                :dependent => :destroy, :foreign_key => 'repository_id'
@@ -20,35 +25,17 @@ module OpenProject::GitHosting
           # alias_method_chain :report_last_commit,       :git_hosting
           # alias_method_chain :extra_report_last_commit, :git_hosting
 
-          # Place additional constraints on repository identifiers
-          # because of multi repos
-          validate :additional_ident_constraints
-
           before_destroy :clean_cache, prepend: true
 
           before_validation  :set_git_urls
         end
       end
 
-
       module ClassMethods
 
         # Repo ident unique
         def repo_ident_unique?
           OpenProject::GitHosting::GitoliteWrapper.true?(:unique_repo_identifier)
-        end
-
-
-        def have_duplicated_identifier?
-          if ((self.all.map(&:identifier).inject(Hash.new(0)) do |h, x|
-              h[x] += 1 unless x.blank?
-              h
-            end.values.max) || 0) > 1
-            # Oops -- have duplication
-            return true
-          else
-            return false
-          end
         end
 
 
@@ -116,22 +103,6 @@ module OpenProject::GitHosting
 
       module InstanceMethods
 
-        # New version of extra() -- construct extra association if missing
-        def extra
-          retval = self.git_extra
-          if retval.nil?
-            retval = RepositoryGitExtra.new()
-            self.git_extra = retval  # Should save object...
-          end
-          retval
-        end
-
-
-        def extra=(new_extra_struct)
-          self.git_extra = (new_extra_struct)
-        end
-
-
         def report_last_commit_with_git_hosting
           # Always true
           true
@@ -144,26 +115,20 @@ module OpenProject::GitHosting
         end
 
 
-        # If repo identifiers unique, identifier forms unique label
-        # Else, use directory notation: <project identifier>/<repo identifier>
         def git_cache_id
-          if identifier.blank?
-            # Should only happen with one repo/project (the default)
             project.identifier
-          else
-            "#{project.identifier}/#{identifier}"
-          end
         end
 
 
         # This is the (possibly non-unique) basename for the git repository
         def redmine_name
-          identifier.blank? ? project.identifier : identifier
+          project.identifier
         end
 
 
         def gitolite_repository_path
-          "#{Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir]}#{gitolite_repository_name}.git"
+          File.join(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir],
+            "#{gitolite_repository_name}.git")
         end
 
 
@@ -340,12 +305,7 @@ module OpenProject::GitHosting
         def get_full_parent_path
           return "" if !OpenProject::GitHosting::GitoliteWrapper.true?(:hierarchical_organisation)
 
-          if self.is_default?
-            parent_parts = []
-          else
-            parent_parts = [project.identifier.to_s]
-          end
-
+          parent_parts = []
           p = project
           while p.parent
             parent_id = p.parent.identifier.to_s
@@ -400,42 +360,6 @@ module OpenProject::GitHosting
         end
 
 
-        # Check several aspects of repository identifier (only for Redmine 1.4+)
-        # 1) cannot equal identifier of any project
-        # 2) if repo_ident_unique? make sure that repo identifier is globally unique
-        # 3) cannot make this repo the default if there will be some other repo with blank identifier
-        def additional_ident_constraints
-          if !identifier.blank? && (new_record? || identifier_changed?)
-            if Project.find_by_identifier(identifier)
-              errors.add(:identifier, :ident_cannot_equal_project)
-            end
-
-            # See if a repo for another project has the same identifier (existing validations already check for current project)
-            if self.class.repo_ident_unique? && Repository.find_by_identifier(identifier, :conditions => ["project_id <> ?", project.id])
-              errors.add(:identifier, :ident_not_unique)
-            end
-          end
-
-          unless new_record?
-            # Make sure identifier hasn't changed.  Allow null and blank
-            # Note that simply using identifier_changed doesn't seem to work
-            # if the identifier was "NULL" but the new identifier is ""
-            if (identifier_was.blank? && !identifier.blank? ||
-              !identifier_was.blank? && identifier_changed?)
-              errors.add(:identifier, :cannot_change) if identifier_changed?
-            end
-          end
-
-          if project && (is_default? || set_as_default?)
-            # Need to make sure that we don't take the default slot away from a sibling repo with blank identifier
-            possibles = Repository.find_all_by_project_id(project.id, :conditions => ["identifier = '' or identifier is null"])
-            if possibles.any? && (new_record? || possibles.detect{|x| x.id != id})
-              errors.add(:base, :blank_default_exists)
-            end
-          end
-        end
-
-
         def clean_cache
           OpenProject::GitHosting::GitHosting.logger.info { "Clean cache before delete repository '#{gitolite_repository_name}'" }
           OpenProject::GitHosting::Cache.clear_cache_for_repository(self)
@@ -447,6 +371,3 @@ module OpenProject::GitHosting
   end
 end
 
-unless Repository::Git.included_modules.include?(OpenProject::GitHosting::Patches::RepositoryGitPatch)
-  Repository::Git.send(:include, OpenProject::GitHosting::Patches::RepositoryGitPatch)
-end

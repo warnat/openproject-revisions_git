@@ -3,9 +3,10 @@ module OpenProject::GitHosting
     module ProjectsControllerPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          include InstanceMethods
 
           alias_method_chain :create,    :git_hosting
           alias_method_chain :update,    :git_hosting
@@ -133,6 +134,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless ProjectsController.included_modules.include?(OpenProject::GitHosting::Patches::ProjectsControllerPatch)
-  ProjectsController.send(:include, OpenProject::GitHosting::Patches::ProjectsControllerPatch)
-end
+ProjectsController.send(:include, OpenProject::GitHosting::Patches::ProjectsControllerPatch)

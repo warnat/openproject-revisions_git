@@ -1,12 +1,14 @@
 require 'fileutils'
+
 module OpenProject::GitHosting
   module Patches
     module SettingPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          include InstanceMethods
 
           before_save  :save_git_hosting_values
           after_commit :restore_git_hosting_values
@@ -398,6 +400,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless Setting.included_modules.include?(OpenProject::GitHosting::Patches::SettingPatch)
-  Setting.send(:include, OpenProject::GitHosting::Patches::SettingPatch)
-end
+Setting.send(:include, OpenProject::GitHosting::Patches::SettingPatch)

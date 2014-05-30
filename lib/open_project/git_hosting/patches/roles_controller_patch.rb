@@ -3,9 +3,11 @@ module OpenProject::GitHosting
     module RolesControllerPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          include InstanceMethods
+          
           alias_method_chain :create,      :git_hosting
           alias_method_chain :update,      :git_hosting
           alias_method_chain :destroy,     :git_hosting
@@ -65,6 +67,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless RolesController.included_modules.include?(OpenProject::GitHosting::Patches::RolesControllerPatch)
-  RolesController.send(:include, OpenProject::GitHosting::Patches::RolesControllerPatch)
-end
+RolesController.send(:include, OpenProject::GitHosting::Patches::RolesControllerPatch)

@@ -3,9 +3,10 @@ module OpenProject::GitHosting
     module UserPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          include InstanceMethods
 
           attr_accessor :status_has_changed
 
@@ -64,6 +65,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless User.included_modules.include?(OpenProject::GitHosting::Patches::UserPatch)
-  User.send(:include, OpenProject::GitHosting::Patches::UserPatch)
-end
+User.send(:include, OpenProject::GitHosting::Patches::UserPatch)

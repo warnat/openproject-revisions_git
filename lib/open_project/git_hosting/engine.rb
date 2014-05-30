@@ -13,7 +13,7 @@ module OpenProject::GitHosting
         :gitolite_ssh_public_key        => File.join(Dir.home, '.ssh', 'id_rsa.pub').to_s,
 
         # Gitolite Storage Config
-        :gitolite_global_storage_dir    => 'repositories/',
+        :gitolite_global_storage_dir    => File.join(Dir.home, 'repositories'),
         :gitolite_redmine_storage_dir   => '',
         :gitolite_recycle_bin_dir       => 'recycle_bin/',
 
@@ -110,24 +110,37 @@ module OpenProject::GitHosting
           :caption => :label_archived_repositories,
           :after => :administration,
           :if => proc { User.current.logged? && User.current.admin? }
+
+        menu :my_menu,
+          :public_keys,
+          { :controller => 'gitolite_public_keys', :action => 'index'},
+          :html => { :class => 'icon2 icon-locked-folder' },
+          :caption => :label_public_keys
+
       end
 
-    initializer 'git_hosting.patches' do
-      require 'open_project/git_hosting/patches/git_adapter_patch'
-      require 'open_project/git_hosting/patches/member_patch'
-      require 'open_project/git_hosting/patches/my_controller_patch'
-      require 'open_project/git_hosting/patches/project_patch'
-      require 'open_project/git_hosting/patches/projects_controller_patch'
-      require 'open_project/git_hosting/patches/repositories_controller_patch'
-      require 'open_project/git_hosting/patches/repositories_helper_patch'
-      require 'open_project/git_hosting/patches/repository_git_patch'
-      require 'open_project/git_hosting/patches/repository_patch'
-      require 'open_project/git_hosting/patches/roles_controller_patch'
-      require 'open_project/git_hosting/patches/setting_patch'
-      require 'open_project/git_hosting/patches/settings_controller_patch'
-      require 'open_project/git_hosting/patches/user_patch'
-      require 'open_project/git_hosting/patches/users_controller_patch'
-      require 'open_project/git_hosting/patches/users_helper_patch'
+    # Reload patches for development
+    # initializer 'git_hosting.patches' do
+    ActionDispatch::Callbacks.to_prepare do
+      require_dependency 'open_project/git_hosting/patches/git_adapter_patch'
+      require_dependency 'open_project/git_hosting/patches/repository_git_patch'
+      Redmine::Scm::Adapters::GitAdapter.send(:include, OpenProject::GitHosting::Patches::GitAdapterPatch)
+      Repository::Git.send(:include, OpenProject::GitHosting::Patches::RepositoryGitPatch)
+
+      # TODO remove
+      # require 'open_project/git_hosting/patches/member_patch'
+      # require 'open_project/git_hosting/patches/my_controller_patch'
+      # require 'open_project/git_hosting/patches/project_patch'
+      # require 'open_project/git_hosting/patches/projects_controller_patch'
+      # require 'open_project/git_hosting/patches/repositories_controller_patch'
+      # require 'open_project/git_hosting/patches/repositories_helper_patch'
+      # require 'open_project/git_hosting/patches/repository_patch'
+      # require 'open_project/git_hosting/patches/roles_controller_patch'
+      # require 'open_project/git_hosting/patches/setting_patch'
+      # require 'open_project/git_hosting/patches/settings_controller_patch'
+      # require 'open_project/git_hosting/patches/user_patch'
+      # require 'open_project/git_hosting/patches/users_controller_patch'
+      # require 'open_project/git_hosting/patches/users_helper_patch'
     end
 
     initializer 'git_hosting.hooks' do
@@ -135,10 +148,12 @@ module OpenProject::GitHosting
     end
 
 
-      #patches [:GitAdapter]
-      # patches [:GitAdapter, :MyController, :RepositoryGit, :SettingsController,
-      # :Issue, :Project, :Repository, :User, :Journal, :ProjectsController, :RolesController,
-      # :UsersController, :Member, :RepositoriesController, :Setting, :UsersHelper]
+      patches [
+        :Project, :Repository, :User, :Setting, :Member,
+        :ProjectsController, :RolesController, :RepositoriesController,
+        :SettingsController, :UsersController, :MyController,
+        :RepositoriesHelper, :UsersHelper
+      ]
 
   end
 end

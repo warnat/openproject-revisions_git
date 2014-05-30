@@ -97,7 +97,6 @@ module OpenProject::GitHosting::GitoliteWrapper
 
       # Set post-receive hook params
       repo_conf.set_git_config("OpenProject::GitHosting.projectid", repository.project.identifier.to_s)
-      repo_conf.set_git_config("OpenProject::GitHosting.repositoryid", "#{repository.identifier || ''}")
       repo_conf.set_git_config("OpenProject::GitHosting.repositorykey", repository.extra[:key])
 
       if project.active?

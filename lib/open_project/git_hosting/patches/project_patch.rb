@@ -3,9 +3,10 @@ module OpenProject::GitHosting
     module ProjectPatch
 
       def self.included(base)
-        base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          include InstanceMethods
 
           scope :active_or_archived, -> { where "status = #{Project::STATUS_ACTIVE} OR status = #{Project::STATUS_ARCHIVED}" }
         end
@@ -32,6 +33,4 @@ module OpenProject::GitHosting
   end
 end
 
-unless Project.included_modules.include?(OpenProject::GitHosting::Patches::ProjectPatch)
-  Project.send(:include, OpenProject::GitHosting::Patches::ProjectPatch)
-end
+Project.send(:include, OpenProject::GitHosting::Patches::ProjectPatch)

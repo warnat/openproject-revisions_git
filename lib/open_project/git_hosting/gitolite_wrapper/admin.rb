@@ -3,8 +3,9 @@ module OpenProject::GitHosting::GitoliteWrapper
 
   	attr_reader :admin
 
-  	def initialize(action, object_id, options)
-  		@admin = GitoliteWrapper.cached_gitolite_admin
+  	def initialize(action, object_id, options={})
+  		@admin = OpenProject::GitHosting::GitoliteWrapper.admin
+      @gitolite_config = @admin.config
 
       @object_id      = object_id
       @action         = action
@@ -15,5 +16,12 @@ module OpenProject::GitHosting::GitoliteWrapper
   		Rails.logger
   	end
 
+
+    def gitolite_admin_repo_commit(message = '')
+      logger.info("#{@action} : commiting to Gitolite...")
+      @admin.save("#{@action} : #{message}")
+    rescue => e
+      logger.error { "#{e.message}" }
+    end
   end
  end

@@ -1,9 +1,6 @@
 class RepositoryDeploymentCredential < ActiveRecord::Base
   unloadable
 
-  STATUS_ACTIVE = 1
-  STATUS_INACTIVE = 0
-
   VALID_PERMS  = [ "R", "RW+" ]
   DEFAULT_PERM = "RW+"
 
@@ -21,8 +18,8 @@ class RepositoryDeploymentCredential < ActiveRecord::Base
 
   validates_inclusion_of  :perm, :in => VALID_PERMS
 
-  scope :active,   -> { where active: STATUS_ACTIVE }
-  scope :inactive, -> { where active: STATUS_LOCKED }
+  scope :active,   -> { where active: true }
+  scope :inactive, -> { where active: false }
 
   after_commit ->(obj) { obj.update_permissions }, on: :create
   after_commit ->(obj) { obj.update_permissions }, on: :update
@@ -61,7 +58,7 @@ class RepositoryDeploymentCredential < ActiveRecord::Base
 
   def update_permissions
     OpenProject::GitHosting::GitHosting.logger.info("Update deploy keys for repository : '#{repository.gitolite_repository_name}'")
-    OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, repository.id })
+    OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, repository.id)
   end
 
 

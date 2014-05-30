@@ -1,9 +1,12 @@
+require_dependency 'redmine/scm/adapters/git_adapter'
+
 module OpenProject::GitHosting::Patches::GitAdapterPatch
   def self.included(base)
-    base.send(:extend, ClassMethods)
-    base.send(:include, InstanceMethods)
     base.class_eval do
       unloadable
+
+      include InstanceMethods
+      extend ClassMethods
 
       class << self
         alias_method_chain :sq_bin,         :git_hosting
@@ -64,4 +67,3 @@ module OpenProject::GitHosting::Patches::GitAdapterPatch
   end
 end
 
-Redmine::Scm::Adapters::GitAdapter.send(:include, OpenProject::GitHosting::Patches::GitAdapterPatch)

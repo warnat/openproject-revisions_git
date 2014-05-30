@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 3.2.14"
   
   s.add_dependency "lockfile"
-  s.add_dependency "jbox-gitolite", "~> 1.1.11"
+  s.add_dependency "gitolite-rugged"
+  s.add_dependency "sshkey"
 
 end

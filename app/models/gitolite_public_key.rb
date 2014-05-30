@@ -1,9 +1,6 @@
 class GitolitePublicKey < ActiveRecord::Base
   unloadable
 
-  STATUS_ACTIVE = 1
-  STATUS_LOCKED = 0
-
   KEY_TYPE_USER = 0
   KEY_TYPE_DEPLOY = 1
 
@@ -12,8 +9,8 @@ class GitolitePublicKey < ActiveRecord::Base
   belongs_to :user
   has_many   :repository_deployment_credentials, :dependent => :destroy
 
-  scope :active,   -> { where active: STATUS_ACTIVE }
-  scope :inactive, -> { where active: STATUS_LOCKED }
+  scope :active,   -> { where active: true }
+  scope :inactive, -> { where active: false }
 
   scope :user_key,   -> { where key_type: KEY_TYPE_USER }
   scope :deploy_key, -> { where key_type: KEY_TYPE_DEPLOY }
@@ -184,23 +181,17 @@ class GitolitePublicKey < ActiveRecord::Base
 
   def key_format
     file = Tempfile.new('foo')
-
-    begin
-      file.write(key)
-      file.close
-      # This will throw if exitcode != 0
-      OpenProject::GitHosting.capture("ssh-keygen", "-l", "-f", file.path)
-      valid = true
-    rescue GitHostingException => e
-      errors.add(:key, l(:error_key_corrupted))
-      valid = false
-    ensure
-      file.unlink
-    end
-
-    return valid
+    file.write(key)
+    file.close
+    # This will throw if exitcode != 0
+    OpenProject::GitHosting::GitHosting.capture('ssh-keygen', '-l', '-f', file.path)
+    true
+  rescue OpenProject::GitHosting::GitHosting::GitHostingException => e
+    errors.add(:key, l(:error_key_corrupted))
+    false
+  ensure
+    file.unlink
   end
-
 
   def key_uniqueness
     return if !new_record?

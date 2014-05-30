@@ -3,13 +3,10 @@ require 'uri'
 class RepositoryPostReceiveUrl < ActiveRecord::Base
   unloadable
 
-  STATUS_ACTIVE   = 1
-  STATUS_INACTIVE = 0
-
   belongs_to :repository
 
-  scope :active,   -> { where active: STATUS_ACTIVE }
-  scope :inactive, -> { where active: STATUS_INACTIVE }
+  scope :active,   -> { where active: true }
+  scope :inactive, -> { where active: false }
 
   attr_accessible :url, :mode, :active
 
