@@ -1,29 +1,33 @@
 <table class="list">
-
   <% if ssh_keys.nil? || ssh_keys.empty? %>
     <tr>
-      <td>
+      <td colspan=4>
         <label><%= l(:label_no_public_keys) %></label>
       </td>
     </tr>
   <% else %>
+    <thead>
+      <tr>
+        <th><%= l :label_public_key_title %></th>
+        <th><%= l :label_identifier_can_be_arbitrary %></th>
+        <th><%= l :label_public_key_fingerprint %></th>
+        <th></th>
+    </thead>
+    <tbody>
     <% ssh_keys.each do |key| %>
       <tr class="<%= curcycle=cycle('odd', 'even') %>">
-        <td style="text-align: left;"><%= h(key) %></td>
-
-        <% if params[:id] %>
-          <td style="width: 60%; text-align: center;"><%= "#{key.identifier}.pub" %></td>
-        <% end %>
-
-        <td style="width:10%;" class="buttons">
+        <td><%= h(key) %></td>
+        <td><%= "#{key.identifier}.pub" %></td>
+        <td><%= "#{key.fingerprint}" %></td>
+        <td class="buttons">
           <%= link_to l(:button_delete),
-                 :controller => controller,
-                 :action => 'destroy',
-                 :method => 'delete',
+                 { :controller => target, :action => 'destroy', :id => key.id },
+                 :method => :delete,
                  :class   => 'icon icon-delete',
                  :confirm => l(:text_gitolite_key_destroy_confirmation, :title => keylabel(key)) %>
         </td>
       </tr>
     <% end %>
+    </tbody>
   <% end %>
 </table>

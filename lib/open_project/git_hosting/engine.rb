@@ -113,7 +113,7 @@ module OpenProject::GitHosting
 
         menu :my_menu,
           :public_keys,
-          { :controller => 'gitolite_public_keys', :action => 'index'},
+          { :controller => 'my_public_keys', :action => 'index'},
           :html => { :class => 'icon2 icon-locked-folder' },
           :caption => :label_public_keys
 

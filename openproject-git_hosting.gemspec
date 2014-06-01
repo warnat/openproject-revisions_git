@@ -19,6 +19,5 @@ Gem::Specification.new do |s|
   
   s.add_dependency "lockfile"
   s.add_dependency "gitolite-rugged"
-  s.add_dependency "sshkey"
 
 end

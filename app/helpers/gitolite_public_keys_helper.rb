@@ -35,6 +35,16 @@ module GitolitePublicKeysHelper
   end
 
 
+  def save_and_flash
+    if @gitolite_public_key.save
+      flash[:notice] = l(:notice_public_key_created, :title => view_context.keylabel(@gitolite_public_key)).html_safe
+    else
+      flash[:error] = @gitolite_public_key.errors.full_messages.to_sentence
+    end
+  end
+
+
+
   def can_create_deployment_keys_for_some_project(theuser = User.current)
     theuser.projects_by_role.each_key do |role|
       return true if role.allowed_to?(:create_deployment_keys)

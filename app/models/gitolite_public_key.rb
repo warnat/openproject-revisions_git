@@ -1,4 +1,4 @@
-class GitolitePublicKey < ActiveRecord::Base
+  class GitolitePublicKey < ActiveRecord::Base
   unloadable
 
   KEY_TYPE_USER = 0
@@ -24,10 +24,11 @@ class GitolitePublicKey < ActiveRecord::Base
   validates_associated :repository_deployment_credentials
 
   validate :has_not_been_changed
-  validate :key_format
+  validate :key_correctness
   validate :key_uniqueness
 
   before_validation :set_identifier
+  before_validation :set_fingerprint
   before_validation :strip_whitespace
   before_validation :remove_control_characters
 
@@ -43,6 +44,7 @@ class GitolitePublicKey < ActiveRecord::Base
   def to_s
     title
   end
+
 
 
   def set_identifier
@@ -131,6 +133,21 @@ class GitolitePublicKey < ActiveRecord::Base
 
   private
 
+  def set_fingerprint
+    file = Tempfile.new('keytest')
+    file.write(key)
+    file.close
+    # This will throw if exitcode != 0
+    output = OpenProject::GitHosting::GitHosting.capture('ssh-keygen', '-l', '-f', file.path)
+    if output
+      self.fingerprint = output.split[1]
+    end
+  rescue OpenProject::GitHosting::GitHosting::GitHostingException => e
+    errors.add(:key, l(:error_key_corrupted))
+  ensure
+    file.unlink
+  end
+
 
   # Strip leading and trailing whitespace
   def strip_whitespace
@@ -179,60 +196,31 @@ class GitolitePublicKey < ActiveRecord::Base
   end
 
 
-  def key_format
-    file = Tempfile.new('foo')
-    file.write(key)
-    file.close
-    # This will throw if exitcode != 0
-    OpenProject::GitHosting::GitHosting.capture('ssh-keygen', '-l', '-f', file.path)
-    true
-  rescue OpenProject::GitHosting::GitHosting::GitHostingException => e
-    errors.add(:key, l(:error_key_corrupted))
-    false
-  ensure
-    file.unlink
+  def key_correctness
+    # Test correctness of fingerprint from output
+    # and general ssh-(r|d|ecd)sa <key> <id> structure
+    (self.fingerprint =~ /^(\w{2}:?)+$/i) &&
+    (key.match(/^(\S+)\s+(\S+)/))
   end
 
   def key_uniqueness
     return if !new_record?
 
-    keypieces = key.match(/^(\S+)\s+(\S+)/)
-    key_format = keypieces[1]
-    key_data   = keypieces[2]
-
-    # Check against the gitolite administrator key file (owned by noone).
-    all_keys = []
-
-    all_keys.push GitolitePublicKey.new({ :user => nil, :key => File.read(Setting.plugin_openproject_git_hosting[:gitolite_ssh_public_key]) })
-
-    # Check all active keys
-    all_keys += (GitolitePublicKey.active.all)
-
-    all_keys.each do |existing_key|
-
-      existingpieces = existing_key.key.match(/^(\S+)\s+(\S+)/)
-
-      if existingpieces && (existingpieces[2] == key_data)
-        # Hm.... have a duplicate key!
-        if existing_key.user == User.current
-          errors.add(:key, l(:error_key_in_use_by_you, :name => existing_key.title))
-          return false
-        elsif User.current.admin?
-          if existing_key.user
-            errors.add(:key, l(:error_key_in_use_by_other, :login => existing_key.user.login, :name => existing_key.title))
-            return false
-          else
-            errors.add(:key, l(:error_key_in_use_by_gitolite_admin))
-            return false
-          end
-        else
-          errors.add(:key, l(:error_key_in_use_by_someone))
-          return false
-        end
+    existing = GitolitePublicKey.find_by_fingerprint(self.fingerprint)
+    if existing
+      # Hm.... have a duplicate key!
+      if existing.user == User.current
+        errors.add(:key, l(:error_key_in_use_by_you, :name => existing.title))
+        return false
+      elsif User.current.admin?
+        errors.add(:key, l(:error_key_in_use_by_other, :login => existing.user.login, :name => existing.title))
+        return false
+      else
+        errors.add(:key, l(:error_key_in_use_by_someone))
+        return false
       end
     end
-
-    return true
+    true
   end
 
 end
