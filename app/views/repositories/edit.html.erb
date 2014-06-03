@@ -22,13 +22,6 @@
         </li>
       <% end %>
 
-      <% if user_allowed_to(:view_repository_git_notifications, @repository.project) %>
-        <li id="tab-repository_git_notifications">
-          <%= link_to "<i class=\"fa fa-envelope\"></i>".html_safe + l(:label_git_notifications),
-                      repository_git_notifications_path(@repository) %>
-        </li>
-      <% end %>
-
       <% if user_allowed_to(:view_repository_mirrors, @repository.project) %>
         <li id="tab-repository_mirrors">
           <%= link_to "<i class=\"fa fa-sitemap\"></i>".html_safe + l(:label_repository_mirrors),

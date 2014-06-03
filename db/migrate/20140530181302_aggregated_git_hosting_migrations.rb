@@ -102,14 +102,6 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
       add_index :repository_deployment_credentials, :gitolite_public_key_id,
         :name => 'index_deployment_credentials_on_gitolite_pk_id'
 
-      create_table :repository_git_notifications do |t|
-        t.references :repository, :null => false
-        t.column :include_list,  :text
-        t.column :exclude_list,  :text
-        t.column :prefix, :string
-        t.column :sender_address, :string
-      end
-
       create_table :repository_git_config_keys do |t|
         t.references :repository, :null => false
         t.column :key,   :string, :null => false
@@ -182,7 +174,6 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
     drop_table :repository_git_extras
     drop_table :repository_post_receive_urls
     drop_table :repository_deployment_credentials
-    drop_table :repository_git_notifications
     drop_table :repository_git_config_keys
     drop_table :github_issues
     drop_table :github_comments

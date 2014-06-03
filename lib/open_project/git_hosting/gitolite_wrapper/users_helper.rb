@@ -2,6 +2,7 @@ module OpenProject::GitHosting::GitoliteWrapper
   module UsersHelper
 
     def handle_user_update(user)
+      byebug
       add_active_keys(user.gitolite_public_keys.active)
       remove_inactive_keys(user.gitolite_public_keys.inactive)
     end
@@ -15,7 +16,7 @@ module OpenProject::GitHosting::GitoliteWrapper
     def add_active_keys(keys)
       keys.each do |key|
         parts = key.key.split
-        repo_keys = @gitolite_admin.ssh_keys[key.owner]
+        repo_keys = @admin.ssh_keys[key.owner]
         repo_key = repo_keys.find_all{|k| k.location == key.location && k.owner == key.owner}.first
         if repo_key
           logger.info { "#{@action} : SSH key '#{key.owner}@#{key.location}' already exists in Gitolite, update it ..." }
@@ -27,7 +28,7 @@ module OpenProject::GitHosting::GitoliteWrapper
           repo_key = Gitolite::SSHKey.new(parts[0], parts[1], parts[2])
           repo_key.location = key.location
           repo_key.owner = key.owner
-          @gitolite_admin.add_key(repo_key)
+          @admin.add_key(repo_key)
         end
       end
     end
@@ -45,12 +46,12 @@ module OpenProject::GitHosting::GitoliteWrapper
 
 
     def remove_inactive_key(key)
-      repo_keys = @gitolite_admin.ssh_keys[key['owner']]
+      repo_keys = @admin.ssh_keys[key['owner']]
       repo_key  = repo_keys.find_all{|k| k.location == key['location'] && k.owner == key['owner']}.first
 
       if repo_key
         logger.info { "#{@action} : SSH key '#{key['owner']}@#{key['location']}' exists in Gitolite, delete it ..." }
-        @gitolite_admin.rm_key(repo_key)
+        @admin.rm_key(repo_key)
       else
         logger.info { "#{@action} : SSH key '#{key['owner']}@#{key['location']}' does not exits in Gitolite, exit !" }
         return false

@@ -31,6 +31,7 @@ module OpenProject::GitHosting::GitoliteWrapper
 
 
     def handle_repository_update(repository)
+      byebug
       repo_name = repository.gitolite_repository_name
       repo_path = repository.gitolite_repository_path
       repo_conf = @gitolite_config.repos[repo_name]
@@ -106,25 +107,6 @@ module OpenProject::GitHosting::GitoliteWrapper
           repo_conf.set_git_config("http.uploadpack", 'false')
         end
 
-        # Set mail-notifications hook params
-        mailing_list = repository.mailing_list_params[:mailing_list]
-
-        if repository.extra[:git_notify] && !mailing_list.empty?
-          email_prefix   = repository.mailing_list_params[:email_prefix]
-          sender_address = repository.mailing_list_params[:sender_address]
-
-          repo_conf.set_git_config("multimailhook.enabled", 'true')
-          repo_conf.set_git_config("multimailhook.environment", "gitolite")
-          repo_conf.set_git_config("multimailhook.mailinglist", mailing_list.keys.join(", "))
-          repo_conf.set_git_config("multimailhook.from", sender_address)
-          repo_conf.set_git_config("multimailhook.emailPrefix", email_prefix)
-
-          # Set SMTP server for mail-notifications hook
-          #~ repo_conf.set_git_config("multimailhook.smtpServer", ActionMailer::Base.smtp_settings[:address])
-        else
-          repo_conf.set_git_config("multimailhook.enabled", 'false')
-        end
-
         # Set Git config keys
         if repository.repository_git_config_keys.any?
           repository.repository_git_config_keys.each do |git_config_key|
@@ -133,7 +115,6 @@ module OpenProject::GitHosting::GitoliteWrapper
         end
       else
         repo_conf.set_git_config("http.uploadpack", 'false')
-        repo_conf.set_git_config("multimailhook.enabled", 'false')
       end
 
       @gitolite_config.add_repo(repo_conf)
@@ -207,13 +188,7 @@ module OpenProject::GitHosting::GitoliteWrapper
           new_user_list = []
 
           user_list.each do |user|
-            ## We assume here that ':gitolite_config_file' is different than 'gitolite.conf'
-            ## like 'redmine.conf' with 'include "redmine.conf"' in 'gitolite.conf'.
-            ## This way, we know that all repos in this file are managed by Redmine so we
-            ## don't need to backup users
-            next if @gitolite_identifier_prefix == ''
-
-            # ignore these users
+            # ignore skip users
             next if SKIP_USERS.include?(user)
 
             # backup users that are not Redmine users

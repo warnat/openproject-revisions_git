@@ -25,7 +25,7 @@ module GitolitePublicKeysHelper
 
   def find_gitolite_public_key
     key = GitolitePublicKey.find_by_id(params[:id])
-    if key && (@user == key.user || @user.admin?)
+    if key && (@user == key.user || User.current.admin?)
       @gitolite_public_key = key
     elsif key
       render_403

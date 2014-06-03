@@ -1,9 +1,10 @@
 class GitolitePublicKeysController < ApplicationController
   unloadable
-  
+
   include GitolitePublicKeysHelper
 
   before_filter :require_admin
+  before_filter :find_gitolite_public_key, :only => [:destroy]
 
   def create
     @user = User.find_by_id(gitolite_keys_allowed_params[:user_id])
@@ -16,9 +17,6 @@ class GitolitePublicKeysController < ApplicationController
 
   def destroy
     if request.delete?
-
-      @user = User.current
-      find_gitolite_public_key
 
       if @gitolite_public_key.destroy
         flash[:notice] = l(:notice_public_key_deleted, :title => view_context.keylabel(@gitolite_public_key)).html_safe

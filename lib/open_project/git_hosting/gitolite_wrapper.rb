@@ -110,7 +110,10 @@ module OpenProject::GitHosting
           author_email: git_config_email,
 
           public_key: gitolite_ssh_public_key,
-          private_key: gitolite_ssh_private_key
+          private_key: gitolite_ssh_private_key,
+
+          key_subdir: 'openproject',
+          config_file: 'openproject.conf'
       }
     end
 
@@ -183,11 +186,9 @@ module OpenProject::GitHosting
     #                        #
     ##########################
 
-    @admin = nil
     def self.admin
       admin_dir = Setting.plugin_openproject_git_hosting[:gitolite_admin_dir]
       logger.info { "Acessing gitolite-admin.git at '#{admin_dir}'" }
-      @admin unless @admin.nil?
       Gitolite::GitoliteAdmin.new(admin_dir, gitolite_admin_settings)
     end
 
@@ -205,7 +206,6 @@ module OpenProject::GitHosting
 
       WRAPPERS.each do |wrappermod|
         if wrappermod.method_defined?(action)
-          byebug
           return wrappermod.new(action,object,options).send(action)
         end
       end

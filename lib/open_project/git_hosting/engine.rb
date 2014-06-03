@@ -53,8 +53,6 @@ module OpenProject::GitHosting
         :all_projects_use_git             => false,
         :init_repositories_on_create      => false,
         :delete_git_repositories          => true,
-        :hierarchical_organisation        => true,
-        :unique_repo_identifier           => false,
 
         # Download Revision Config
         :download_revision_enabled        => true,
@@ -93,11 +91,6 @@ module OpenProject::GitHosting
           permission :create_repository_git_config_keys, { :repository_git_config_keys => :create }
           permission :view_repository_git_config_keys, { :repository_git_config_keys => :index }
           permission :edit_repository_git_config_keys, { :repository_git_config_keys => :edit }
-
-          permission :create_repository_git_notifications, { :repository_git_notifications => :create }
-          permission :view_repository_git_notifications, { :repository_git_notifications => :index }
-          permission :edit_repository_git_notifications, { :repository_git_notifications => :edit } 
-          permission :receive_git_notifications, { :gitolite_hooks => :post_receive } 
 
           permission :create_gitolite_ssh_key, { :my => :account }
           permission :download_git_revision, { :download_git_revision => :index }

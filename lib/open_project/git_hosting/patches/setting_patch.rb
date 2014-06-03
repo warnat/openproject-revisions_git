@@ -148,25 +148,6 @@ module OpenProject::GitHosting
             end
 
 
-            # Check to see if we are trying to claim all repository identifiers are unique
-            if valuehash[:unique_repo_identifier] == 'true'
-              if Repository::Git.have_duplicated_identifier?
-                # Oops -- have duplication.  Force to false.
-                OpenProject::GitHosting::GitHosting.logger.error("Detected non-unique repository identifiers. Cannot switch to unique_repo_identifier, setting unique_repo_identifier => 'false'")
-                valuehash[:unique_repo_identifier] = 'false'
-              end
-            end
-
-
-            if @@old_valuehash[:hierarchical_organisation] == 'true' && valuehash[:hierarchical_organisation] == 'false'
-              if Repository::Git.have_duplicated_identifier?
-                # Oops -- have duplication.  Force to true.
-                OpenProject::GitHosting::GitHosting.logger.error("Detected non-unique repository identifiers. Cannot switch to flat mode, setting hierarchical_organisation => 'true'")
-                valuehash[:hierarchical_organisation] = 'true'
-              end
-            end
-
-
             # Exclude bad expire times (and exclude non-numbers)
             if valuehash[:gitolite_recycle_bin_expiration_time]
               if valuehash[:gitolite_recycle_bin_expiration_time].to_f > 0

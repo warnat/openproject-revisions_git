@@ -105,9 +105,7 @@ module OpenProject::GitHosting
         def git_repo_init
           if @project.module_enabled?('repository') && OpenProject::GitHosting::GitoliteWrapper.true?(:all_projects_use_git)
             # Create new repository
-            repository = Repository.factory("Git")
-            repository.is_default = true
-            @project.repositories << repository
+            @project.repository = Repository.factory("Git")
 
             options = { :create_readme_file => OpenProject::GitHosting::GitoliteWrapper.true?(:init_repositories_on_create) }
 

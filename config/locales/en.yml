@@ -107,31 +107,6 @@ en:
   label_value: Value
 
 
-  ########### GIT NOTIFICATIONS ###########
-  # Basics labels
-  label_git_notifications: Mailing list
-  label_git_notifications_add: Add mailing list
-  label_git_notifications_create: Create mailing list
-  label_git_notifications_edit: Edit mailing list
-  label_git_notifications_delete: Delete mailing list
-
-  # Basics notices
-  notice_git_notifications_created: Mailing list was successfully created
-  notice_git_notifications_updated: Mailing list was successfully updated
-  notice_git_notifications_deleted: Mailing list was successfully deleted
-  notice_git_notifications_create_failed: Failed to create mailing list
-  notice_git_notifications_update_failed: Failed to update mailing list
-
-  # Misc
-  label_git_notification_include_list: Include list
-  label_git_notification_exclude_list: Exclude list
-  label_git_notification_default_list: Default list
-  label_git_notification_effective_list: Effective list
-
-  label_gitolite_notify_prefix: Mailing list prefix
-  label_gitolite_notify_sender_address: Mailing list sender address
-
-
   ########### POST RECEIVE URL ###########
   # Basics labels
   label_post_receive_urls: Post Receive URLs
@@ -211,7 +186,6 @@ en:
   label_enable_smart_http: Smart HTTP Mode
   label_git_daemon: Git Daemon
   label_smart_http: Smart HTTP
-  label_git_notify: Git Notifications
   label_repository_default_branch: Repository default branch
   label_init_repo_with_readme: Initialize this repository with a README
   label_browse_repository: Browse repository
@@ -312,10 +286,6 @@ en:
   permission_view_repository_git_config_keys: View Git config keys
   permission_edit_repository_git_config_keys: Edit Git config keys
 
-  permission_create_repository_git_notifications: Create Git mailing list
-  permission_view_repository_git_notifications: View Git mailing list
-  permission_edit_repository_git_notifications: Edit Git mailing list
-  permission_receive_git_notifications: Receive Git notifications on commit
 
   permission_create_gitolite_ssh_key: Create SSH keys
 
@@ -430,16 +400,6 @@ en:
   label_gitolite_cache_max_time: Max cache time
   label_gitolite_cache_max_size: Max cache element size
   label_gitolite_cache_max_elements: Max cache elements
-
-  # Gitolite Notifications
-  label_tab_notify: Notifications
-  label_gitolite_notify_config: Git Mailing List Configuration
-
-  label_gitolite_notify_by_default: "Enable 'Git Notifications' hook for new repositories by default?"
-  label_gitolite_notify_global_prefix: Git mailing list global prefix
-  label_gitolite_notify_global_sender_address: Git mailing list global sender address
-  label_gitolite_notify_global_include: Git mailing list global include list
-  label_gitolite_notify_global_exclude: Git mailing list global exclude list
 
   # Redmine Config
   label_tab_redmine: Redmine

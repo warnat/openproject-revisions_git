@@ -1,6 +1,8 @@
 module OpenProject::GitHosting::GitoliteWrapper
   class Projects < Admin
 
+    include RepositoriesHelper
+
     def update_projects
       # Reduce list to available projects
       filtered = [*@object_id].map { |id| Project.find_by_id(id) }.compact
@@ -68,37 +70,33 @@ module OpenProject::GitHosting::GitoliteWrapper
     private
 
 
-    def perform_update(projects)
-      projects = (projects.is_a?(Array) ? projects : [projects])
-
-      if projects.detect{|p| p.repositories.detect{|r| r.is_a?(Repository::Git)}}
-        @admin.transaction do
-          projects.each do |project|
-            handle_project_update(project)
-            gitolite_admin_repo_commit("#{project.identifier}")
-          end
+    def perform_update(*projects)
+      @admin.transaction do
+        projects.each do |project|
+          handle_project_update(project)
+          gitolite_admin_repo_commit("#{project.identifier}")
         end
       end
     end
 
 
-    def update_projects_forced(projects)
-      projects = (projects.is_a?(Array) ? projects : [projects])
-
-      if projects.detect{|p| p.repositories.detect{|r| r.is_a?(Repository::Git)}}
-        @admin.transaction do
-          projects.each do |project|
-            handle_project_update(project, true)
-            gitolite_admin_repo_commit("#{project.identifier}")
-          end
+    def update_projects_forced(*projects)
+      @admin.transaction do
+        projects.each do |project|
+          handle_project_update(project, true)
+          gitolite_admin_repo_commit("#{project.identifier}")
         end
       end
     end
 
 
     def handle_project_update(project, force = false)
-      project.gitolite_repos.each do |repository|
-        handle_repository_add(repository, :force => force)
+
+      return unless project.repository.is_a?(Repository::Git)
+      if force == true
+        handle_repository_add(project.repository, :force => true)
+      else
+        handle_repository_update(project.repository)
       end
     end
   end

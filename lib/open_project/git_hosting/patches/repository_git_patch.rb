@@ -14,8 +14,6 @@ module OpenProject::GitHosting
           has_one  :extra, :foreign_key => 'repository_id', :class_name => 'RepositoryGitExtra', :dependent => :destroy
           accepts_nested_attributes_for :extra
 
-          has_one  :git_notification, :foreign_key => 'repository_id', :class_name => 'RepositoryGitNotification', :dependent => :destroy
-
           has_many :repository_mirrors,                :dependent => :destroy, :foreign_key => 'repository_id'
           has_many :repository_post_receive_urls,      :dependent => :destroy, :foreign_key => 'repository_id'
           has_many :repository_deployment_credentials, :dependent => :destroy, :foreign_key => 'repository_id'
@@ -32,12 +30,6 @@ module OpenProject::GitHosting
       end
 
       module ClassMethods
-
-        # Repo ident unique
-        def repo_ident_unique?
-          OpenProject::GitHosting::GitoliteWrapper.true?(:unique_repo_identifier)
-        end
-
 
         # Translate repository path into a unique ID for use in caching of git commands.
         #
@@ -63,41 +55,19 @@ module OpenProject::GitHosting
         end
 
 
-        # Parse a path of the form <proj1>/<proj2>/<proj3>/<repo> and return the specified
-        # repository.  If either 'repo_ident_unique?' is true or the <repo> is a project
-        # identifier, just return the last component.  Otherwise,
-        # use the immediate parent (<proj3>) to try to identify the repo.
+        # Parse a path of the form <proj1>/<proj2>/<proj3>/<projekt>.git and return the specified
+        # project identifier.
         #
-        # Flags:
-        #  :loose => true : Try to identify corresponding repo even if path is not quite correct
-        #
-        # Note that the :loose flag is used when interpreting the contents of the
-        # repository.  If switching back and forth between the "repo_ident_unique?"
-        # form, it will still identify the repository (as long as there are not more than
-        # one repo with the same identifier.
-        #
-        # Example of data captured by regex :
-        # <MatchData "test/test2/test3/test4/test5.git" 1:"test4/" 2:"test4" 3:"test5" 4:".git">
-        # <MatchData "blabla2.git" 1:nil 2:nil 3:"blabla2" 4:".git">
+        # Example: project1/subproject1/myproject.git => 'myproject'
 
         def find_by_path(path, flags = {})
-          if parseit = path.match(/^.*?(([^\/]+)\/)?([^\/]+?)(\.git)?$/)
-            if proj = Project.find_by_identifier(parseit[3])
-              # return default or first repo with blank identifier (or first Git repo--very rare?)
-              proj && (proj.repository || proj.repo_blank_ident || proj.gitolite_repos.first)
-            elsif repo_ident_unique? || flags[:loose] && parseit[2].nil?
-              find_by_identifier(parseit[3])
-            elsif parseit[2] && proj = Project.find_by_identifier(parseit[2])
-              find_by_identifier_and_project_id(parseit[3], proj.id) ||
-              flags[:loose] && find_by_identifier(parseit[3]) || nil
-            else
-              nil
-            end
+          identifier = File.basename(path, ".*")
+          if (project = Project.find_by_identifier(identifier))
+            project.repository
           else
             nil
           end
         end
-
       end
 
 
@@ -240,71 +210,7 @@ module OpenProject::GitHosting
         end
 
 
-        def mailing_list_default_users
-          default_users = project.member_principals.map(&:user).compact.uniq
-          default_users = default_users.select{|user| user.allowed_to?(:receive_git_notifications, project)}.map(&:mail)
-          return default_users.uniq.sort
-        end
-
-
-        def mailing_list_effective
-          mailing_list = {}
-
-          # First collect all project users
-          default_users = mailing_list_default_users
-          if !default_users.empty?
-            default_users.each do |mail|
-              mailing_list[mail] = :project
-            end
-          end
-
-          # Then add global include list
-          if !Setting.plugin_openproject_git_hosting[:gitolite_notify_global_include].empty?
-            Setting.plugin_openproject_git_hosting[:gitolite_notify_global_include].sort.each do |mail|
-              mailing_list[mail] = :global
-            end
-          end
-
-          # Then filter
-          mailing_list = filter_list(mailing_list)
-
-          # Then add local include list
-          if !git_notification.nil? && !git_notification.include_list.empty?
-            git_notification.include_list.sort.each do |mail|
-              mailing_list[mail] = :local
-            end
-          end
-
-          return mailing_list
-        end
-
-
-        def mailing_list_params
-          if !git_notification.nil? && !git_notification.prefix.empty?
-            email_prefix = git_notification.prefix
-          else
-            email_prefix = Setting.plugin_openproject_git_hosting[:gitolite_notify_global_prefix]
-          end
-
-          if !git_notification.nil? && !git_notification.sender_address.empty?
-            sender_address = git_notification.sender_address
-          else
-            sender_address = Setting.plugin_openproject_git_hosting[:gitolite_notify_global_sender_address]
-          end
-
-          params = {
-            :mailing_list   => mailing_list_effective,
-            :email_prefix   => email_prefix,
-            :sender_address => sender_address,
-          }
-
-          return params
-        end
-
-
         def get_full_parent_path
-          return "" if !OpenProject::GitHosting::GitoliteWrapper.true?(:hierarchical_organisation)
-
           parent_parts = []
           p = project
           while p.parent
@@ -316,42 +222,12 @@ module OpenProject::GitHosting
           return parent_parts.join("/")
         end
 
-
-        def exists_in_gitolite?
-          OpenProject::GitHosting.dir_exists?(gitolite_repository_path)
-        end
-
-
         def gitolite_hook_key
           self.extra.key
         end
 
 
         private
-
-
-        def filter_list(mail_list)
-          mailing_list = {}
-          exclude_list = []
-
-          # Build exclusion list
-          if !Setting.plugin_openproject_git_hosting[:gitolite_notify_global_exclude].empty?
-            exclude_list = exclude_list + Setting.plugin_openproject_git_hosting[:gitolite_notify_global_exclude]
-          end
-
-          if !git_notification.nil? && !git_notification.exclude_list.empty?
-            exclude_list = exclude_list + git_notification.exclude_list
-          end
-
-          exclude_list = exclude_list.uniq.sort
-
-          mail_list.each do |mail, from|
-            mailing_list[mail] = from unless exclude_list.include?(mail)
-          end
-
-          return mailing_list
-        end
-
 
         # Set up git urls for new repositories
         def set_git_urls

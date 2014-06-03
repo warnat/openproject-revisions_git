@@ -171,13 +171,7 @@ class GitoliteHooksController < ApplicationController
   # Notice that an empty "repositoryid" is assumed to refer to the default repo for a project
   def find_repository
     if @hook_type == 'redmine'
-      if params[:repositoryid] && !params[:repositoryid].blank?
-        @repository = @project.repositories.find_by_identifier(params[:repositoryid])
-      else
-        # return default or first repo with blank identifier
-        @repository = @project.repository || @project.repo_blank_ident
-      end
-
+      @repository = @project.repository
       if @repository.nil?
         render :partial => 'gitolite_hooks/repository_not_found'
         return

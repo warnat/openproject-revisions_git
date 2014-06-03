@@ -107,31 +107,6 @@ fr:
   label_value: Valeur
 
 
-  ########### GIT NOTIFICATIONS ###########
-  # Basics labels
-  label_git_notifications: Liste de diffusion
-  label_git_notifications_add: Ajouter une liste de diffusion
-  label_git_notifications_create: Créer une liste de diffusion
-  label_git_notifications_edit: Modifier la liste de diffusion
-  label_git_notifications_delete: Effacer la liste de diffusion
-
-  # Basics notices
-  notice_git_notifications_created: Liste de diffusion créée avec succès
-  notice_git_notifications_updated: Liste de diffusion modifiée avec succès
-  notice_git_notifications_deleted: Liste de diffusion effacée avec succès
-  notice_git_notifications_create_failed: Échec de création de la liste de diffusion
-  notice_git_notifications_update_failed: Échec de modification de la liste de diffusion
-
-  # Misc
-  label_git_notification_include_list: Liste d'inclusion
-  label_git_notification_exclude_list: Liste d'exclusion
-  label_git_notification_default_list: Liste par défaut
-  label_git_notification_effective_list: Liste effective
-
-  label_gitolite_notify_prefix: Préfixe de la liste de diffusion
-  label_gitolite_notify_sender_address: Adresse de l'expéditeur de la liste de diffusion
-
-
   ########### POST RECEIVE URL ###########
   # Basics labels
   label_post_receive_urls: URL après réception
@@ -207,7 +182,6 @@ fr:
   label_enable_smart_http: Mode Smart HTTP
   label_git_daemon: Daemon Git
   label_smart_http: Smart HTTP
-  label_git_notify: Notifications Git
   label_repository_default_branch: Branche par défaut
   label_init_repo_with_readme: Initialiser le dépôt avec un fichier README
   label_browse_repository: Parcourir les sources
@@ -307,11 +281,6 @@ fr:
   permission_create_repository_git_config_keys: Créer des clés de configuration Git
   permission_view_repository_git_config_keys: Voir des clés de configuration Git
   permission_edit_repository_git_config_keys: Modifier des clés de configuration Git
-
-  permission_create_repository_git_notifications: Créer des listes de distributions git
-  permission_view_repository_git_notifications: Voir les listes de distribution git
-  permission_edit_repository_git_notifications: Modifier les listes de distribution git
-  permission_receive_git_notifications: Recevoir des notifications à chaque commit git
 
   permission_create_gitolite_ssh_key: Créer des clés SSH
 
@@ -420,16 +389,6 @@ fr:
   label_gitolite_cache_max_time: Temps maximal du cache
   label_gitolite_cache_max_size: Taille maximale d'un élément du cache
   label_gitolite_cache_max_elements: Nombre maximal d'éléments dans le cache
-
-  # Gitolite Notifications
-  label_tab_notify: Notifications
-  label_gitolite_notify_config: Configuration des listes de diffusions de Git
-
-  label_gitolite_notify_by_default: Activer le hook « Notifications Git » pour les nouveaux dépôts par défaut
-  label_gitolite_notify_global_prefix: Préfixe global des notifications
-  label_gitolite_notify_global_sender_address: Adresse de l'expéditeur des notifications
-  label_gitolite_notify_global_include: Liste d'inclusion globale des notifications
-  label_gitolite_notify_global_exclude: Liste d'exclusion globale des notifications
 
   # Redmine Config
   label_tab_redmine: Redmine
