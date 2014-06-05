@@ -2,52 +2,38 @@ module OpenProject::GitHosting::GitoliteWrapper
   module RepositoriesHelper
 
     def handle_repository_add(repository, opts = {})
-      force = (opts.has_key?(:force) && opts[:force] == true) || false
-      old_perms = (opts.has_key?(:old_perms) && opts[:old_perms].is_a?(Hash)) ? opts[:old_perms] : {}
-
       repo_name = repository.gitolite_repository_name
       repo_path = repository.gitolite_repository_path
-      repo_conf = @gitolite_config.repos[repo_name]
+      project   = repository.project
 
-      if !repo_conf
-        logger.info { "#{@action} : repository '#{repo_name}' does not exist in Gitolite, create it ..." }
-        logger.debug { "#{@action} : repository path '#{repo_path}'" }
-        old_permissions = old_perms
-      else
-        if force
-          logger.warn { "#{@action} : repository '#{repo_name}' already exists in Gitolite, force mode !" }
-          logger.debug { "#{@action} : repository path '#{repo_path}'" }
-          old_permissions = get_old_permissions(repo_conf)
-          @gitolite_config.rm_repo(repo_name)
-        else
-          logger.warn { "#{@action} : repository '#{repo_name}' already exists in Gitolite, exit !" }
-          logger.debug { "#{@action} : repository path '#{repo_path}'" }
-          return false
-        end
+      if @gitolite_config.repos[repo_name]
+        logger.warn { "#{@action} : repository '#{repo_name}' already exists in Gitolite, removing first" }
+        @gitolite_config.rm_repo(repo_name)
       end
 
-      do_update_repository(repository, old_permissions)
+      # Create new repo object
+      repo_conf = Gitolite::Config::Repo.new(repo_name)
+      set_repo_config_keys(repo_conf, repository)
+
+      @gitolite_config.add_repo(repo_conf)
+      repo_conf.permissions = [build_permissions(repository)]
     end
 
 
-    def handle_repository_update(repository)
-      byebug
-      repo_name = repository.gitolite_repository_name
-      repo_path = repository.gitolite_repository_path
-      repo_conf = @gitolite_config.repos[repo_name]
+    #
+    # Sets the git config-keys for the given repo configuration
+    #
+    def set_repo_config_keys(repo_conf, repository)
+      # Set post-receive hook params
+      repo_conf.set_git_config("openproject.githosting.projectid", repository.project.identifier.to_s)
+      repo_conf.set_git_config("openproject.githosting.repositorykey", repository.extra[:key])
+      repo_conf.set_git_config("http.uploadpack", (User.anonymous.allowed_to?(:view_changesets, repository.project) ||
+        repository.extra[:git_http]))
 
-      if repo_conf
-        logger.info { "#{@action} : repository '#{repo_name}' exists in Gitolite, update it ..." }
-        logger.debug { "#{@action} : repository path '#{repo_path}'" }
-        old_perms = get_old_permissions(repo_conf)
-        @gitolite_config.rm_repo(repo_name)
-      else
-        logger.warn { "#{@action} : repository '#{repo_name}' does not exist in Gitolite, exit !" }
-        logger.debug { "#{@action} : repository path '#{repo_path}'" }
-        return false
+      # Set Git config keys
+      repository.repository_git_config_keys.each do |config_entry|
+        repo_conf.set_git_config(config_entry.key, config_entry.value)
       end
-
-      do_update_repository(repository, old_perms)
     end
 
 
@@ -56,14 +42,11 @@ module OpenProject::GitHosting::GitoliteWrapper
       repo_path = repository_data['repo_path']
       repo_conf = @gitolite_config.repos[repo_name]
 
-      if !repo_conf
-        logger.warn { "#{@action} : repository '#{repo_name}' does not exist in Gitolite, exit !" }
-        logger.debug { "#{@action} : repository path '#{repo_path}'" }
-        return false
-      else
-        logger.info { "#{@action} : repository '#{repo_name}' exists in Gitolite, delete it ..." }
-        logger.debug { "#{@action} : repository path '#{repo_path}'" }
+      if repo_conf
         @gitolite_config.rm_repo(repo_name)
+      else
+        logger.warn { "#{@action} : repository '#{repo_name}' does not exist in Gitolite" }
+        logger.debug { "#{@action} : repository path '#{repo_path}'" }
       end
     end
 
@@ -86,45 +69,6 @@ module OpenProject::GitHosting::GitoliteWrapper
         gitolite_admin_repo_commit("#{@action} : #{project.identifier} | #{repo_list}")
       end
     end
-
-
-    def do_update_repository(repository, old_permissions)
-      repo_name = repository.gitolite_repository_name
-      repo_conf = @gitolite_config.repos[repo_name]
-      project   = repository.project
-
-      # Create new repo object
-      repo_conf = Gitolite::Config::Repo.new(repo_name)
-
-      # Set post-receive hook params
-      repo_conf.set_git_config("OpenProject::GitHosting.projectid", repository.project.identifier.to_s)
-      repo_conf.set_git_config("OpenProject::GitHosting.repositorykey", repository.extra[:key])
-
-      if project.active?
-        if User.anonymous.allowed_to?(:view_changesets, project) || repository.extra[:git_http] != 0
-          repo_conf.set_git_config("http.uploadpack", 'true')
-        else
-          repo_conf.set_git_config("http.uploadpack", 'false')
-        end
-
-        # Set Git config keys
-        if repository.repository_git_config_keys.any?
-          repository.repository_git_config_keys.each do |git_config_key|
-            repo_conf.set_git_config(git_config_key.key, git_config_key.value)
-          end
-        end
-      else
-        repo_conf.set_git_config("http.uploadpack", 'false')
-      end
-
-      @gitolite_config.add_repo(repo_conf)
-
-      current_permissions = build_permissions(repository)
-      current_permissions = merge_permissions(current_permissions, old_permissions)
-
-      repo_conf.permissions = [current_permissions]
-    end
-
 
     def do_move_repositories(repository)
       repo_id   = repository.redmine_name
@@ -161,10 +105,8 @@ module OpenProject::GitHosting::GitoliteWrapper
           repository.update_column(:url, new_relative_path)
           repository.update_column(:root_url, new_relative_path)
 
-          # update gitolite conf
-          old_perms = get_old_permissions(repo_conf)
           @gitolite_config.rm_repo(old_repo_name)
-          handle_repository_add(repository, :force => true, :old_perms => old_perms)
+          handle_repository_add(repository, :force => true)
         else
           return false
         end
@@ -172,77 +114,9 @@ module OpenProject::GitHosting::GitoliteWrapper
 
     end
 
-
-    SKIP_USERS = [ 'gitweb', 'daemon', 'DUMMY_REDMINE_KEY', 'REDMINE_ARCHIVED_PROJECT', 'REDMINE_CLOSED_PROJECT' ]
-
-    def get_old_permissions(repo_conf)
-      current_permissions = repo_conf.permissions[0]
-      old_permissions = {}
-
-      current_permissions.each do |perm, branch_settings|
-        old_permissions[perm] = {}
-
-        branch_settings.each do |branch, user_list|
-          next if user_list.empty?
-
-          new_user_list = []
-
-          user_list.each do |user|
-            # ignore skip users
-            next if SKIP_USERS.include?(user)
-
-            # backup users that are not Redmine users
-            if !user.include?(@gitolite_identifier_prefix)
-              new_user_list.push(user)
-            end
-          end
-
-          if new_user_list.any?
-            old_permissions[perm][branch] = new_user_list
-          end
-        end
-      end
-
-      return old_permissions
-    end
-
-
-    def merge_permissions(current_permissions, old_permissions)
-      merge_permissions = {}
-      merge_permissions['RW+'] = {}
-      merge_permissions['RW'] = {}
-      merge_permissions['R'] = {}
-
-      current_permissions.each do |perm, branch_settings|
-        branch_settings.each do |branch, user_list|
-          if user_list.any?
-            if !merge_permissions[perm].has_key?(branch)
-              merge_permissions[perm][branch] = []
-            end
-            merge_permissions[perm][branch] += user_list
-          end
-        end
-      end
-
-      old_permissions.each do |perm, branch_settings|
-        branch_settings.each do |branch, user_list|
-          if user_list.any?
-            if !merge_permissions[perm].has_key?(branch)
-              merge_permissions[perm][branch] = []
-            end
-            merge_permissions[perm][branch] += user_list
-          end
-        end
-      end
-
-      merge_permissions.each do |perm, branch_settings|
-        merge_permissions.delete(perm) if merge_permissions[perm].empty?
-      end
-
-      return merge_permissions
-    end
-
-
+    # Builds the set of permissions for all
+    # users and deploy keys of the repository
+    #
     def build_permissions(repository)
       users   = repository.project.member_principals.map(&:user).compact.uniq
       project = repository.project
@@ -305,6 +179,7 @@ module OpenProject::GitHosting::GitoliteWrapper
     end
 
 
+    # TODO
     def is_repository_empty?(new_path)
       empty_repo = false
 
@@ -325,6 +200,7 @@ module OpenProject::GitHosting::GitoliteWrapper
     end
 
 
+    # TODO
     def move_physical_repo(old_path, new_path, new_parent_path)
       ## CASE 0
       if old_path == new_path

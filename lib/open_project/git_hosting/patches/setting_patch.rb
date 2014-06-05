@@ -102,26 +102,6 @@ module OpenProject::GitHosting
               end
             end
 
-
-            # Normalize Config File
-            if valuehash[:gitolite_config_file]
-              # Must be relative!
-              normalizedFile  = File.expand_path(valuehash[:gitolite_config_file].lstrip.rstrip, "/")
-              if (normalizedFile != "/")
-                # Clobber leading '/'
-                valuehash[:gitolite_config_file] = normalizedFile[1..-1]
-              else
-                valuehash[:gitolite_config_file] = OpenProject::GitHosting::GitoliteWrapper::GITOLITE_DEFAULT_CONFIG_FILE
-              end
-
-              # Repair key must be true if default path
-              if valuehash[:gitolite_config_file] == OpenProject::GitHosting::GitoliteWrapper::GITOLITE_DEFAULT_CONFIG_FILE
-                valuehash[:gitolite_config_has_admin_key] = 'true'
-                valuehash[:gitolite_identifier_prefix] = OpenProject::GitHosting::GitoliteWrapper::GITOLITE_IDENTIFIER_DEFAULT_PREFIX
-              end
-            end
-
-
             # Normalize paths, should be relative and end in '/'
             [ :gitolite_global_storage_dir, :gitolite_recycle_bin_dir ].each do |setting|
               if valuehash[setting]
@@ -164,41 +144,6 @@ module OpenProject::GitHosting
                 valuehash[:gitolite_server_port] = "#{valuehash[:gitolite_server_port].to_i}"
               else
                 valuehash[:gitolite_server_port] = @@old_valuehash[:gitolite_server_port]
-              end
-            end
-
-
-            # Validate gitolite_notify mail list
-            [ :gitolite_notify_global_include, :gitolite_notify_global_exclude ].each do |setting|
-              if !valuehash[setting].empty?
-                valuehash[setting] = valuehash[setting].select{|mail| !mail.blank?}
-                has_error = 0
-
-                valuehash[setting].each do |item|
-                  has_error += 1 unless item =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i
-                end unless valuehash[setting].empty?
-
-                if has_error > 0
-                  valuehash[setting] = @@old_valuehash[setting]
-                end
-              end
-            end
-
-
-            # Validate intersection of global_include/global_exclude
-            intersection = valuehash[:gitolite_notify_global_include] & valuehash[:gitolite_notify_global_exclude]
-            if intersection.length.to_i > 0
-              valuehash[:gitolite_notify_global_include] = @@old_valuehash[:gitolite_notify_global_include]
-              valuehash[:gitolite_notify_global_exclude] = @@old_valuehash[:gitolite_notify_global_exclude]
-            end
-
-
-            # Validate global sender address
-            if valuehash[:gitolite_notify_global_sender_address].blank?
-              valuehash[:gitolite_notify_global_sender_address] = Setting.mail_from.to_s.strip.downcase
-            else
-              if !/^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i.match(valuehash[:gitolite_notify_global_sender_address])
-                valuehash[:gitolite_notify_global_sender_address] = @@old_valuehash[:gitolite_notify_global_sender_address]
               end
             end
 
@@ -298,11 +243,7 @@ module OpenProject::GitHosting
 
             ## Gitolite config file has changed, create a new one!
             if @@old_valuehash[:gitolite_config_file] != valuehash[:gitolite_config_file] ||
-               @@old_valuehash[:gitolite_config_has_admin_key] != valuehash[:gitolite_config_has_admin_key] ||
-               @@old_valuehash[:gitolite_notify_global_prefix] != valuehash[:gitolite_notify_global_prefix] ||
-               @@old_valuehash[:gitolite_notify_global_sender_address] != valuehash[:gitolite_notify_global_sender_address] ||
-               @@old_valuehash[:gitolite_notify_global_include] != valuehash[:gitolite_notify_global_include] ||
-               @@old_valuehash[:gitolite_notify_global_exclude] != valuehash[:gitolite_notify_global_exclude]
+               @@old_valuehash[:gitolite_config_has_admin_key] != valuehash[:gitolite_config_has_admin_key]
                 # Need to update everyone!
                 projects = Project.active_or_archived.includes(:repositories).all
                 if projects.length > 0
@@ -326,7 +267,7 @@ module OpenProject::GitHosting
               projects = Project.active_or_archived.includes(:repositories).all
               if projects.length > 0
                 OpenProject::GitHosting::GitHosting.logger.info("Forced resync of all projects (#{projects.length})...")
-                OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects_forced, projects.length)
+                OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects, projects.length)
               end
 
               @@resync_projects = false

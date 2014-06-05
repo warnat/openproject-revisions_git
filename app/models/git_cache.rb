@@ -1,5 +1,5 @@
 class GitCache < ActiveRecord::Base
   unloadable
 
-  attr_accessible :command, :command_output, :repo_identifier
+  attr_accessible :command, :command_output, :project_identifier
 end

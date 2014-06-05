@@ -1,60 +1,66 @@
 module OpenProject::GitHosting::GitoliteWrapper
   class Users < Admin
 
-    include OpenProject::GitHosting::GitoliteWrapper::UsersHelper
-
-
     def add_ssh_key
-      object = User.find_by_id(@object_id)
-      update_user(object)
-    end
-
-
-    def update_ssh_keys
-      object = User.find_by_id(@object_id)
-      update_user(object)
+      key = @object_id
+      logger.info("Adding SSH key for user '#{key.user.login}'")
+      @admin.transaction do
+        add_gitolite_key(key)
+        gitolite_admin_repo_commit("#{key.title} for #{key.user.login}")
+      end
     end
 
 
     def delete_ssh_key
-      object = @object_id
-      delete_ssh_keys(object)
+      key = @object_id
+      logger.info("Deleting SSH key #{key[:identifier]}")
+      @admin.transaction do
+        remove_gitolite_key(key)
+        gitolite_admin_repo_commit("#{key[:title]}")
+      end
     end
 
 
     def update_all_ssh_keys_forced
-      object = User.includes(:gitolite_public_keys).all
-      update_all_ssh_keys(object)
+      users = User.includes(:gitolite_public_keys).all.select {|u| u.gitolite_public_keys.any?}
+      @admin.transaction do
+        users.each do |user|
+          user.gitolite_public_keys.each do |key|
+            add_gitolite_key
+          end
+        end
+        gitolite_admin_repo_commit("Added SSH keys for #{users.size} users")
+      end
     end
 
 
     private
 
-
-    def update_user(user)
-      @admin.transaction do
-        handle_user_update(user)
-        gitolite_admin_repo_commit("#{user.login}")
+    def add_gitolite_key(key)
+      parts = key.key.split
+      repo_keys = @admin.ssh_keys[key.identifier]
+      repo_key = repo_keys.find_all{|k| k.location == key.title && k.ownidentifierer == key.identifier}.first
+      if repo_key
+        logger.info("#{@action} : SSH key '#{key.identifier}@#{key.location}' exists, updating ...")
+        repo_key.type, repo_key.blob, repo_key.email = parts
+        repo_key.owner = key.identifier
+        repo_key.location = key.title
+      else
+        repo_key = Gitolite::SSHKey.new(parts[0], parts[1], parts[2], key.identifier, key.title)
+        @admin.add_key(repo_key)
       end
     end
 
 
-    def delete_ssh_keys(ssh_key)
-      @admin.transaction do
-        handle_ssh_key_delete(ssh_key)
-        gitolite_admin_repo_commit("#{ssh_key['title']}")
-      end
-    end
+    def remove_gitolite_key(key)
+      repo_keys = @admin.ssh_keys[key[:owner]]
+      repo_key  = repo_keys.find_all{|k| k.location == key[:location] && k.owner == key[:owner]}.first
 
-
-    def update_all_ssh_keys(users)
-      @admin.transaction do
-        users.each do |user|
-          if user.gitolite_public_keys.any?
-            handle_user_update(user)
-            gitolite_admin_repo_commit("#{user.login}")
-          end
-        end
+      if repo_key
+        @admin.rm_key(repo_key)
+      else
+        logger.info("#{@action} : SSH key '#{key[:owner]}@#{key[:location]}' does not exits in Gitolite, exit !")
+        return false
       end
     end
 

@@ -5,7 +5,7 @@ module OpenProject::GitHosting::GitoliteWrapper
 
 
     def add_repository
-      repository = Repository.find_by_id(@object_id)
+      repository = @object_id
 
       @admin.transaction do
 
@@ -18,12 +18,10 @@ module OpenProject::GitHosting::GitoliteWrapper
 
 
     def update_repository
-      repository = Repository.find_by_id(@object_id)
+      repository = @object_id
 
-      @admin.transaction do
-        handle_repository_update(repository)
-        gitolite_admin_repo_commit("#{repository.gitolite_repository_name}")
-      end
+      # We override the repository in gitolite anyway
+      add_repository
 
       # Treat options
       if @options.has_key?(:delete_git_config_key) && !@options[:delete_git_config_key].empty?
@@ -33,10 +31,8 @@ module OpenProject::GitHosting::GitoliteWrapper
 
 
     def delete_repositories
-      repositories_array = @object_id
-
       @admin.transaction do
-        repositories_array.each do |repository_data|
+        @object_id.each do |repository_data|
           handle_repository_delete(repository_data)
 
           recycle = OpenProject::GitHosting::Recycle.new

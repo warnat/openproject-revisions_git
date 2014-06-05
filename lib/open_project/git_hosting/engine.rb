@@ -13,16 +13,14 @@ module OpenProject::GitHosting
         :gitolite_ssh_public_key        => File.join(Dir.home, '.ssh', 'id_rsa.pub').to_s,
 
         # Gitolite Storage Config
-        :gitolite_global_storage_dir    => File.join(Dir.home, 'repositories'),
+        :gitolite_global_storage_dir    => 'repositories/',
         :gitolite_redmine_storage_dir   => '',
         :gitolite_recycle_bin_dir       => 'recycle_bin/',
 
         # Gitolite Config File
         :gitolite_admin_dir                    => File.join(Dir.home, 'gitolite-admin'),
-        :gitolite_identifier_prefix            => 'openproject_',
 
         # Gitolite Global Config
-        :gitolite_temp_dir                     => Dir.mktmpdir('gitolite_tmp').to_s,
         :gitolite_scripts_dir                  => File.join(Dir.home, 'bin'),
         :gitolite_timeout                      => 10,
         :gitolite_recycle_bin_expiration_time  => 24.0,

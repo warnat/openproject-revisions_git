@@ -46,7 +46,7 @@ module OpenProject::GitHosting
           if request.post? && @repository.is_a?(Repository::Git) && !@repository.errors.any?
 
               OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{@repository.gitolite_repository_name}'")
-              OpenProject::GitHosting::GitoliteWrapper.update(:add_repository, @repository.id)
+              OpenProject::GitHosting::GitoliteWrapper.update(:add_repository, @repository)
           end
         end
 
@@ -71,7 +71,7 @@ module OpenProject::GitHosting
 
               ## Update repository
               OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has modified repository '#{@repository.gitolite_repository_name}'")
-              OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @repository.id)
+              OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @repository)
 
               ## Update repository default branch
               if update_default_branch

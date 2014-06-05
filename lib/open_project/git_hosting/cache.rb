@@ -418,7 +418,7 @@ module OpenProject::GitHosting
       repo_id = repository.git_cache_id
 
       # Clear cache
-      old_cached = GitCache.find_all_by_repo_identifier(repo_id)
+      old_cached = GitCache.find_all_by_project_identifier(repo_id)
       if old_cached != nil
         old_ids = old_cached.collect(&:id)
         GitCache.destroy(old_ids)

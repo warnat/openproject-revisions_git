@@ -9,9 +9,6 @@
   belongs_to :user
   has_many   :repository_deployment_credentials, :dependent => :destroy
 
-  scope :active,   -> { where active: true }
-  scope :inactive, -> { where active: false }
-
   scope :user_key,   -> { where key_type: KEY_TYPE_USER }
   scope :deploy_key, -> { where key_type: KEY_TYPE_DEPLOY }
 
@@ -22,6 +19,7 @@
   validates_uniqueness_of :identifier, :scope => :user_id
 
   validates_associated :repository_deployment_credentials
+  validates_format_of :title, :with => /\A[a-z0-9_\-]*\z/i
 
   validate :has_not_been_changed
   validate :key_correctness
@@ -40,52 +38,40 @@
     where("user_id = ?", user.id)
   end
 
+  # Returns the path to this key under the gitolite keydir
+  # resolves to <user.gitolite_identifier>/<title>/<identifier>.pub
+  #
+  # The root folder for this user is the user's identifier
+  # for logical grouping of their keys, which are organized
+  # by their title in subfolders.
+  #
+  # This is due to the new gitolite multi-keys organization
+  # using folders. See http://gitolite.com/gitolite/users.html
+  def key_path
+    File.join(self.user.gitolite_identifier, self.title, self.identifier)
+  end
 
   def to_s
     title
   end
 
-
-
+  # Returns the unique identifier for this key based on the key_type
+  #
+  # For user public keys, this simply is the user's gitolite_identifier.
+  # For deployment keys, we use an incrementing number.
   def set_identifier
     self.identifier ||=
       begin
-        my_time = Time.now
-        time_tag = "#{my_time.to_i.to_s}_#{my_time.usec.to_s}"
-        key_count = GitolitePublicKey.by_user(self.user).deploy_key.length + 1
         case key_type
           when KEY_TYPE_USER
-            # add "redmine_" as a prefix to the username, and then the current date
-            # this helps ensure uniqueness of each key identifier
-            #
-            # also, it ensures that it is very, very unlikely to conflict with any
-            # existing key name if gitolite config is also being edited manually
-            "#{self.user.gitolite_identifier}" << "@redmine_" << "#{time_tag}".gsub(/[^0-9a-zA-Z\-]/, '_')
+            self.user.gitolite_identifier
           when KEY_TYPE_DEPLOY
-            # add "redmine_deploy_key_" as a prefix, and then the current date
-            # to help ensure uniqueness of each key identifier
-            # "redmine_#{DEPLOY_PSEUDO_USER}_#{time_tag}".gsub(/[^0-9a-zA-Z\-]/, '_') << "@redmine_" << "#{time_tag}".gsub(/[^0-9a-zA-Z\-]/, '_')
-            "#{self.user.gitolite_identifier}_#{DEPLOY_PSEUDO_USER}_#{key_count}".gsub(/[^0-9a-zA-Z\-]/, '_') << "@redmine_" << "#{time_tag}".gsub(/[^0-9a-zA-Z\-]/, '_')
+            "#{self.user.gitolite_identifier}_#{DEPLOY_PSEUDO_USER}"
           else
             nil
-          end
         end
+      end
   end
-
-
-  # Make sure that current identifier is consistent with current user login.
-  # This method explicitly overrides the static nature of the identifier
-  def reset_identifier
-    # Fix identifier
-    self.identifier = nil
-    set_identifier
-
-    # Need to override the "never change identifier" constraint
-    self.save(:validate => false)
-
-    self.identifier
-  end
-
 
   # Key type checking functions
   def user_key?
@@ -97,36 +83,18 @@
     key_type == KEY_TYPE_DEPLOY
   end
 
-
-  def owner
-    self.identifier.split('@')[0]
-  end
-
-
-  def location
-    self.identifier.split('@')[1]
-  end
-
-
   protected
 
-
   def add_ssh_key
-    OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has added a SSH key")
-    OpenProject::GitHosting::GitoliteWrapper.update(:add_ssh_key, self.user.id)
+    OpenProject::GitHosting::GitoliteWrapper.update(:add_ssh_key, self)
   end
 
 
   def destroy_ssh_key
     OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has deleted a SSH key")
 
-    repo_key = {}
-    repo_key['title']    = self.identifier
-    repo_key['key']      = self.key
-    repo_key['location'] = self.location
-    repo_key['owner']    = self.owner
+    repo_key = { title: self.title, key: self.key, location: self.title, owner: self.identifier, identifier: self.identifier }
 
-    OpenProject::GitHosting::GitHosting.logger.info("Delete SSH key #{self.identifier}")
     OpenProject::GitHosting::GitoliteWrapper.update(:delete_ssh_key, repo_key)
   end
 

@@ -41,7 +41,7 @@ module OpenProject::GitHosting
           # Return cached value if pesent
           return @@cached_id if @@cached_path == repo_path
 
-          repo = Repository::Git.find_by_path(repo_path, :loose => true)
+          repo = Repository::Git.find_by_path(repo_path)
 
           if repo
             # Cache translated id path, return id
@@ -98,6 +98,7 @@ module OpenProject::GitHosting
 
         def gitolite_repository_path
           File.join(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir],
+            get_full_parent_path,
             "#{gitolite_repository_name}.git")
         end
 

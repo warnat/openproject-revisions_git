@@ -44,7 +44,6 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
         t.column :title, :string, :null => false
         t.column :identifier, :string, :null => false
         t.column :key, :text, :null => false
-        t.column :active, :boolean, :default => true
         t.column :key_type, :integer, :null => false,
                  :default => GitolitePublicKey::KEY_TYPE_USER
         t.column :delete_when_unused, :boolean, :default => true
@@ -58,19 +57,18 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
       create_table :git_caches do |t|
         t.column :command, :text, :null => false
         t.column :command_output, :binary, :null => false
-        t.column :proj_identifier, :string
+        t.column :project_identifier, :string
         t.timestamps
       end
 
       create_table :repository_mirrors do |t|
-        t.references :project, :null => false
+        t.references :repository, :null => false
         t.column :active, :boolean, :default => true
         t.column :url, :string, :null => false
         t.column :push_mode, :integer, :default => 0, :null => false
         t.column :include_all_branches, :boolean, :default => false
         t.column :include_all_tags, :boolean, :default => false
         t.column :explicit_refspec, :string, :default => ""
-        t.references :project
         t.timestamps
       end
 
@@ -84,11 +82,10 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
       end
 
       create_table :repository_post_receive_urls do |t|
-        t.references :project, :null => false
+        t.references :repository, :null => false
         t.column :active, :boolean, :default => true
         t.column :url, :string, :null => false
         t.column :mode, :string, :default => "github"
-        t.references :project
         t.timestamps
       end
 
@@ -123,6 +120,13 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
       # Roles
       #
 
+      if Redmine::DefaultData::Loader.no_data?
+        puts "Redmine Roles have not yet been seeded. Loading them now."
+        # Ensure previous migrations have run
+        Role.reset_column_information
+        Redmine::DefaultData::Loader.load('en')
+      end
+
       manager_role_name = I18n.t(:default_role_manager, {:locale => 'en'})
       puts "Updating role : '#{manager_role_name}'..."
       manager_role = Role.find_by_name(manager_role_name)
@@ -140,7 +144,6 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
         manager_role.add_permission! :create_deployment_keys
         manager_role.add_permission! :edit_deployment_keys
         manager_role.save
-        puts "done !"
       else
         puts "Role '#{manager_role_name}' not found, exit !"
       end
@@ -153,12 +156,9 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
         developer_role.add_permission! :view_repository_post_receive_urls
         developer_role.add_permission! :view_deployment_keys
         developer_role.save
-        puts "done !"
       else
         puts "Role '#{developer_role_name}' not found, exit !"
       end
-
-
 
     end
 

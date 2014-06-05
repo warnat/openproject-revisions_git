@@ -24,8 +24,12 @@ module OpenProject::GitHosting
       module InstanceMethods
 
 
+        #
+        # Returns a unique identifier for this user to use for gitolite keys.
+        # As login names may change (i.e., user renamed), we use the user id
+        # with its login name as a prefix for readibility.
         def gitolite_identifier
-          "#{Setting.plugin_openproject_git_hosting[:gitolite_identifier_prefix]}#{self.login.underscore}".gsub(/[^0-9a-zA-Z\-]/, '_')
+          [self.login.underscore.gsub(/[^0-9a-zA-Z\-]/, '_'), '_', self.id].join
         end
 
 
@@ -34,7 +38,7 @@ module OpenProject::GitHosting
 
         def update_repositories
           if status_has_changed
-            git_projects = self.projects.uniq.select{|p| p.gitolite_repos.any?}.map{|project| project.id}
+            git_projects = self.projects.uniq.select{|p| p.gitolite_repos.any?}
 
             OpenProject::GitHosting::GitHosting.logger.info { "User status has changed, update projects" }
             OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, git_projects)

@@ -18,7 +18,7 @@ module OpenProject::GitHosting
 
         def update_member
           OpenProject::GitHosting::GitHosting.logger.info("Membership changes on project '#{self.project}', update!")
-          OpenProject::GitHosting::GitoliteWrapper.update(:update_members, self.project.id)
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, self.project.repository)
         end
 
       end

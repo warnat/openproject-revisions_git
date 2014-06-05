@@ -55,15 +55,13 @@ module OpenProject::GitHosting
           projects = @project.self_and_descendants
 
           # Only take projects that have Git repos.
-          git_projects = projects.uniq.select{|p| p.gitolite_repos.any?}
+          git_projects = projects.uniq.select{|p| p.repository && p.repository.is_a?(Repository::Git)}
 
           git_projects.reverse.each do |project|
-            project.gitolite_repos.reverse.each do |repository|
-              repository_data = {}
-              repository_data['repo_name']   = repository.gitolite_repository_name
-              repository_data['repo_path']   = repository.gitolite_repository_path
-              destroy_repositories.push(repository_data)
-            end
+            repository_data = {}
+            repository_data['repo_name']   = project.repository.gitolite_repository_name
+            repository_data['repo_path']   = project.repository.gitolite_repository_path
+            destroy_repositories.push(repository_data)
           end
 
           destroy_without_git_hosting(&block)
@@ -84,7 +82,7 @@ module OpenProject::GitHosting
           unarchive_without_git_hosting(&block)
 
           OpenProject::GitHosting::GitHosting.logger.info("Project has been unarchived, update it : '#{@project}'")
-          OpenProject::GitHosting::GitoliteWrapper.update(:update_project, @project.id)
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @project.repository)
         end
 
 
@@ -95,7 +93,7 @@ module OpenProject::GitHosting
           projects = @project.self_and_descendants
 
           # Only take projects that have Git repos.
-          git_projects = projects.uniq.select{|p| p.gitolite_repos.any?}.map{|project| project.id}
+          git_projects = projects.uniq.select{|p| p.gitolite_repos.any?}
 
           OpenProject::GitHosting::GitHosting.logger.info(message)
           OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, git_projects)
@@ -111,7 +109,7 @@ module OpenProject::GitHosting
 
 
             OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{repository.gitolite_repository_name}'" )
-            OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, @project.id)
+            OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @project.repository)
           end
         end
 
@@ -125,7 +123,7 @@ module OpenProject::GitHosting
             end
           end
           OpenProject::GitHosting::GitHosting.logger.info("Set Git daemon for repositories of project : '#{@project}'" )
-          OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, @project.id)
+          OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @project.repository)
         end
       end
     end

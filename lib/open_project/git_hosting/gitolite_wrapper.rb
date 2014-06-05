@@ -143,12 +143,35 @@ module OpenProject::GitHosting
 
     #
     # Execute a command as the gitolite user defined in +GitoliteWrapper.gitolite_user+.
-    # 
+    #
     # Will shell out to +sudo -n -u <gitolite_user> params+
     #
     def self.sudo_shell(*params)
       GitHosting.shell('sudo', *sudo_shell_params.concat(params))
     end
+
+    #
+    # Execute a command as the gitolite user defined in +GitoliteWrapper.gitolite_user+.
+    #
+    # Instead of capturing the command, it calls the block with the stdout pipe.
+    # Raises an exception if the command does not exit with 0.
+    #
+    def self.sudo_pipe(*params, &block)
+      Open3.popen3("sudo", *sudo_shell_params.concat(params))  do |stdin, stdout, stderr, thr|
+        begin
+          exitcode = thr.value.exitstatus
+          if exitcode != 0
+            logger.error("sudo call with '#{params.join(" ")}' returned exit #{exitcode}. Error was: #{stderr.read}")
+          else
+            block.call(stdout)
+          end
+        ensure
+          stdout.close
+          stdin.close
+        end
+      end
+    end
+
 
     # Return only the output of the shell command
     # Throws an exception if the shell command does not exit with code 0.
@@ -159,11 +182,11 @@ module OpenProject::GitHosting
     # Returns the sudo prefix to all sudo_* commands
     #
     # These are as follows:
-    # * (-H) sets home to `gitolite_user` at all times
+    # * (-i) login as `gitolite_user` (setting ENV['HOME')
     # * (-n) non-interactive
     # * (-u `gitolite_user`) target user
     def self.sudo_shell_params
-      ['-H', '-n', '-u', gitolite_user]
+      ['-i', '-n', '-u', gitolite_user]
     end
 
     # Execute a command in the gitolite forced environment through this user
