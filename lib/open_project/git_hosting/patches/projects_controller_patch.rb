@@ -34,47 +34,42 @@ module OpenProject::GitHosting
         def update_with_git_hosting(&block)
           update_without_git_hosting(&block)
 
-          update = true
+          return if @project.repository.nil?
 
-          if @project.gitolite_repos.detect {|repo| repo.url != repo.gitolite_repository_path || repo.url != repo.root_url}
-            # Hm... something about parent hierarchy changed.  Update us and our children
-            update = false
+          if @project.repository.url != @project.repository.gitolite_repository_path ||
+             @project.repository.url != @project.repository.root_url
 
             OpenProject::GitHosting::GitHosting.logger.info("Move repositories of project : '#{@project}'")
             OpenProject::GitHosting::GitoliteWrapper.(:move_repositories, @project.id)
+          else
+            # Adjust daemon status
+            disable_git_daemon_if_not_public
           end
-
-          # Adjust daemon status
-          disable_git_daemon_if_not_public if update
         end
 
 
         def destroy_with_git_hosting(&block)
-          destroy_repositories = []
-
-          projects = @project.self_and_descendants
-
-          # Only take projects that have Git repos.
-          git_projects = projects.uniq.select{|p| p.repository && p.repository.is_a?(Repository::Git)}
-
-          git_projects.reverse.each do |project|
-            repository_data = {}
-            repository_data['repo_name']   = project.repository.gitolite_repository_name
-            repository_data['repo_path']   = project.repository.gitolite_repository_path
-            destroy_repositories.push(repository_data)
-          end
+          # Remember all projects with git repositories we have to delete later on.
+          # Reverse the list to remove the lowermost repo first.
+          destroy_repos = flatten_project_git_repos.reverse
 
           destroy_without_git_hosting(&block)
 
           if api_request? || params[:confirm]
-            OpenProject::GitHosting::GitoliteWrapper.update(:delete_repositories, destroy_repositories)
+            OpenProject::GitHosting::GitoliteWrapper.update(:delete_repositories, destroy_repos)
           end
         end
 
 
+
         def archive_with_git_hosting(&block)
           archive_without_git_hosting(&block)
-          update_projects("Project has been archived, update it : '#{@project}'")
+
+          # Remove all subprojects from gitolite-admin
+          remove_repos = flatten_project_git_repos
+
+          OpenProject::GitHosting::GitHosting.logger.info("Archiving '#{@project}'")
+          OpenProject::GitHosting::GitoliteWrapper.update(:remove_repositories, remove_repos)
         end
 
 
@@ -88,17 +83,18 @@ module OpenProject::GitHosting
 
         private
 
+        # Given a list of projects, returns a list of Git repos
+        # of all subprojects with two keys:
+        # name, path of the repository
+        def flatten_project_git_repos
+          projects = @project.self_and_descendants.uniq
+            .select{|p| p.repository.is_a?(Repository::Git)}
 
-        def update_projects(message)
-          projects = @project.self_and_descendants
-
-          # Only take projects that have Git repos.
-          git_projects = projects.uniq.select{|p| p.gitolite_repos.any?}
-
-          OpenProject::GitHosting::GitHosting.logger.info(message)
-          OpenProject::GitHosting::GitoliteWrapper.update(:update_projects, git_projects)
+          projects.map do |project|
+            { name: project.repository.gitolite_repository_name,
+              path: project.repository.gitolite_repository_path }
+          end
         end
-
 
         def git_repo_init
           if @project.module_enabled?('repository') && OpenProject::GitHosting::GitoliteWrapper.true?(:all_projects_use_git)
@@ -115,12 +111,10 @@ module OpenProject::GitHosting
 
 
         def disable_git_daemon_if_not_public
-          # Go through all gitolite repos and diable Git daemon if necessary
-          @project.gitolite_repos.each do |repository|
-            if repository.extra[:git_daemon] && !@project.is_public
-              repository.extra[:git_daemon] = false
-              repository.extra.save
-            end
+          # Go through all gitolite repos and disable Git daemon if necessary
+          if @project.repository.extra[:git_daemon] && !@project.is_public
+            @project.repository.extra[:git_daemon] = false
+            @project.repository.extra.save
           end
           OpenProject::GitHosting::GitHosting.logger.info("Set Git daemon for repositories of project : '#{@project}'" )
           OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @project.repository)

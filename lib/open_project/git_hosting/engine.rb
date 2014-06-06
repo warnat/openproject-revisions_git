@@ -14,7 +14,7 @@ module OpenProject::GitHosting
 
         # Gitolite Storage Config
         :gitolite_global_storage_dir    => 'repositories/',
-        :gitolite_redmine_storage_dir   => '',
+        :gitolite_storage_subdir   => '',
         :gitolite_recycle_bin_dir       => 'recycle_bin/',
 
         # Gitolite Config File

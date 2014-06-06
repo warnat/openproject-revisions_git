@@ -5,7 +5,7 @@
                                :controller => 'archived_repositories',
                                :action => 'revision',
                                :id => project,
-                               :repository_id => @repository.identifier_param,
+                               :repository_id => @repository.id,
                                :rev => scmid)
                          end
     render :partial => 'revision_graph',
@@ -16,7 +16,7 @@
 end %>
 <%= form_tag(
       {:controller => 'archived_repositories', :action => 'diff', :id => project,
-       :repository_id => @repository.identifier_param, :path => to_path_param(path)},
+       :repository_id => @repository.id, :path => to_path_param(path)},
       :method => :get
      ) do %>
 <table class="list changesets">

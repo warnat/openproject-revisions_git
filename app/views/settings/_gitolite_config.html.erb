@@ -68,11 +68,11 @@
 </p>
 
 <p>
-  <label><%= l(:label_gitolite_redmine_storage_dir) %></label>
-  <%= text_field_tag("settings[gitolite_redmine_storage_dir]",
-    Setting.plugin_openproject_git_hosting[:gitolite_redmine_storage_dir] , :size => 60) %>
+  <label><%= l(:label_gitolite_storage_subdir) %></label>
+  <%= text_field_tag("settings[gitolite_storage_subdir]",
+    Setting.plugin_openproject_git_hosting[:gitolite_storage_subdir] , :size => 60) %>
   <br />
-  <em><%= l(:label_gitolite_redmine_storage_dir_desc) %></em>
+  <em><%= l(:label_gitolite_storage_subdir_desc) %></em>
 </p>
 
 <h3><%= l(:label_gitolite_git_config) %></h3>

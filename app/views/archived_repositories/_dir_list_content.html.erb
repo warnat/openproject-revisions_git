@@ -10,14 +10,14 @@
 <span class="expander" onclick="scmEntryClick('<%= tr_id %>', '<%= escape_javascript(url_for(
                        :action => 'show',
                        :id     => @project,
-                       :repository_id => @repository.identifier_param,
+                       :repository_id => @repository.id,
                        :path   => to_path_param(ent_path),
                        :rev    => @rev,
                        :depth  => (depth + 1),
                        :parent_id => tr_id)) %>');">&nbsp;</span>
 <% end %>
 <%=  link_to h(ent_name),
-          {:action => (entry.is_dir? ? 'show' : 'changes'), :id => @project, :repository_id => @repository.identifier_param, :path => to_path_param(ent_path), :rev => @rev},
+          {:action => (entry.is_dir? ? 'show' : 'changes'), :id => @project, :repository_id => @repository.id, :path => to_path_param(ent_path), :rev => @rev},
           :class => (entry.is_dir? ? 'icon icon-folder' : "icon icon-file #{Redmine::MimeType.css_class_of(ent_name)}")%>
 </td>
 <td class="size"><%= (entry.size ? number_to_human_size(entry.size) : "?") unless entry.is_dir? %></td>

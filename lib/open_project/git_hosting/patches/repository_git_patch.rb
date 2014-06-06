@@ -91,35 +91,22 @@ module OpenProject::GitHosting
 
 
         # This is the (possibly non-unique) basename for the git repository
-        def redmine_name
+        def repo_basename
           project.identifier
         end
 
 
         def gitolite_repository_path
           File.join(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir],
-            get_full_parent_path,
-            "#{gitolite_repository_name}.git")
+            gitolite_repository_name)
         end
-
 
         def gitolite_repository_name
-          File.expand_path(File.join("./", Setting.plugin_openproject_git_hosting[:gitolite_redmine_storage_dir], get_full_parent_path, redmine_name), "/")[1..-1]
+          File.join('/', get_full_parent_path, "#{repo_basename}.git")
         end
-
 
         def redmine_repository_path
-          File.expand_path(File.join("./", get_full_parent_path, redmine_name), "/")[1..-1]
-        end
-
-
-        def new_repository_name
-          gitolite_repository_name
-        end
-
-
-        def old_repository_name
-          "#{self.url.gsub(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir], '').gsub('.git', '')}"
+          File.expand_path(File.join("./", get_full_parent_path, repo_basename), "/")[1..-1]
         end
 
 

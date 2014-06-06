@@ -9,7 +9,7 @@
           <ul>
             <% project.repositories.each do |repository| %>
               <li>
-                <%= link_to h(repository.url), {:controller => 'archived_repositories', :action => 'show', :id => project, :repository_id => repository.identifier_param} %>
+                <%= link_to h(repository.url), {:controller => 'archived_repositories', :action => 'show', :id => project, :repository_id => repository.id} %>
               </li>
             <% end %>
           </ul>

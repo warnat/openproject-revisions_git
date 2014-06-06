@@ -16,7 +16,7 @@
   <%= form_tag({:controller => 'archived_repositories',
                :action     => 'revision',
                :id         => @project,
-               :repository_id => @repository.identifier_param,
+               :repository_id => @repository.id,
                :rev        => nil},
                :method     => :get) do %>
     <%= text_field_tag 'rev', @rev, :size => 8 %>
@@ -81,7 +81,7 @@
 <p><%= link_to(l(:label_view_diff),
                :action => 'diff',
                :id     => @project,
-               :repository_id => @repository.identifier_param,
+               :repository_id => @repository.id,
                :path   => "",
                :rev    => @changeset.identifier) if @changeset.filechanges.any? %></p>
 

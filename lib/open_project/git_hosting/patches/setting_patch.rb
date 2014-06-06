@@ -117,13 +117,13 @@ module OpenProject::GitHosting
 
 
             # Normalize Redmine Subdirectory path, should be either empty or relative and end in '/'
-            if valuehash[:gitolite_redmine_storage_dir]
-              normalizedFile  = File.expand_path(valuehash[:gitolite_redmine_storage_dir].lstrip.rstrip, "/")
+            if valuehash[:gitolite_storage_subdir]
+              normalizedFile  = File.expand_path(valuehash[:gitolite_storage_subdir].lstrip.rstrip, "/")
               if (normalizedFile != "/")
                 # Clobber leading '/' add trailing '/'
-                valuehash[:gitolite_redmine_storage_dir] = normalizedFile[1..-1] + "/"
+                valuehash[:gitolite_storage_subdir] = normalizedFile[1..-1] + "/"
               else
-                valuehash[:gitolite_redmine_storage_dir] = ''
+                valuehash[:gitolite_storage_subdir] = ''
               end
             end
 
@@ -229,7 +229,7 @@ module OpenProject::GitHosting
 
             ## Storage infos has changed, move repositories!
             if @@old_valuehash[:gitolite_global_storage_dir] != valuehash[:gitolite_global_storage_dir] ||
-               @@old_valuehash[:gitolite_redmine_storage_dir] != valuehash[:gitolite_redmine_storage_dir] ||
+               @@old_valuehash[:gitolite_storage_subdir] != valuehash[:gitolite_storage_subdir] ||
                @@old_valuehash[:hierarchical_organisation] != valuehash[:hierarchical_organisation]
                 # Need to update everyone!
                 projects = Project.active_or_archived.includes(:repositories).all.select { |x| x if x.parent_id.nil? }

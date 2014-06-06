@@ -49,11 +49,9 @@
 <% content_for :sidebar do %>
   <h3><%= l(:label_repository_plural) %></h3>
   <ul class="repository git">
-    <% @repositories.sort.each do |repo| %>
-        <li class="repository git"><%= link_to h(repo.name), {:controller => 'repositories', :action => 'show', :id => @project, :repository_id => repo.identifier_param, :rev => nil, :path => nil},
-                                      :class => 'repository' + (@repository.is_a?(Repository::Git) ? ' git' : '') + (repo == @repository ? ' selected' : '') %>
-        </li>
-    <% end %>
+    <li class="repository git"><%= link_to h(@repository.name), {:controller => 'repositories', :action => 'show', :id => @project, :repository_id => @repository.id, :rev => nil, :path => nil},
+                                  :class => 'repository' + (@repository.is_a?(Repository::Git) ? ' git' : '') + ' selected') %>
+    </li>
   </ul>
 
   <% if @repository.is_a?(Repository::Git) && OpenProject::GitHosting::GitoliteWrapper.true?(:show_repositories_url) && User.current.allowed_to?(:view_changesets, @project) %>

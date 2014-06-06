@@ -17,7 +17,7 @@ module OpenProject::GitHosting
     def initialize
       @recycle_bin_dir     = Setting.plugin_openproject_git_hosting[:gitolite_recycle_bin_dir]
       @global_storage_dir  = Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir]
-      @redmine_storage_dir = Setting.plugin_openproject_git_hosting[:gitolite_redmine_storage_dir]
+      @redmine_storage_dir = Setting.plugin_openproject_git_hosting[:gitolite_storage_subdir]
       @recycle_bin_expiration_time = (Setting.plugin_openproject_git_hosting[:gitolite_recycle_bin_expiration_time].to_f*60).to_i
     end
 

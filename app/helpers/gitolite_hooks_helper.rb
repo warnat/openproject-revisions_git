@@ -69,7 +69,7 @@ module GitoliteHooksHelper
         next if revision.nil?
 
         revision_url = url_for(:controller => 'repositories', :action => 'revision',
-                               :id => @project, :repository_id => @repository.identifier_param, :rev => rev,
+                               :id => @project, :repository_id => @repository.id, :rev => rev,
                                :only_path => false, :host => Setting['host_name'], :protocol => Setting['protocol'])
 
         commit = {
@@ -100,7 +100,7 @@ module GitoliteHooksHelper
       end
 
       repository_url = url_for(:controller => 'repositories', :action => 'show',
-                               :id => @project, :repository_id => @repository.identifier_param,
+                               :id => @project, :repository_id => @repository.id,
                                :only_path => false, :host => Setting["host_name"], :protocol => Setting["protocol"])
 
       payload << {

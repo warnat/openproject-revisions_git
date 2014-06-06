@@ -80,7 +80,7 @@
     <% if @repository && @repository.is_a?(Repository::Git) && !@repository.new_record? %>
       <p>
         <label><%= l(:label_browse_repository) %></label>
-        <%= link_to h(@repository.url), {:controller => 'repositories', :action => 'show', :id => @project, :repository_id => @repository.identifier_param} %>
+        <%= link_to h(@repository.url), {:controller => 'repositories', :action => 'show', :id => @project, :repository_id => @repository.id} %>
       </p>
 
       <p>

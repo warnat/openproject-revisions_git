@@ -36,17 +36,26 @@ module OpenProject::GitHosting::GitoliteWrapper
       end
     end
 
+    # Delete the reposistory from gitolite-admin (and commit)
+    # and yield (e.g., for deletion / moving to trash before commit)
+    #
+    def handle_repository_delete(repos)
+      @admin.transaction do
+        repos.each do |repo|
+          if @gitolite_config.repos[repo[:name]]
 
-    def handle_repository_delete(repository_data)
-      repo_name = repository_data['repo_name']
-      repo_path = repository_data['repo_path']
-      repo_conf = @gitolite_config.repos[repo_name]
+            # Delete from in-memory gitolite
+            @gitolite_config.rm_repo(repo[:name])
 
-      if repo_conf
-        @gitolite_config.rm_repo(repo_name)
-      else
-        logger.warn { "#{@action} : repository '#{repo_name}' does not exist in Gitolite" }
-        logger.debug { "#{@action} : repository path '#{repo_path}'" }
+            # Allow post-processing of removed repo
+            yield repo
+
+            # Commit changes
+            gitolite_admin_repo_commit(repo[:name])
+          else
+            logger.warn("#{@action} : '#{repo[:name]}' does not exist in Gitolite")
+          end
+        end
       end
     end
 

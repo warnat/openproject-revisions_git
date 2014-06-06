@@ -29,16 +29,33 @@ module OpenProject::GitHosting::GitoliteWrapper
       end
     end
 
+    # Remove the given repositories from gitolite-admin
+    # Does NOT remove the repository from filesystem.
+    def remove_repositories
+      handle_repository_delete(@object_id)
+    end
 
+
+    # Delete the given repositories.
+    #
+    # As the project/repo model may be deleted already,
+    # receives an array of repo name and path.
+    #
+    # Performs two steps
+    # 1. Delete the reposistory from gitolite-admin (and commit)
+    # 2. Depending on the setting :delete_git_repositories
+    #  (true) Delete the physical repository
+    #  (false) Move the physical repository to the recycle location
     def delete_repositories
-      @admin.transaction do
-        @object_id.each do |repository_data|
-          handle_repository_delete(repository_data)
-
+      if Setting.plugin_openproject_git_hosting[:delete_git_repositories]
+        handle_repository_delete(@object_id) do |repo|
+          byebug
+          OpenProject::GitHosting::GitoliteWrapper::sudo_rmdir(repo[:path])
+        end
+      else
+        handle_repository_delete(@object_id) do |repo|
           recycle = OpenProject::GitHosting::Recycle.new
-          recycle.move_repository_to_recycle(repository_data) if @delete_git_repositories
-
-          gitolite_admin_repo_commit("#{repository_data['repo_name']}")
+          recycle.move_repository_to_recycle(repo)
         end
       end
     end
@@ -59,6 +76,5 @@ module OpenProject::GitHosting::GitoliteWrapper
       logger.info { "Fetch changesets for repository '#{repository.gitolite_repository_name}'"}
       repository.fetch_changesets
     end
-
   end
 end

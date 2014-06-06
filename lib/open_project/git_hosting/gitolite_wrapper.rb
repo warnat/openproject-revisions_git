@@ -189,6 +189,17 @@ module OpenProject::GitHosting
       ['-i', '-n', '-u', gitolite_user]
     end
 
+    # Removes a directory and all subdirectories below gitolite_user's $HOME.
+    #
+    # Assumes a relative path.
+    def self.sudo_rmdir(relative_path)
+      repo_path = File.join('$HOME', relative_path)
+      logger.debug("Deleting '#{repo_path}' with git user")
+      sudo_capture('rm','-rf', repo_path)
+    rescue => e
+      logger.error("Could not delete repository '#{relative_path}' from disk: #{e.message}")
+    end
+
     # Execute a command in the gitolite forced environment through this user
     # i.e., executes 'ssh git@localhost <command>'
     #
@@ -215,7 +226,7 @@ module OpenProject::GitHosting
       Gitolite::GitoliteAdmin.new(admin_dir, gitolite_admin_settings)
     end
 
-    WRAPPERS = [GitoliteWrapper::Admin, GitoliteWrapper::Repositories, 
+    WRAPPERS = [GitoliteWrapper::Admin, GitoliteWrapper::Repositories,
       GitoliteWrapper::Users, GitoliteWrapper::Projects]
 
     # Update the Gitolite Repository

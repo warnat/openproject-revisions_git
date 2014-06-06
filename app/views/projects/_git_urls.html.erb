@@ -12,7 +12,7 @@
             <%= link_to l(:label_see_other_repositories), { :controller    => "/repositories",
                                                             :action        => "show",
                                                             :id            => project,
-                                                            :repository_id => project.repository.identifier_param,
+                                                            :repository_id => project.repository.id,
                                                             :rev           => nil,
                                                             :path          => nil
                                                           } %>
