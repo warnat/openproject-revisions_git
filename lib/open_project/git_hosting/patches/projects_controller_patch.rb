@@ -8,7 +8,6 @@ module OpenProject::GitHosting
 
           include InstanceMethods
 
-          alias_method_chain :create,    :git_hosting
           alias_method_chain :update,    :git_hosting
           alias_method_chain :destroy,   :git_hosting
           alias_method_chain :archive,   :git_hosting
@@ -21,26 +20,19 @@ module OpenProject::GitHosting
 
       module InstanceMethods
 
-        def create_with_git_hosting(&block)
-          create_without_git_hosting(&block)
-
-          # Only create repo if project creation worked
-          if validate_parent_id && @project.save
-            git_repo_init
-          end
-        end
-
-
         def update_with_git_hosting(&block)
+
           update_without_git_hosting(&block)
 
-          return if @project.repository.nil?
+          return unless @project.repository.is_a?(Repository::Git)
+
+          byebug
 
           if @project.repository.url != @project.repository.gitolite_repository_path ||
              @project.repository.url != @project.repository.root_url
 
             OpenProject::GitHosting::GitHosting.logger.info("Move repositories of project : '#{@project}'")
-            OpenProject::GitHosting::GitoliteWrapper.(:move_repositories, @project.id)
+            OpenProject::GitHosting::GitoliteWrapper.update(:move_repositories, @project.id)
           else
             # Adjust daemon status
             disable_git_daemon_if_not_public
@@ -95,20 +87,6 @@ module OpenProject::GitHosting
               path: project.repository.gitolite_repository_path }
           end
         end
-
-        def git_repo_init
-          if @project.module_enabled?('repository') && OpenProject::GitHosting::GitoliteWrapper.true?(:all_projects_use_git)
-            # Create new repository
-            @project.repository = Repository.factory("Git")
-
-            options = { :create_readme_file => OpenProject::GitHosting::GitoliteWrapper.true?(:init_repositories_on_create) }
-
-
-            OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{repository.gitolite_repository_name}'" )
-            OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @project.repository)
-          end
-        end
-
 
         def disable_git_daemon_if_not_public
           # Go through all gitolite repos and disable Git daemon if necessary

@@ -13,9 +13,8 @@ module OpenProject::GitHosting
         :gitolite_ssh_public_key        => File.join(Dir.home, '.ssh', 'id_rsa.pub').to_s,
 
         # Gitolite Storage Config
-        :gitolite_global_storage_dir    => 'repositories/',
+        :gitolite_global_storage_dir    => 'repositories',
         :gitolite_storage_subdir   => '',
-        :gitolite_recycle_bin_dir       => 'recycle_bin/',
 
         # Gitolite Config File
         :gitolite_admin_dir                    => File.join(Dir.home, 'gitolite-admin'),
@@ -48,9 +47,7 @@ module OpenProject::GitHosting
         :gitolite_http_by_default         => 1,
 
         # Redmine Config
-        :all_projects_use_git             => false,
         :init_repositories_on_create      => false,
-        :delete_git_repositories          => true,
 
         # Download Revision Config
         :download_revision_enabled        => true,
@@ -95,13 +92,7 @@ module OpenProject::GitHosting
         end
 
 
-        menu :top_menu,
-          :archived_repositories,
-          { :controller => 'archived_repositories', :action => 'plugin' },
-          :caption => :label_archived_repositories,
-          :after => :administration,
-          :if => proc { User.current.logged? && User.current.admin? }
-
+        # Public Keys under user account
         menu :my_menu,
           :public_keys,
           { :controller => 'my_public_keys', :action => 'index'},
@@ -118,20 +109,6 @@ module OpenProject::GitHosting
       Redmine::Scm::Adapters::GitAdapter.send(:include, OpenProject::GitHosting::Patches::GitAdapterPatch)
       Repository::Git.send(:include, OpenProject::GitHosting::Patches::RepositoryGitPatch)
 
-      # TODO remove
-      # require 'open_project/git_hosting/patches/member_patch'
-      # require 'open_project/git_hosting/patches/my_controller_patch'
-      # require 'open_project/git_hosting/patches/project_patch'
-      # require 'open_project/git_hosting/patches/projects_controller_patch'
-      # require 'open_project/git_hosting/patches/repositories_controller_patch'
-      # require 'open_project/git_hosting/patches/repositories_helper_patch'
-      # require 'open_project/git_hosting/patches/repository_patch'
-      # require 'open_project/git_hosting/patches/roles_controller_patch'
-      # require 'open_project/git_hosting/patches/setting_patch'
-      # require 'open_project/git_hosting/patches/settings_controller_patch'
-      # require 'open_project/git_hosting/patches/user_patch'
-      # require 'open_project/git_hosting/patches/users_controller_patch'
-      # require 'open_project/git_hosting/patches/users_helper_patch'
     end
 
     initializer 'git_hosting.hooks' do

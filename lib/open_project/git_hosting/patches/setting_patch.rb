@@ -50,15 +50,6 @@ module OpenProject::GitHosting
                 # Add trailing '/'
                 valuehash[:gitolite_scripts_dir] = normalizedFile + "/"
               end
-
-            elsif valuehash[:gitolite_user] != @@old_valuehash[:gitolite_user] ||
-              valuehash[:gitolite_ssh_private_key] != @@old_valuehash[:gitolite_ssh_private_key] ||
-              valuehash[:gitolite_ssh_public_key] != @@old_valuehash[:gitolite_ssh_public_key] ||
-              valuehash[:gitolite_server_port] != @@old_valuehash[:gitolite_server_port]
-
-              # Remove old scripts, since about to change content (leave directory alone)
-              Pathname.new(OpenProject::GitHosting::GitoliteWrapper.get_scripts_dir_path)
-                .children.each { |p| p.unlink }
             end
 
             # Server domain should not include any path components. Also, ports should be numeric.

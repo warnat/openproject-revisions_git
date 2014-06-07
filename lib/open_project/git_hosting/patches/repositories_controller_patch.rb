@@ -57,14 +57,8 @@ module OpenProject::GitHosting
           if @repository.is_a?(Repository::Git)
             if !@repository.errors.any?
 
-              params[:extra][:git_daemon] = params[:extra][:git_daemon] == 'true' ? true : false
-              params[:extra][:git_notify] = params[:extra][:git_notify] == 'true' ? true : false
-
-              update_default_branch = false
-
-              if params[:extra].has_key?(:default_branch) && @repository.extra[:default_branch] != params[:extra][:default_branch]
-                update_default_branch = true
-              end
+              params[:extra][:git_daemon] = params[:extra][:git_daemon] == 'true'
+              params[:extra][:git_notify] = params[:extra][:git_notify] == 'true'
 
               ## Update attributes
               @repository.extra.update_attributes(params[:extra])
@@ -72,12 +66,6 @@ module OpenProject::GitHosting
               ## Update repository
               OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has modified repository '#{@repository.gitolite_repository_name}'")
               OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @repository)
-
-              ## Update repository default branch
-              if update_default_branch
-                OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has modified default_branch of '#{@repository.gitolite_repository_name}' ('#{@repository.extra[:default_branch]}')")
-                OpenProject::GitHosting::GitoliteWrapper.update(:update_repository_default_branch, @repository.id)
-              end
             end
           end
         end

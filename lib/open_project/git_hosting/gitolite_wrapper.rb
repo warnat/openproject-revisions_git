@@ -118,27 +118,12 @@ module OpenProject::GitHosting
     end
 
 
-    # For SSH'ing to gitolite, use a SSH wraper for use
-    # with Git's GIT_SSH command, which only accepts a script name.
-    def self.gitolite_admin_ssh_script_path
-      File.join(get_scripts_dir_path, "gitolite_admin_ssh")
-    end
 
-    def self.get_bin_dir_path
-      File.join(File.dirname(__FILE__), '../../../bin/')
-    end
-
-    # Return the script dir (defaults to <Plugin Root>/bin).
-    def self.get_scripts_dir_path
-      scripts_dir = Setting.plugin_openproject_git_hosting[:gitolite_scripts_dir] || bin_dir
-
-      if !File.directory?(scripts_dir)
-        logger.info("Create scripts directory : '#{scripts_dir}'")
-        FileUtils.mkdir_p scripts_dir
-      end
-
-      scripts_dir
-    end
+    ##########################
+    #                        #
+    #   SUDO Shell Wrapper   #
+    #                        #
+    ##########################
 
 
     #
@@ -189,30 +174,92 @@ module OpenProject::GitHosting
       ['-i', '-n', '-u', gitolite_user]
     end
 
+    # Calls mkdir with the given arguments on the git user's side.
+    #
+    # e.g., sudo_mkdir('-p', '/some/path)
+    #
+    def self.sudo_mkdir(*args)
+      sudo_capture('mkdir', *args)
+    rescue => e
+      logger.error("Couldn't move '#{old_path}' => '#{new_path}'. Reason: #{e.message}")
+    end
+
+    # Moves a file/directory to a new target.
+    # Creates the parent of the target path using mkdir -p.
+    #
+    def self.sudo_move(old_path, new_path)
+      sudo_mkdir('-p', File.dirname(new_path))
+      sudo_capture('mv', old_path, new_path)
+    rescue => e
+      logger.error("Couldn't move '#{old_path}' => '#{new_path}'. Reason: #{e.message}")
+    end
+
     # Removes a directory and all subdirectories below gitolite_user's $HOME.
     #
     # Assumes a relative path.
-    def self.sudo_rmdir(relative_path)
+    #
+    # If force=true, it will delete using 'rm -rf <path>', otherwise
+    # it uses rmdir
+    def self.sudo_rmdir(relative_path, force=false)
       repo_path = File.join('$HOME', relative_path)
-      logger.debug("Deleting '#{repo_path}' with git user")
-      sudo_capture('rm','-rf', repo_path)
+      logger.debug("Deleting '#{repo_path}' [forced=#{force ? 'no' : 'yes'}] with git user")
+
+      if force
+        sudo_capture('rm','-rf', repo_path)
+      else
+        sudo_capture('rmdir', repo_path)
+      end
     rescue => e
       logger.error("Could not delete repository '#{relative_path}' from disk: #{e.message}")
     end
+
+    # Test if a file or directory exists and is readable to the gitolite user
+    # Prepends '$HOME/' to the given path.
+    def self.file_exists?(filename)
+      test = GitoliteWrapper.sudo_capture('whoami')
+      sudo_test(filename, '-r')
+    end
+
+    # Test if a given path is an empty directory using the git user.
+    #
+    # Prepends '$HOME/' to the given path.
+    def self.sudo_directory_empty?(path)
+      home_path = File.join('$HOME', path)
+      out, _ , code = GitoliteWrapper.sudo_shell('find', home_path, '-prune', '-empty', '-type', 'd')
+      return code == 0 && out.include?(path)
+    end
+
+    ##########################
+    #                        #
+    #       SSH Wrapper      #
+    #                        #
+    ##########################
 
     # Execute a command in the gitolite forced environment through this user
     # i.e., executes 'ssh git@localhost <command>'
     #
     # Returns stdout, stderr and the exit code
     def self.ssh_shell(*params)
-      GitHosting.shell('ssh', '-T', gitolite_url, '-p', gitolite_server_port, *params)
+      GitHosting.shell('ssh', *ssh_shell_params.concat(params))
     end
 
     # Return only the output from the ssh command and checks
     def self.ssh_capture(*params)
-      GitHosting.capture('ssh', '-T', gitolite_url, '-p', gitolite_server_port, *params)
+      GitHosting.capture('ssh', *ssh_shell_params.concat(params))
     end
 
+    # Returns the ssh prefix arguments for all ssh_* commands
+    #
+    # These are as follows:
+    # * (-T) Never request tty
+    # * (-i <gitolite_ssh_private_key>) Use the SSH keys given in Settings
+    # * (-p <gitolite_server_port>) Use port from settings
+    # * (-o BatchMode=yes) Never ask for a password
+    # * <gitolite_user>@localhost (see +gitolite_url+)
+    def self.ssh_shell_params
+      ['-T', '-o', 'BatchMode=yes', gitolite_url, '-p',
+        gitolite_server_port, '-i', gitolite_ssh_private_key]
+    end
 
     ##########################
     #                        #
@@ -245,13 +292,6 @@ module OpenProject::GitHosting
       end
 
       raise GitHostingException.new(action, "No available Wrapper for action '#{action}' found.")
-    end
-
-    def purge_recycle_bin
-      repositories_array = @object_id
-      recycle = Recycle.new
-      recycle.delete_expired_files(repositories_array)
-      logger.info { "#{@action} : done !" }
     end
 
 
@@ -290,7 +330,7 @@ module OpenProject::GitHosting
     end
 
     # Returns the gitolite welcome/info banner, containing its version.
-    # 
+    #
     # Upon error, returns the shell error code instead.
     def self.gitolite_banner
       Rails.cache.fetch(GitHosting.cache_key('gitolite_banner')) {
@@ -318,37 +358,17 @@ module OpenProject::GitHosting
       }
     end
 
-    ## Test if a file exists and is readable to the gitolite user
-    def self.file_exists?(filename)
-      begin
-        out, err, code = GitoliteWrapper.sudo_shell('test', '-r', filename)
-        return code == 0
-      rescue => e
-        logger.error("File check for #{filename} failed: #{e.message}")
-        false
-      end
-    end
 
-    def self.gitolite_admin_ssh_script_is_installed?
-      Rails.cache.fetch(GitHosting.cache_key('admin_ssh_script_installed?')) do
-        if File.exists?(gitolite_admin_ssh_script_path)
-          true
-        else
-          setup_admin_ssh_script
-        end
-      end
-    end
-
-    def self.setup_admin_ssh_script
-      logger.info("Create script file : '#{gitolite_admin_ssh_script_path}'")
-      File.open(gitolite_admin_ssh_script_path, "w") do |f|
-        f.puts "#!/bin/sh"
-        f.puts "exec ssh -T -o BatchMode=yes -o StrictHostKeyChecking=no -p #{gitolite_server_port} -i #{gitolite_ssh_private_key} \"$@\""
-      end
-
-      File.chmod(0550, gitolite_admin_ssh_script_path) > 0
+    # Test properties of a path from the git user.
+    # Prepends '$HOME/' to the given path
+    #
+    # e.g., Test if a directory exists: sudo_test('$HOME/somedir', '-d')
+    def self.sudo_test(path, *testarg)
+      path = File.join('$HOME', path)
+      out, _ , code = GitoliteWrapper.sudo_shell('test', *testarg, path)
+      return code == 0
     rescue => e
-      logger.error("Cannot create script file '#{gitolite_admin_ssh_script_path}': #{e.message}")
+      logger.debug("File check for #{path} failed: #{e.message}")
       false
     end
 
@@ -414,6 +434,6 @@ module OpenProject::GitHosting
       end
 
       return @@mirroring_keys_installed
-    end    
+    end
   end
 end

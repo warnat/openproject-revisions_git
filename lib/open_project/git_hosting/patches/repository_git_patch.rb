@@ -73,65 +73,53 @@ module OpenProject::GitHosting
 
       module InstanceMethods
 
-        def report_last_commit_with_git_hosting
-          # Always true
-          true
-        end
-
-
-        def extra_report_last_commit_with_git_hosting
-          # Always true
-          true
-        end
-
-
         def git_cache_id
             project.identifier
         end
 
-
-        # This is the (possibly non-unique) basename for the git repository
-        def repo_basename
-          project.identifier
+        # Returns the hierarchical repository path
+        # e.g., "foo/bar.git"
+        def git_path
+          [gitolite_repository_name, '.git'].join
         end
 
-
+        # Returns the repository path to locate gitolite
+        # (relative from +gitolite_users+ $HOME)
+        #
+        # e.g., Project Foo, Subproject Bar => 'repositories/foo/bar.git'
         def gitolite_repository_path
           File.join(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir],
-            gitolite_repository_name)
+            git_path)
         end
 
+        # Returns the repository name
+        #
+        # e.g., Project Foo, Subproject Bar => 'foo/bar'
         def gitolite_repository_name
-          File.join('/', get_full_parent_path, "#{repo_basename}.git")
+          if (parent_path = get_full_parent_path).empty?
+            project.identifier
+          else
+            File.join(parent_path, project.identifier)
+          end
         end
-
-        def redmine_repository_path
-          File.expand_path(File.join("./", get_full_parent_path, repo_basename), "/")[1..-1]
-        end
-
 
         def http_user_login
           User.current.anonymous? ? "" : "#{User.current.login}@"
         end
 
 
-        def git_access_path
-          "#{gitolite_repository_name}.git"
-        end
-
-
         def http_access_path
-          "#{Setting.plugin_openproject_git_hosting[:http_server_subdir]}#{redmine_repository_path}.git"
+          "#{Setting.plugin_openproject_git_hosting[:http_server_subdir]}#{git_path}"
         end
 
 
         def ssh_url
-          "ssh://#{Setting.plugin_openproject_git_hosting[:gitolite_user]}@#{Setting.plugin_openproject_git_hosting[:ssh_server_domain]}/#{git_access_path}"
+          "ssh://#{Setting.plugin_openproject_git_hosting[:gitolite_user]}@#{Setting.plugin_openproject_git_hosting[:ssh_server_domain]}/#{git_path}"
         end
 
 
         def git_url
-          "git://#{Setting.plugin_openproject_git_hosting[:ssh_server_domain]}/#{git_access_path}"
+          "git://#{Setting.plugin_openproject_git_hosting[:ssh_server_domain]}/#{git_path}"
         end
 
 

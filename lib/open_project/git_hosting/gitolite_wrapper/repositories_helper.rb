@@ -1,3 +1,4 @@
+require 'pathname'
 module OpenProject::GitHosting::GitoliteWrapper
   module RepositoriesHelper
 
@@ -7,7 +8,7 @@ module OpenProject::GitHosting::GitoliteWrapper
       project   = repository.project
 
       if @gitolite_config.repos[repo_name]
-        logger.warn { "#{@action} : repository '#{repo_name}' already exists in Gitolite, removing first" }
+        logger.warn("#{@action} : repository '#{repo_name}' already exists in Gitolite, removing first")
         @gitolite_config.rm_repo(repo_name)
       end
 
@@ -60,67 +61,117 @@ module OpenProject::GitHosting::GitoliteWrapper
     end
 
 
-    def handle_repositories_move(project)
-      projects = project.self_and_descendants
+    # Move a list of git repositories to their new location
+    #
+    # The old repository location is expected to be available from its url.
+    # Upon moving the project (e.g., to a subproject),
+    # the repository's url will still reflect its old location.
+    def handle_repositories_move(repos)
 
-      # Only take projects that have Git repos.
-      git_projects = projects.uniq.select{|p| p.gitolite_repos.any?}
-      return if git_projects.empty?
+      # We'll ned the repository root directory.
+      gitolite_repos_root = Pathname.new(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir])
 
-      git_projects.reverse.each do |project|
-        repo_list = []
+      repos.each do |repo|
 
-        project.gitolite_repos.reverse.each do |repository|
-          repo_list.push(repository.gitolite_repository_name)
-          do_move_repositories(repository)
-        end
+        # Old repository location: <:gitolite_global_storage_dir>/<path>
+        old_repository_path = Pathname.new(repo.url)
 
-        gitolite_admin_repo_commit("#{@action} : #{project.identifier} | #{repo_list}")
+        # Old name is the <path> section of above, thus extract it from url.
+        # But remove the '.git' part.
+        old_repository_name = old_repository_path.relative_path_from(gitolite_repos_root)
+          .basename('.git').to_s
+
+        # Actually move the repository
+        do_move_repository(repo, old_repository_path.to_s, old_repository_name)
+
+        gitolite_admin_repo_commit("#{@action} : #{repo.project.identifier}")
       end
     end
 
-    def do_move_repositories(repository)
-      repo_id   = repository.redmine_name
-      repo_name = repository.old_repository_name
 
-      repo_conf = @gitolite_config.repos[repo_name]
+    # Move a repository in gitolite-admin from its old entry to a new one
+    #
+    # This involves the following steps:
+    # 1. Remove the old entry (+old_name+)
+    # 2. Move the physical repository on filesystem.
+    # 3. Add the repository using +repo.gitolite_repository_name+
+    #
+    def do_move_repository(repo, old_path, old_name)
 
-      old_repo_name = repository.old_repository_name
-      new_repo_name = repository.new_repository_name
+      new_name  = repo.gitolite_repository_name
+      new_path  = repo.gitolite_repository_path
 
-      old_relative_path  = repository.url
-      new_relative_path  = repository.gitolite_repository_path
+      logger.info("#{@action} : Moving '#{old_name}' -> '#{new_name}'")
+      logger.debug("-- On filesystem, this means '#{old_path}' -> '#{new_path}'")
 
-      old_relative_parent_path = old_relative_path.gsub(repo_id + '.git', '')
-      new_relative_parent_path = new_relative_path.gsub(repo_id + '.git', '')
+      # Remove old config entry
+      old_repo_conf = @gitolite_config.rm_repo(old_name)
 
-      logger.info { "#{@action} : Moving '#{repo_name}'..." }
-      logger.debug { "  Old repository name (for Gitolite)           : #{old_repo_name}" }
-      logger.debug { "  New repository name (for Gitolite)           : #{new_repo_name}" }
-      logger.debug { "-----" }
-      logger.debug { "  Old relative path (for Redmine code browser) : #{old_relative_path}" }
-      logger.debug { "  New relative path (for Redmine code browser) : #{new_relative_path}" }
-      logger.debug { "-----" }
-      logger.debug { "  Old relative parent path (for Gitolite)      : #{old_relative_parent_path}" }
-      logger.debug { "  New relative parent path (for Gitolite)      : #{new_relative_parent_path}" }
+      # Move the repo on filesystem
+      move_physical_repo(old_path, new_path)
 
-      if !repo_conf
-        logger.error { "#{@action} : repository '#{repo_name}' does not exist in Gitolite, exit !" }
-        return false
-      else
-        if move_physical_repo(old_relative_path, new_relative_path, new_relative_parent_path)
-          @delete_parent_path.push(old_relative_parent_path)
+      # Add the repo as new
+      handle_repository_add(repo)
 
-          repository.update_column(:url, new_relative_path)
-          repository.update_column(:root_url, new_relative_path)
+    end
 
-          @gitolite_config.rm_repo(old_repo_name)
-          handle_repository_add(repository, :force => true)
-        else
-          return false
-        end
+    def move_physical_repo(old_path, new_path)
+
+      if old_path == new_path
+        logger.warn("#{@action} : old repository and new repository are identical '#{old_path}' .. why move?")
+        return
       end
 
+      # Now we have multiple options, due to the way gitolite sets up repositories
+      new_path_exists = OpenProject::GitHosting::GitoliteWrapper.file_exists?(new_path)
+      old_path_exists = OpenProject::GitHosting::GitoliteWrapper.file_exists?(old_path)
+
+      # If the new path exists, some old project wasn't correctly cleaned.
+      if new_path_exists
+        logger.warn("#{@action} : New location '#{new_path}' was non-empty. Cleaning first.")
+        clean_repo_dir(new_path)
+      end
+
+      # Old repository has never been created by gitolite
+      # => No need to move anything on the disk
+      if !old_path_exists
+        logger.info("#{@action} : Old location '#{old_path}' was never created. Skipping disk movement.")
+        return
+      end
+
+      # Otherwise, move the old repo
+      OpenProject::GitHosting::GitoliteWrapper.sudo_move(old_path, new_path)
+
+      # Clean up the old path
+      clean_repo_dir(old_path)
+    end
+
+    # Removes the repository path and all parent repositories that are empty
+    #
+    # (i.e., if moving foo/bar/repo.git to foo/repo.git, foo/bar remains and is possibly abandoned)
+    # This moves up from the lowermost point, and deletes all empty directories.
+    def clean_repo_dir(path)
+      parent = Pathname.new(path).parent
+      repo_root = Pathname.new(Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir])
+
+      # Delete the repository project itself.
+      OpenProject::GitHosting::GitoliteWrapper::sudo_rmdir(path, true)
+
+      loop do
+
+        parent_repo = parent.to_s
+
+        # Stop deletion upon finding a non-empty parent repository
+        break unless OpenProject::GitHosting::GitoliteWrapper::sudo_directory_empty?(parent_repo)
+
+        # Stop if we're in the project root
+        break if parent_repo == repo_root
+
+        logger.info("#{@action} : Cleaning repository directory #{parent_repo.to_s} ... ")
+        OpenProject::GitHosting::GitoliteWrapper::sudo_rmdir(parent_repo)
+        parent = parent.parent
+
+      end
     end
 
     # Builds the set of permissions for all
@@ -144,15 +195,11 @@ module OpenProject::GitHosting::GitoliteWrapper
         read   = read_users.map{|user| user.gitolite_identifier}
 
         ## DEPLOY KEY
-        deploy_keys = repository.repository_deployment_credentials.active
-
-        if deploy_keys.any?
-          deploy_keys.each do |cred|
-            if cred.perm == "RW+"
-              rewind << cred.gitolite_public_key.owner
-            elsif cred.perm == "R"
-              read << cred.gitolite_public_key.owner
-            end
+        repository.repository_deployment_credentials.active.each do |cred|
+          if cred.perm == "RW+"
+            rewind << cred.gitolite_public_key.owner
+          elsif cred.perm == "R"
+            read << cred.gitolite_public_key.owner
           end
         end
 
@@ -175,112 +222,7 @@ module OpenProject::GitHosting::GitoliteWrapper
       permissions
     end
 
-
-    def clean_path(path_list)
-      path_list.uniq.sort.reverse.each do |path|
-        begin
-          logger.info { "#{@action} : cleaning repository path : '#{path}'" }
-          GitHosting.execute_command(:shell_cmd, "rmdir '#{path}' 2>/dev/null || true")
-        rescue GitHosting::GitHostingException => e
-          logger.error { "#{@action} : error while cleaning repository path '#{path}'" }
-        end
-      end
-    end
-
-
     # TODO
-    def is_repository_empty?(new_path)
-      empty_repo = false
-
-      begin
-        output = GitHosting.execute_command(:shell_cmd, "find '#{new_path}/objects' -type f | wc -l").chomp.gsub('\n', '')
-        logger.debug { "#{@action} : counted objects in repository directory '#{new_path}' : '#{output}'" }
-
-        if output.to_i == 0
-          empty_repo = true
-        else
-          empty_repo = false
-        end
-      rescue GitHosting::GitHostingException => e
-        empty_repo = false
-      end
-
-      return empty_repo
-    end
-
-
-    # TODO
-    def move_physical_repo(old_path, new_path, new_parent_path)
-      ## CASE 0
-      if old_path == new_path
-        logger.info { "#{@action} : old repository and new repository are identical '#{old_path}', nothing to do, exit !" }
-        return true
-      end
-
-      ## CASE 1
-      if GitoliteWrapper.file_exists?(new_path) && GitoliteWrapper.file_exists?(old_path)
-
-        if is_repository_empty?(new_path)
-          logger.warn { "#{@action} : target repository '#{new_path}' already exists and is empty, remove it ..." }
-          begin
-            GitHosting.execute_command(:shell_cmd, "rm -rf '#{new_path}'")
-          rescue GitHosting::GitHostingException => e
-            logger.error { "#{@action} : removing existing target repository failed, exit !" }
-            return false
-          end
-        else
-          logger.warn { "#{@action} : target repository '#{new_path}' exists and is not empty, considered as already moved, try to remove the old_path" }
-
-          if is_repository_empty?(old_path)
-            begin
-              GitHosting.execute_command(:shell_cmd, "rm -rf '#{old_path}'")
-              return true
-            rescue GitHosting::GitHostingException => e
-              logger.error { "#{@action} : removing source repository directory failed, exit !" }
-              return false
-            end
-          else
-            logger.error { "#{@action} : the source repository directory is not empty, cannot remove it, exit ! (This repo will be orphan)" }
-            return false
-          end
-        end
-
-      ## CASE 2
-      elsif !GitoliteWrapper.file_exists?(new_path) && !GitoliteWrapper.file_exists?(old_path)
-        logger.error { "#{@action} : both old repository '#{old_path}' and new repository '#{new_path}' does not exist, cannot move it, exit but let Gitolite create the new repo !" }
-        return true
-
-      ## CASE 3
-      elsif GitoliteWrapper.file_exists?(new_path) && !GitoliteWrapper.file_exists?(old_path)
-        logger.error { "#{@action} : old repository '#{old_path}' does not exist, but the new one does, use it !" }
-        return true
-
-      ## CASE 4
-      elsif !GitoliteWrapper.file_exists?(new_path) && GitoliteWrapper.file_exists?(old_path)
-
-        logger.debug { "#{@action} : really moving Gitolite repository from '#{old_path}' to '#{new_path}'" }
-
-        if !GitoliteWrapper.file_exists? new_parent_path
-          begin
-            GitHosting.execute_command(:shell_cmd, "mkdir -p '#{new_parent_path}'")
-          rescue GitHosting::GitHostingException => e
-            logger.error { "#{@action} : creation of parent path '#{new_parent_path}' failed, exit !" }
-            return false
-          end
-        end
-
-        begin
-          GitHosting.execute_command(:shell_cmd, "mv '#{old_path}' '#{new_path}'")
-          logger.info { "#{@action} : done !" }
-          return true
-        rescue GitHosting::GitHostingException => e
-          logger.error { "move_physical_repo(#{old_path}, #{new_path}) failed" }
-          return false
-        end
-      end
-    end
-
-
     def create_readme_file(repository)
       temp_dir = Dir.mktmpdir
 

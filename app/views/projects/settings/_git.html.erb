@@ -1,6 +1,6 @@
 <p>
 	<%# TODO show only admin? %>
-	<%= form.text_field(:url, :size => 100, :value => repository.gitolite_repository_path, :disabled => true) %>
+	<%= form.text_field(:url, :size => 100, :value => repository.git_path, :disabled => true) %>
 	<br />
 	<em>The repository path for Gitolite this project resides under.</em>
 	<p>

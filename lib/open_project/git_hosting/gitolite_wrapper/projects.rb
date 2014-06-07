@@ -13,12 +13,15 @@ module OpenProject::GitHosting::GitoliteWrapper
     end
 
     def move_repositories
-      project = Project.find_by_id(@object_id)
+      projects = Project.find_by_id(@object_id).self_and_descendants
+
+      # Only take projects that have Git repos.
+      git_projects = projects.map{|p| p.repository if p.repository.is_a?(Repository::Git)}.compact
+      return if git_projects.empty?
 
       @admin.transaction do
-        @delete_parent_path = []
-        handle_repositories_move(project)
-        clean_path(@delete_parent_path)
+        byebug
+        handle_repositories_move(git_projects)
       end
     end
 
@@ -27,13 +30,16 @@ module OpenProject::GitHosting::GitoliteWrapper
       projects = Project.active_or_archived.includes(:repositories).all.select { |x| x.parent_id.nil? }
 
       @admin.transaction do
-        @delete_parent_path = []
-
         projects.each do |project|
-          handle_repositories_move(project)
-        end
 
-        clean_path(@delete_parent_path)
+          # Only take projects that have Git repos.
+          git_projects = project.self_and_descendants
+            .map{|p| p.repository if p.repository.is_a?(Repository::Git)}.compact
+
+          next if git_projects.empty?
+
+          handle_repositories_move(git_projects)
+        end
       end
     end
 

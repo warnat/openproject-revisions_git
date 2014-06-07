@@ -43,38 +43,16 @@ module OpenProject::GitHosting::GitoliteWrapper
     #
     # Performs two steps
     # 1. Delete the reposistory from gitolite-admin (and commit)
-    # 2. Depending on the setting :delete_git_repositories
-    #  (true) Delete the physical repository
-    #  (false) Move the physical repository to the recycle location
+    # 2. Delete the physical repository
+    # (and all empty parent directories within the repository storage)
     def delete_repositories
-      if Setting.plugin_openproject_git_hosting[:delete_git_repositories]
-        handle_repository_delete(@object_id) do |repo|
-          byebug
-          OpenProject::GitHosting::GitoliteWrapper::sudo_rmdir(repo[:path])
-        end
-      else
-        handle_repository_delete(@object_id) do |repo|
-          recycle = OpenProject::GitHosting::Recycle.new
-          recycle.move_repository_to_recycle(repo)
-        end
+      handle_repository_delete(@object_id) do |repo|
+
+        # Delete all empty parent directories
+        # From the lowermost repository
+        clean_repo_dir(repo[:path])
       end
     end
 
-
-    def update_repository_default_branch
-      repository = Repository.find_by_id(@object_id)
-
-      begin
-        OpenProject::GitHosting.execute_command(:git_cmd, "--git-dir='#{repository.gitolite_repository_path}' symbolic-ref HEAD refs/heads/#{repository.extra[:default_branch]}")
-        logger.info { "Default branch successfully updated for repository '#{repository.gitolite_repository_name}'"}
-      rescue GitHosting::GitHostingException => e
-        logger.error { "Error while updating default branch for repository '#{repository.gitolite_repository_name}'"}
-      end
-
-      OpenProject::GitHosting::Cache.clear_cache_for_repository(repository)
-
-      logger.info { "Fetch changesets for repository '#{repository.gitolite_repository_name}'"}
-      repository.fetch_changesets
-    end
   end
 end
