@@ -54,13 +54,6 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
       add_index :gitolite_public_keys, :user_id
       add_index :gitolite_public_keys, :identifier
 
-      create_table :git_caches do |t|
-        t.column :command, :text, :null => false
-        t.column :command_output, :binary, :null => false
-        t.column :project_identifier, :string
-        t.timestamps
-      end
-
       create_table :repository_mirrors do |t|
         t.references :repository, :null => false
         t.column :active, :boolean, :default => true
@@ -169,7 +162,6 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
 
 
     drop_table :gitolite_public_keys
-    drop_table :git_caches
     drop_table :repository_mirrors
     drop_table :repository_git_extras
     drop_table :repository_post_receive_urls

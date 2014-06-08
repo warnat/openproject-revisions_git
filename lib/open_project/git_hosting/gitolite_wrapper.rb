@@ -280,14 +280,9 @@ module OpenProject::GitHosting
     #
     # action: An API action defined in one of the gitolite/* classes.
     def self.update(action, object, options={})
-      if options[:flush_cache] == true
-        logger.info("Flushing Settings Cache !")
-        Setting.check_cache
-      end
-
       WRAPPERS.each do |wrappermod|
         if wrappermod.method_defined?(action)
-          return wrappermod.new(action,object,options).send(action)
+          return wrappermod.new(action,object,options).run
         end
       end
 
@@ -301,33 +296,6 @@ module OpenProject::GitHosting
     #                        #
     ##########################
 
-
-    # TODO remove?
-    def self.http_root_url
-      my_root_url(false)
-    end
-
-    # TODO remove?
-    def self.https_root_url
-      my_root_url(true)
-    end
-
-    # TODO remove?
-    def self.my_root_url(ssl = false)
-      # Remove any path from httpServer in case they are leftover from previous installations.
-      # No trailing /.
-      my_root_path = OpenProject::Configuration.rails_relative_url_root
-
-      if ssl && https_server_domain != ''
-        server_domain = https_server_domain
-      else
-        server_domain = http_server_domain
-      end
-
-      my_root_url = File.join(server_domain[/^[^\/]*/], my_root_path, "/")[0..-2]
-
-      return my_root_url
-    end
 
     # Returns the gitolite welcome/info banner, containing its version.
     #

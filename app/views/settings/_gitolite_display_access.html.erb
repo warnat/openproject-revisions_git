@@ -8,8 +8,8 @@
 
   http_server_subdir           = Setting.plugin_openproject_git_hosting[:http_server_subdir]
 
-  http_server_domain           = OpenProject::GitHosting::GitoliteWrapper.http_root_url
-  https_server_domain          = OpenProject::GitHosting::GitoliteWrapper.https_root_url
+  http_server_domain           = 'foo' # OpenProject::GitHosting::GitoliteWrapper.http_root_url
+  https_server_domain          = 'bar' #OpenProject::GitHosting::GitoliteWrapper.https_root_url
 
   hierarchical_organisation    = OpenProject::GitHosting::GitoliteWrapper.true?(:hierarchical_organisation)
 %>

@@ -222,30 +222,6 @@ module OpenProject::GitHosting::GitoliteWrapper
       permissions
     end
 
-    # TODO
-    def create_readme_file(repository)
-      temp_dir = Dir.mktmpdir
-
-      command = ""
-      command << "env GIT_SSH=#{ConfigGitolite.gitolite_admin_ssh_script_path} git clone #{repository.ssh_url} #{temp_dir} 2>&1"
-      command << " && cd #{temp_dir}"
-      command << " && echo '## #{repository.gitolite_repository_name}' >> README.md"
-      command << " && git add README.md"
-      command << " && git commit README.md -m 'Initialize repository'"
-      command << " && env GIT_SSH=#{ConfigGitolite.gitolite_admin_ssh_script_path} git push -u origin #{repository.extra[:default_branch]}"
-
-      begin
-        output = GitHosting.execute_command(:local_cmd, command)
-        logger.info { "README file successfully created for repository '#{repository.gitolite_repository_name}'"}
-      rescue GitHosting::GitHostingException => e
-        logger.error { "Error while creating README file for repository '#{repository.gitolite_repository_name}'"}
-        logger.error { e.output }
-      end
-
-      FileUtils.remove_entry temp_dir rescue ''
-    end
-
-
     def delete_hook_param(repository, parameter_name)
       begin
         GitHosting.execute_command(:git_cmd, "--git-dir='#{repository.gitolite_repository_path}' config --local --unset #{parameter_name}")

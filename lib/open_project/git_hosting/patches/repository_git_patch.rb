@@ -19,41 +19,11 @@ module OpenProject::GitHosting
           has_many :repository_deployment_credentials, :dependent => :destroy, :foreign_key => 'repository_id'
           has_many :repository_git_config_keys,        :dependent => :destroy, :foreign_key => 'repository_id'
 
-          # TODO
-          # alias_method_chain :report_last_commit,       :git_hosting
-          # alias_method_chain :extra_report_last_commit, :git_hosting
-
-          before_destroy :clean_cache, prepend: true
-
           before_validation  :set_git_urls
         end
       end
 
       module ClassMethods
-
-        # Translate repository path into a unique ID for use in caching of git commands.
-        #
-        # We perform caching here to speed this up, since this function gets called
-        # many times during the course of a repository lookup.
-        @@cached_path = nil
-        @@cached_id = nil
-        def repo_path_to_git_cache_id(repo_path)
-          # Return cached value if pesent
-          return @@cached_id if @@cached_path == repo_path
-
-          repo = Repository::Git.find_by_path(repo_path)
-
-          if repo
-            # Cache translated id path, return id
-            @@cached_path = repo_path
-            @@cached_id = repo.git_cache_id
-          else
-            # Hm... clear cache, return nil
-            @@cached_path = nil
-            @@cached_id = nil
-          end
-        end
-
 
         # Parse a path of the form <proj1>/<proj2>/<proj3>/<projekt>.git and return the specified
         # project identifier.
@@ -72,10 +42,6 @@ module OpenProject::GitHosting
 
 
       module InstanceMethods
-
-        def git_cache_id
-            project.identifier
-        end
 
         # Returns the hierarchical repository path
         # e.g., "foo/bar.git"
@@ -210,13 +176,6 @@ module OpenProject::GitHosting
           self.url = self.gitolite_repository_path if self.url.blank?
           self.root_url = self.url if self.root_url.blank?
         end
-
-
-        def clean_cache
-          OpenProject::GitHosting::GitHosting.logger.info { "Clean cache before delete repository '#{gitolite_repository_name}'" }
-          OpenProject::GitHosting::Cache.clear_cache_for_repository(self)
-        end
-
       end
 
     end

@@ -94,15 +94,13 @@ module OpenProject::GitHosting
             end
 
             # Normalize paths, should be relative and end in '/'
-            [ :gitolite_global_storage_dir, :gitolite_recycle_bin_dir ].each do |setting|
-              if valuehash[setting]
-                normalizedFile  = File.expand_path(valuehash[setting].lstrip.rstrip, "/")
-                if (normalizedFile != "/")
-                  # Clobber leading '/' add trailing '/'
-                  valuehash[setting] = normalizedFile[1..-1] + "/"
-                else
-                  valuehash[setting] = @@old_valuehash[setting]
-                end
+            if valuehash[:gitolite_global_storage_dir]
+              normalizedFile  = File.expand_path(valuehash[:gitolite_global_storage_dir].lstrip.rstrip, "/")
+              if (normalizedFile != "/")
+                # Clobber leading '/' add trailing '/'
+                valuehash[:gitolite_global_storage_dir] = normalizedFile[1..-1] + "/"
+              else
+                valuehash[:gitolite_global_storage_dir] = @@old_valuehash[:gitolite_global_storage_dir]
               end
             end
 
@@ -149,16 +147,6 @@ module OpenProject::GitHosting
             end
 
 
-            # Validate gitolite_timeout > 0 and < 30 (and exclude non-numbers)
-            if valuehash[:gitolite_timeout]
-              if valuehash[:gitolite_timeout].to_i > 0 and valuehash[:gitolite_timeout].to_i < 30
-                valuehash[:gitolite_timeout] = "#{valuehash[:gitolite_timeout].to_i}"
-              else
-                valuehash[:gitolite_timeout] = @@old_valuehash[:gitolite_timeout]
-              end
-            end
-
-
             ## This a force update
             if valuehash[:gitolite_resync_all_projects] == 'true'
               @@resync_projects = true
@@ -170,12 +158,6 @@ module OpenProject::GitHosting
             if valuehash[:gitolite_resync_all_ssh_keys] == 'true'
               @@resync_ssh_keys = true
               valuehash[:gitolite_resync_all_ssh_keys] = false
-            end
-
-
-            if valuehash.has_key?(:gitolite_purge_repos) && !valuehash[:gitolite_purge_repos].empty?
-              @@delete_trash_repo = valuehash[:gitolite_purge_repos]
-              valuehash[:gitolite_purge_repos] = []
             end
 
 
@@ -195,29 +177,6 @@ module OpenProject::GitHosting
           if self.name == 'plugin_openproject_git_hosting'
             valuehash = self.value
 
-            # Settings cache doesn't seem to invalidate symbolic versions of Settings immediately,
-            # so, any use of Setting.plugin_openproject_git_hosting[] by things called during this
-            # callback will be outdated.... True for at least some versions of redmine plugin...
-            #
-            # John Kubiatowicz 12/21/2011
-            if Setting.respond_to?(:check_cache)
-              # Clear out all cached settings.
-              Setting.check_cache
-            end
-
-
-            ## SSH infos has changed, update scripts!
-            if @@old_valuehash[:gitolite_scripts_dir] != valuehash[:gitolite_scripts_dir] ||
-               @@old_valuehash[:gitolite_user] != valuehash[:gitolite_user] ||
-               @@old_valuehash[:gitolite_ssh_private_key] != valuehash[:gitolite_ssh_private_key] ||
-               @@old_valuehash[:gitolite_ssh_public_key] != valuehash[:gitolite_ssh_public_key] ||
-               @@old_valuehash[:gitolite_server_port] != valuehash[:gitolite_server_port]
-                # Need to update scripts
-                # TODO?
-                #OpenProject::GitHosting::GitoliteWrapper.update_scripts
-            end
-
-
             ## Storage infos has changed, move repositories!
             if @@old_valuehash[:gitolite_global_storage_dir] != valuehash[:gitolite_global_storage_dir] ||
                @@old_valuehash[:gitolite_storage_subdir] != valuehash[:gitolite_storage_subdir] ||
@@ -227,7 +186,7 @@ module OpenProject::GitHosting
                 if projects.length > 0
                   OpenProject::GitHosting::GitHosting.logger.info("Gitolite configuration has been modified : repositories hierarchy")
                   OpenProject::GitHosting::GitHosting.logger.info("Resync all projects (root projects : '#{projects.length}')...")
-                  OpenProject::GitHosting::GitoliteWrapper.update(:move_repositories_tree, projects.length, {:flush_cache => true})
+                  OpenProject::GitHosting::GitoliteWrapper.update(:move_repositories_tree, projects.length)
                 end
             end
 
@@ -289,19 +248,6 @@ module OpenProject::GitHosting
                 hooks = OpenProject::GitHosting::Hooks.new
                 hooks.hook_params_installed?
             end
-
-
-            ## Gitolite cache has changed, clear cache entries!
-            if @@old_valuehash[:gitolite_cache_max_time] != valuehash[:gitolite_cache_max_time]
-              OpenProject::GitHosting::Cache.clear_obsolete_cache_entries
-            end
-
-
-            if !@@delete_trash_repo.empty?
-              OpenProject::GitHosting.update(:purge_recycle_bin, @@delete_trash_repo)
-              @@delete_trash_repo = []
-            end
-
 
             @@old_valuehash = valuehash.clone
           end

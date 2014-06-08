@@ -39,24 +39,8 @@ module OpenProject::GitHosting::Patches::GitAdapterPatch
       end
       full_args += args
 
-      # Compute string from repo_path that should be same as: repo.git_cache_id
-      # If only we had access to the repo (we don't).
-      OpenProject::GitHosting::GitHosting.logger.debug("Lookup for git_cache_id with repository path '#{repo_path}' ... ")
-
-      git_cache_id = Repository::Git.repo_path_to_git_cache_id(repo_path)
-
-      # if !git_cache_id.nil?
-      #   # Insert cache between shell execution and caller
-      #   GitHosting.logger.debug("Found git_cache_id ('#{git_cache_id}'), call cache... ")
-      #   GitHosting.logger.debug("Send GitCommand : #{full_args.join(" ")}")
-      #   Cache.execute(full_args, git_cache_id, options, &block)
-      # else
-      #   GitHosting.logger.debug { "Unable to find git_cache_id, bypass cache... " }
       OpenProject::GitHosting::GitHosting.logger.debug("Send GitCommand : #{full_args.join(" ")}")
       OpenProject::GitHosting::GitoliteWrapper.sudo_pipe(*full_args, &block)
-
-      #Redmine::Scm::Adapters::AbstractAdapter.shellout(cmd_str, options, &block)
-      # end
     end
 
   end

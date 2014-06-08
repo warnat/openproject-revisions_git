@@ -24,11 +24,7 @@ class GitoliteHooksController < ApplicationController
 
 
   def post_receive_redmine
-    ## Clear existing cache
-    OpenProject::GitHosting::Cache.clear_cache_for_repository(@repository)
-
     self.response.headers["Content-Type"] = "text/plain;"
-
     self.response_body = Enumerator.new do |y|
 
       ## Fetch commits from the repository

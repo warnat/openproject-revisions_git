@@ -23,5 +23,10 @@ module OpenProject::GitHosting::GitoliteWrapper
     rescue => e
       logger.error { "#{e.message}" }
     end
+
+    def run
+      send(@action)
+    end
+    handle_asynchronously :run
   end
  end

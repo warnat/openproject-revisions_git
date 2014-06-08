@@ -9,9 +9,7 @@ module OpenProject::GitHosting
           include InstanceMethods
 
           alias_method_chain :show,    :git_hosting
-          # TODO
           alias_method_chain :edit,  :git_hosting
-          # alias_method_chain :update,  :git_hosting
           alias_method_chain :destroy, :git_hosting
 
           helper :git_hosting
@@ -47,26 +45,6 @@ module OpenProject::GitHosting
 
               OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' created a new repository '#{@repository.gitolite_repository_name}'")
               OpenProject::GitHosting::GitoliteWrapper.update(:add_repository, @repository)
-          end
-        end
-
-
-        def update_with_git_hosting(&block)
-          update_without_git_hosting(&block)
-
-          if @repository.is_a?(Repository::Git)
-            if !@repository.errors.any?
-
-              params[:extra][:git_daemon] = params[:extra][:git_daemon] == 'true'
-              params[:extra][:git_notify] = params[:extra][:git_notify] == 'true'
-
-              ## Update attributes
-              @repository.extra.update_attributes(params[:extra])
-
-              ## Update repository
-              OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has modified repository '#{@repository.gitolite_repository_name}'")
-              OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, @repository)
-            end
           end
         end
 

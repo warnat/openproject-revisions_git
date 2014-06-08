@@ -22,7 +22,6 @@ module OpenProject::GitHosting
         # Gitolite Global Config
         :gitolite_scripts_dir                  => File.join(Dir.home, 'bin'),
         :gitolite_timeout                      => 10,
-        :gitolite_recycle_bin_expiration_time  => 24.0,
         :gitolite_log_level                    => 'info',
         :gitolite_log_split                    => false,
         :git_config_username                   => 'OpenProject Git Hosting',
@@ -31,11 +30,6 @@ module OpenProject::GitHosting
         # Gitolite Hooks Config
         :gitolite_force_hooks_update      => true,
         :gitolite_hooks_debug             => false,
-
-        # Gitolite Cache Config
-        :gitolite_cache_max_time          => 86400,
-        :gitolite_cache_max_size          => 16,
-        :gitolite_cache_max_elements      => 2000,
 
         # Gitolite Access Config
         :ssh_server_domain                => 'localhost',
