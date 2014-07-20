@@ -4,18 +4,28 @@ module OpenProject::GitHosting::GitoliteWrapper
     attr_reader :admin
 
     def initialize(action, object_id, options={})
-      @admin = OpenProject::GitHosting::GitoliteWrapper.admin
-      @gitolite_config = @admin.config
-
       @object_id      = object_id
       @action         = action
       @options        = options
+
+      logger.info("Creating gitolite action for '#{@action}'")
     end
+
+    def run
+      logger.info("Running delayed job '#{@action}'")
+
+      # Created here to avoid serialization of these heavy objects
+      # before delayed_job.
+      @admin = OpenProject::GitHosting::GitoliteWrapper.admin
+      @gitolite_config = @admin.config
+
+      send(@action)
+    end
+    handle_asynchronously :run
 
     def logger
       Rails.logger
     end
-
 
     def gitolite_admin_repo_commit(message = '')
       logger.info("#{@action} : commiting to Gitolite...")
@@ -24,9 +34,5 @@ module OpenProject::GitHosting::GitoliteWrapper
       logger.error { "#{e.message}" }
     end
 
-    def run
-      send(@action)
-    end
-    handle_asynchronously :run
   end
  end
