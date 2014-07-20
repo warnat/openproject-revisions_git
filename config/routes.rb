@@ -24,8 +24,8 @@ OpenProject::Application.routes.draw do
   #   end
   # end
 
-  # SMART http_server_subdirP
-  match ':repo_path/*git_params', #:prefix => Setting.plugin_openproject_git_hosting[:http_server_subdir], 
+  # SMART HTTP
+  match 'git/:repo_path/*git_params',
     :repo_path => /([^\/]+\/)*?[^\/]+\.git/, :to => 'smart_http#index'
 
   # POST RECEIVE

@@ -1,9 +1,7 @@
 <%
   # Gitolite Access Config
   ssh_server_domain   = Setting.plugin_openproject_git_hosting[:ssh_server_domain]
-  http_server_domain  = Setting.plugin_openproject_git_hosting[:http_server_domain]
   https_server_domain = Setting.plugin_openproject_git_hosting[:https_server_domain]
-  http_server_subdir  = Setting.plugin_openproject_git_hosting[:http_server_subdir]
 
   gitolite_http_by_default   = Setting.plugin_openproject_git_hosting[:gitolite_http_by_default]
 
@@ -14,15 +12,6 @@
 
 <h3><%= l(:label_gitolite_access_config) %></h3>
 
-
-
-<p>
-  <label><%= l(:label_http_server_domain) %></label>
-  <%= text_field_tag("settings[http_server_domain]", http_server_domain, :size => 60) %>
-  <br />
-  <em><%= l(:label_default_domain_name) %> : <%= Setting.host_name.split('/').first %></em>
-</p>
-
 <p>
   <label><%= l(:label_https_server_domain) %></label>
   <%= text_field_tag("settings[https_server_domain]", https_server_domain, :size => 60) %>
@@ -31,18 +20,11 @@
 </p>
 
 <p>
-  <label><%= raw l(:label_http_server_subdir) %></label>
-  <%= text_field_tag("settings[http_server_subdir]", "./#{http_server_subdir}", :size => 60) %>
-</p>
-
-<p>
   <label><%= l(:label_gitolite_http_by_default) %></label>
   <%= select_tag("settings[gitolite_http_by_default]", 
     options_for_select([
       [l(:label_disabled), "0"],
-      [l(:label_http_only), "3"],
       [l(:label_https_only), "1"],
-      [l(:label_https_and_http), "2"]
     ], gitolite_http_by_default)) %>
 </p>
 

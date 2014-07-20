@@ -89,11 +89,6 @@ module OpenProject::GitHosting
         end
 
 
-        def http_url
-          "http://#{http_user_login}#{Setting.plugin_openproject_git_hosting[:http_server_domain]}/#{http_access_path}"
-        end
-
-
         def https_url
           "https://#{http_user_login}#{Setting.plugin_openproject_git_hosting[:https_server_domain]}/#{http_access_path}"
         end
@@ -114,12 +109,6 @@ module OpenProject::GitHosting
             :commiter => commiter
           }
 
-          ## Unsecure channels (clear password), commit is disabled
-          http_access = {
-            :url      => http_url,
-            :commiter => 'false'
-          }
-
           git_access = {
             :url      => git_url,
             :commiter => 'false'
@@ -133,15 +122,6 @@ module OpenProject::GitHosting
 
           if extra[:git_http] == 1
             hash[:https] = https_access
-          end
-
-          if extra[:git_http] == 2
-            hash[:https] = https_access
-            hash[:http] = http_access
-          end
-
-          if extra[:git_http] == 3
-            hash[:http] = http_access
           end
 
           if project.is_public && extra[:git_daemon] == 1

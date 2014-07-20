@@ -33,9 +33,7 @@ module OpenProject::GitHosting
 
         # Gitolite Access Config
         :ssh_server_domain                => 'localhost',
-        :http_server_domain               => 'localhost',
-        :https_server_domain              => '',
-        :http_server_subdir               => '',
+        :https_server_domain              => 'localhost',
         :show_repositories_url            => true,
         :gitolite_daemon_by_default       => false,
         :gitolite_http_by_default         => 1,
