@@ -3,7 +3,7 @@ module OpenProject::GitHosting
     engine_name :openproject_git_hosting
 
 
-    def self.settings 
+    def self.settings
       { :partial => 'settings/openproject_git_hosting',
         :default => {
         # Gitolite SSH Config
@@ -91,7 +91,7 @@ module OpenProject::GitHosting
           :html => { :class => 'icon2 icon-locked-folder' },
           :caption => :label_public_keys
 
-      end
+    end
 
     # Reload patches for development
     # initializer 'git_hosting.patches' do
@@ -108,12 +108,12 @@ module OpenProject::GitHosting
     end
 
 
-      patches [
+    patches [
         :Project, :Repository, :User, :Setting, :Member,
         :ProjectsController, :RolesController, :RepositoriesController,
         :SettingsController, :UsersController, :MyController,
         :RepositoriesHelper, :UsersHelper
-      ]
+    ]
 
   end
 end

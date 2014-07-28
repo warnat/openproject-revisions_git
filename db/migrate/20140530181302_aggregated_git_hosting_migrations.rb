@@ -117,6 +117,7 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
         puts "Redmine Roles have not yet been seeded. Loading them now."
         # Ensure previous migrations have run
         Role.reset_column_information
+        Type.reset_column_information
         Redmine::DefaultData::Loader.load('en')
       end
 

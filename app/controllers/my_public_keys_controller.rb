@@ -8,7 +8,7 @@ class MyPublicKeysController < ApplicationController
 
   before_filter :require_login
   
-  before_filter :set_user_keys, :only => [:index]
+  before_filter :set_my_keys, :only => [:index]
   before_filter :find_gitolite_public_key, :only => [:destroy]
 
 
@@ -33,8 +33,9 @@ class MyPublicKeysController < ApplicationController
 
   private
 
-  def set_user
+  def set_my_keys
     @user = User.current
+    set_user_keys
   end
 
   def gitolite_keys_allowed_params
