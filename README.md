@@ -22,7 +22,7 @@ As OpenProject has diverted quite a bit in terms of project management (e.g., re
 
 ✓ Multiple keys per user
 
-** Gitolite Repository Management **
+**Gitolite Repository Management**
 
 ✓ Managing repositories with Gitolite upon creation, update/deletion. (Async w/ delayed_jobs)
 
@@ -57,16 +57,15 @@ I'm assuming you have some basic knowledge of Gitolite and:
 * are in possession of a SSH key pair set up for use with gitolite.
 * have successfully cloned the gitolite-admin.git repository from the user running OpenProject.
 
-##### 1. Gemfile.plugins 
+##### 1. Gemfile.plugins
 
 Add a Gemfile.plugins to your OpenProject root with the following contents:
 
-	gem "openproject-plugins", :git => "https://github.com/opf/openproject-plugins.git", :branch => "stable" 
-	gem "openproject-git_hosting", :git => "https://github.com/oliverguenther/openproject-git_hosting.git", :branch => "devel" 
+	gem "openproject-git_hosting", :git => "https://github.com/oliverguenther/openproject-git_hosting.git", :branch => "dev"
 
 ##### 2. Sudo rights
 
-Ensure the user running OpenProject can sudo to the gitolite user. 
+Ensure the user running OpenProject can sudo to the gitolite user.
 
 Assuming that user is called *openproject* and the gitolite user is *git*, open visudo and add:
 
@@ -85,12 +84,12 @@ Make sure you can ssh into gitolite from the openproject user. If you run the fo
 
 Run OpenProject, go to **Admin > Plugins > OpenProject Git Hosting** (click on configure)
 
-Alter you configuration for Gitolite (Gitolite path, gitolite-admin.git path, etc.) accordingly and click save. 
+Alter you configuration for Gitolite (Gitolite path, gitolite-admin.git path, etc.) accordingly and click save.
 
 ##### 5. Config Test
 
 Check that the output on the tab 'Config Test' looks good.
-Note that many of the settings are not yet functional, and some values on config test are thus irrelevant (Hooks, for example).	    
+Note that many of the settings are not yet functional, and some values on config test are thus irrelevant (Hooks, for example).
 
 ## Basic Usage
 
@@ -114,7 +113,7 @@ Copyright (c) 2014 Oliver Günther (mail@oliverguenther.de)
 
 This plugin bases on the [Redmine Git Hosting plugin by Nicolas Rodriguez](https://github.com/jbox-web/openproject_git_hosting)
 
-Copyright (c) 2013-2014 Nicolas Rodriguez (nrodriguez@jbox-web.com), JBox Web (http://www.jbox-web.com) [![endorse](https://api.coderwall.com/n-rodriguez/endorsecount.png)](https://coderwall.com/n-rodriguez)
+Copyright (c) 2013-2014 Nicolas Rodriguez (nrodriguez@jbox-web.com), JBox Web (http://www.jbox-web.com)
 
 Copyright (c) 2011-2013 John Kubiatowicz (kubitron@cs.berkeley.edu)
 

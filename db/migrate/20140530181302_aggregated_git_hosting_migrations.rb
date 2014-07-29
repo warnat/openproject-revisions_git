@@ -118,6 +118,7 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
         # Ensure previous migrations have run
         Role.reset_column_information
         Type.reset_column_information
+        CustomField.reset_column_information
         Redmine::DefaultData::Loader.load('en')
       end
 
