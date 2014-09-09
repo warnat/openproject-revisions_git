@@ -104,13 +104,15 @@ module OpenProject::GitHosting
     end
 
     initializer 'git_hosting.hooks' do
-      require_relative 'hooks'
+      require 'open_project/git_hosting/hooks'
+      require 'open_project/git_hosting/hooks/gitolite_updater'
+
+      OpenProject::SourceControl::ProxiedRepositoryHook.delegate(Hooks::GitoliteUpdaterHook)
     end
 
 
     patches [
-        :Project, :Repository, :User, :Setting, :Member,
-        :ProjectsController, :RolesController, :RepositoriesController,
+        :Project, :Repository, :User, :Setting,
         :SettingsController, :UsersController, :MyController,
         :RepositoriesHelper, :UsersHelper
     ]

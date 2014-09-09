@@ -182,7 +182,7 @@ module OpenProject::GitHosting
                @@old_valuehash[:gitolite_storage_subdir] != valuehash[:gitolite_storage_subdir] ||
                @@old_valuehash[:hierarchical_organisation] != valuehash[:hierarchical_organisation]
                 # Need to update everyone!
-                projects = Project.active_or_archived.includes(:repositories).all.select { |x| x if x.parent_id.nil? }
+                projects = Project.active.includes(:repositories).all.select { |x| x if x.parent_id.nil? }
                 if projects.length > 0
                   OpenProject::GitHosting::GitHosting.logger.info("Gitolite configuration has been modified : repositories hierarchy")
                   OpenProject::GitHosting::GitHosting.logger.info("Resync all projects (root projects : '#{projects.length}')...")
@@ -195,7 +195,7 @@ module OpenProject::GitHosting
             if @@old_valuehash[:gitolite_config_file] != valuehash[:gitolite_config_file] ||
                @@old_valuehash[:gitolite_config_has_admin_key] != valuehash[:gitolite_config_has_admin_key]
                 # Need to update everyone!
-                projects = Project.active_or_archived.includes(:repositories).all
+                projects = Project.active.includes(:repositories).all
                 if projects.length > 0
                   OpenProject::GitHosting::GitHosting.logger.info("Gitolite configuration has been modified, resync all projects...")
                   OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects, projects.length)
@@ -214,7 +214,7 @@ module OpenProject::GitHosting
             ## A resync has been asked within the interface, update all projects in force mode
             if @@resync_projects == true
               # Need to update everyone!
-              projects = Project.active_or_archived.includes(:repositories).all
+              projects = Project.active.includes(:repositories).all
               if projects.length > 0
                 OpenProject::GitHosting::GitHosting.logger.info("Forced resync of all projects (#{projects.length})...")
                 OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects, projects.length)

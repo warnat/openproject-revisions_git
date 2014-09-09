@@ -8,7 +8,7 @@ module OpenProject::GitHosting::GitoliteWrapper
     end
 
     def update_all_projects
-      projects = Project.active_or_archived.includes(:repositories).all
+      projects = Project.active.includes(:repositories).all
       perform_update(projects)
     end
 
@@ -27,7 +27,7 @@ module OpenProject::GitHosting::GitoliteWrapper
 
 
     def move_repositories_tree
-      projects = Project.active_or_archived.includes(:repositories).all.select { |x| x.parent_id.nil? }
+      projects = Project.active.includes(:repositories).all.select { |x| x.parent_id.nil? }
 
       @admin.transaction do
         projects.each do |project|

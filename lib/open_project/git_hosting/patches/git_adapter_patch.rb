@@ -21,6 +21,9 @@ module OpenProject::GitHosting::Patches::GitAdapterPatch
 
     def scm_version_from_command_line_with_git_hosting
       OpenProject::GitHosting::GitoliteWrapper.sudo_capture('git', '--version', '--no-color')
+    rescue => e
+       OpenProject::GitHosting::GitHosting.logger.error("Can't retrieve git version: #{e}")
+      'unknown'
     end
 
   end

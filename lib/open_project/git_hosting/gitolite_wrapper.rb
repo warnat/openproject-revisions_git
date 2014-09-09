@@ -18,6 +18,10 @@ module OpenProject::GitHosting
       Rails.logger
     end
 
+    def logger
+      self.class.logger
+    end
+
     def self.gitolite_user
       Setting.plugin_openproject_git_hosting[:gitolite_user]
     end
@@ -216,7 +220,6 @@ module OpenProject::GitHosting
     # Test if a file or directory exists and is readable to the gitolite user
     # Prepends '$HOME/' to the given path.
     def self.file_exists?(filename)
-      test = GitoliteWrapper.sudo_capture('whoami')
       sudo_test(filename, '-r')
     end
 

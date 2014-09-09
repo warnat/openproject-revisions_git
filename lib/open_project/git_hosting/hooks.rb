@@ -2,6 +2,17 @@ require 'digest/md5'
 
 module OpenProject::GitHosting
 
+  class RoleUpdater < Redmine::Hook::Listener
+    def roles_changed(context)
+      message = context[:message]
+      projects = Project.active.includes(:repositories).all
+      if projects.length > 0
+        OpenProject::GitHosting::GitHosting.logger.info("Role has been #{message}, resync all projects...")
+        OpenProject::GitHosting::GitoliteWrapper.update(:update_all_projects, projects.length)
+      end
+    end
+  end
+
   class AttributeHook < Redmine::Hook::ViewListener
     render_on :view_create_project_form_attributes, :partial => 'projects/form/attributes/git_project'
   end

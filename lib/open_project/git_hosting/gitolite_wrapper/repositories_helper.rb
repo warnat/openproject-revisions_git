@@ -206,8 +206,6 @@ module OpenProject::GitHosting::GitoliteWrapper
         read << "DUMMY_REDMINE_KEY" if read.empty? && write.empty? && rewind.empty?
         read << "gitweb" if User.anonymous.allowed_to?(:browse_repository, project) && repository.extra[:git_http] != 0
         read << "daemon" if User.anonymous.allowed_to?(:view_changesets, project) && repository.extra[:git_daemon]
-      elsif project.archived?
-        read << "REDMINE_ARCHIVED_PROJECT"
       else
         all_read = rewind_users + write_users + read_users
         read     = all_read.map{|user| user.gitolite_identifier}
