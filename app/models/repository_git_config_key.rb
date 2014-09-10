@@ -47,8 +47,8 @@ class RepositoryGitConfigKey < ActiveRecord::Base
 
 
   def update_repository(options)
-    OpenProject::GitHosting::GitHosting.logger.info("Rebuilding Git config keys respository : '#{repository.gitolite_repository_name}'")
-    OpenProject::GitHosting::GitoliteWrapper.update(:update_repository, repository, options)
+    OpenProject::Revisions::Git::GitoliteWrapper.logger.info("Rebuilding Git config keys respository : '#{repository.gitolite_repository_name}'")
+    OpenProject::Revisions::Git::GitoliteWrapper.update(:update_repository, repository, options)
   end
 
 end

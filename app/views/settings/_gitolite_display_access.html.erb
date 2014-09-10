@@ -1,15 +1,15 @@
 <%
   # Gitolite Display Access
-  gitolite_user                = Setting.plugin_openproject_git_hosting[:gitolite_user]
-  ssh_server_domain            = Setting.plugin_openproject_git_hosting[:ssh_server_domain]
+  gitolite_user                = Setting.plugin_openproject_revisions_git[:gitolite_user]
+  ssh_server_domain            = Setting.plugin_openproject_revisions_git[:ssh_server_domain]
 
-  gitolite_global_storage_dir  = Setting.plugin_openproject_git_hosting[:gitolite_global_storage_dir]
-  gitolite_storage_subdir = Setting.plugin_openproject_git_hosting[:gitolite_storage_subdir]
+  gitolite_global_storage_dir  = Setting.plugin_openproject_revisions_git[:gitolite_global_storage_dir]
+  gitolite_storage_subdir = Setting.plugin_openproject_revisions_git[:gitolite_storage_subdir]
 
-  https_server_domain = Setting.plugin_openproject_git_hosting[:https_server_domain]
+  https_server_domain = Setting.plugin_openproject_revisions_git[:https_server_domain]
 %>
 
-<div class="git_hosting_access_box">
+<div class="revisions_git_access_box">
 
   <h3><%= l(:label_current_access_patterns) %></h3>
 

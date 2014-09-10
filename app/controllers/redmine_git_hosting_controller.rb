@@ -9,7 +9,7 @@ class RedmineGitHostingController < ApplicationController
 
   layout Proc.new { |controller| controller.request.xhr? ? 'popup' : 'base' }
 
-  helper :git_hosting
+  helper :revisions_git
 
 
   def show

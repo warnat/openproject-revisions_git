@@ -31,9 +31,9 @@ class RepositoryGitExtra < ActiveRecord::Base
 
 
   def setup_defaults
-    write_attribute(:git_http,   Setting.plugin_openproject_git_hosting[:gitolite_http_by_default])
-    write_attribute(:git_daemon, Setting.plugin_openproject_git_hosting[:gitolite_daemon_by_default])
-    write_attribute(:git_notify, Setting.plugin_openproject_git_hosting[:gitolite_notify_by_default])
+    write_attribute(:git_http,   Setting.plugin_openproject_revisions_git[:gitolite_http_by_default])
+    write_attribute(:git_daemon, Setting.plugin_openproject_revisions_git[:gitolite_daemon_by_default])
+    write_attribute(:git_notify, Setting.plugin_openproject_revisions_git[:gitolite_notify_by_default])
     write_attribute(:default_branch, 'master')
   end
 

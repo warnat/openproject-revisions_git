@@ -10,84 +10,6 @@ fr:
         blank_default_exists: "Ne peut pas mettre le dépôt par défaut, car le dépôt par défaut courant a un identifiant vide."
         error_wrong_config_key_format: "Mauvais format de clé (doit contenir au moin un '.')"
 
-  ########### MIRRORS ###########
-  # Basics labels
-  label_repository_mirrors: Miroirs du dépôt
-  label_mirror_add: Ajouter un miroir de dépôt
-  label_mirror_create: Créer un miroir de dépôt
-  label_mirror_edit: Modifier un miroir de dépôt
-  label_mirror_delete: Supprimer un miroir de dépôt
-
-  # Basics notices
-  notice_mirror_created: Miroir crée avec succès.
-  notice_mirror_updated: Miroir modifié avec succès.
-  notice_mirror_deleted: Miroir supprimé avec succès.
-  notice_mirror_create_failed: Échec de création du miroir.
-  notice_mirror_update_failed: Échec de modification du miroir.
-
-  # Misc
-  label_mirror_push_mode: Mode de mise à jour du miroir
-  label_mirror_full_mirror: Miroir complet
-  label_mirror_forced_update: Forcer la mise à jour du miroir
-  label_mirror_fast_forward: Avance rapide (non forcé)
-
-  label_mirror_inactive: Inactif
-  label_mirror_help: Le miroir doit donner les droits d'écriture à la clé publique suivante
-
-  label_mirror_push_title: Envoyer au miroir
-  label_mirror_push_info_html: "Envoi des changements au miroir <b>%{mirror_url}</b> : <span class=\"label label-%{status_css}\">%{status}</span>"
-  label_mirror_push_output: Sortie
-  label_mirror_push_sucess: Succès
-  label_mirror_push_fail: Échec
-
-  label_mirror: Miroir
-  label_mirror_push: Envoyer
-  label_mirror_refspec: Refspec
-  label_mirror_include_all_branches: Envoyer toutes les branches
-  label_mirror_include_all_tags: Envoyer toutes les étiquettes
-  label_mirror_explicit_refspec: Spécification de références explicites
-  label_mirror_url_accepted_format: Formats d'URL acceptés
-
-  all_references: "Toutes&nbsp;les&nbsp;références"
-  all_branches: "Toutes&nbsp;les&nbsp;branches"
-  all_tags: "Toutes&nbsp;les&nbsp;étiquettes"
-
-
-  ########### DEPLOYMENT CREDENTIALS ###########
-  # Basics labels
-  label_deployment_credentials: Pièces d'identités de déploiement
-  label_deployment_credential_add: Ajouter une pièce d'identité de déploiement
-  label_deployment_credential_create: Créer une nouvelle pièce d'identité de déploiement
-  label_deployment_credential_edit: Modifier la pièce d'identité de déploiement
-  label_deployment_credential_delete: Supprimer la pièce d'identité de déploiement
-
-  # Basics notices
-  notice_deployment_credential_created: La pièce d'identité de déploiement a été créée avec succès.
-  notice_deployment_credential_updated: La pièce d'identité de déploiement a été modifiée avec succès.
-  notice_deployment_credential_deleted: La pièce d'identité de déploiement a été supprimée avec succès.
-  notice_deployment_credential_deleted_with_key: La pièce d'identité de déploiement et la clé associée ont été supprimées avec succès.
-  notice_deployment_credential_create_failed: Échec de création de la pièce d'identité de déploiement
-  notice_deployment_credential_update_failed: Échec de modification de la pièce d'identité de déploiement
-
-  # Basics fields
-  field_perm: Permissions d'accès
-
-  # Misc
-  label_deployment_credential_create_key_first: Aucune clé de déploiement n'a été détectée. Vous devriez commencer par en créer une.
-  label_deployment_credential_permissions: Permissions d'accès
-  label_deployment_credential_delete_when_unused: Effacer la clé quand elle n'est plus utilisée
-  label_deployment_credential_select_deploy_key: Sélectionnez une clé de déploiement
-
-  label_deployment_credential_owner: Propriétaire
-  label_deployment_credential_public_key_name: Nom de la clé publique
-  label_deployment_credential_public_key_file: Fichier de la clé publique
-  label_deployment_credential_permissions: Permissions
-  label_deployment_credential_honored: Honorée?
-  label_deployment_credential_active: Activée?
-
-  select_other_keys: Autres clés
-
-
   ########### GIT CONFIG KEYS ###########
   # Basics labels
   label_git_config_keys: Clés de configuration Git
@@ -106,21 +28,6 @@ fr:
   label_key: Clé
   label_value: Valeur
 
-
-  ########### POST RECEIVE URL ###########
-  # Basics labels
-  label_post_receive_urls: URL après réception
-  label_post_receive_url_add: Ajouter une URL après réception
-  label_post_receive_url_create: Créer une URL après réception
-  label_post_receive_url_edit: Modifier l'URL après réception
-  label_post_receive_url_delete: Supprimer l'URL après réception
-
-  # Basics notices
-  notice_post_receive_url_created: L'URL après réception a été créé avec succès.
-  notice_post_receive_url_updated: L'URL après réception a été modifié avec succès.
-  notice_post_receive_url_deleted: L'URL après réception a été supprimée avec succès.
-  notice_post_receive_url_create_failed: Échec de création de l'URL après réception.
-  notice_post_receive_url_update_failed: Échec de modification de l'URL après réception.
 
   # Basics fields
   field_mode: Mode
@@ -173,7 +80,7 @@ fr:
 
   ########### REPOSITORIES ###########
 
-  text_scm_command_not_available_git_hosting: Ce SCM n'est pas disponible. Vérifier les paramètres dans la section administration du plugin Redmine Git Hosting.
+  text_scm_command_not_available_revisions_git: Ce SCM n'est pas disponible. Vérifier les paramètres dans la section administration du plugin Redmine Git Hosting.
 
   # Create Repository
   label_repository_options: Options du dépôt
@@ -192,8 +99,6 @@ fr:
 
   # Repository code browser
   label_download_format: Télécharger au format %{archive_format}
-  error_download_revision_no_such_commit: "Le commit %{commit} n'a pas été trouvé"
-
   # Repositories URL (labels)
   label_copy_to_clipboard: Copier dans le presse papier
   label_copied_to_clipboard: Copié!
@@ -212,11 +117,6 @@ fr:
   label_read_only_permission: Lecture seule
 
   notice_empty_repository: Le dépôt est vide. Commencez en suivant les instructions ci-dessous.
-
-  # Gitolite Hooks
-  error_project_not_found: "Aucun projet avec cet identifiant n'a été trouvé"
-  error_repository_not_found: "Aucun dépôt avec cet identifiant n'a été trouvé"
-
 
   # Statistics
   label_repository_statistics_global: Statistiques globales
@@ -266,18 +166,6 @@ fr:
   button_ok: OK
 
   ## Permissions
-  permission_create_repository_mirrors: Créer des miroirs de dépôts
-  permission_view_repository_mirrors: Voir des miroirs de dépôts
-  permission_edit_repository_mirrors: Modifier des miroirs de dépôts
-
-  permission_create_repository_post_receive_urls: Créer des URL après réception
-  permission_view_repository_post_receive_urls: Voir les URL après réception
-  permission_edit_repository_post_receive_urls: Modifier les URL après réception
-
-  permission_create_deployment_keys: Créer des clés de déploiement
-  permission_view_deployment_keys: Voir des clés de déploiement
-  permission_edit_deployment_keys: Modifier des clés de déploiement
-
   permission_create_repository_git_config_keys: Créer des clés de configuration Git
   permission_view_repository_git_config_keys: Voir des clés de configuration Git
   permission_edit_repository_git_config_keys: Modifier des clés de configuration Git
@@ -289,8 +177,8 @@ fr:
   # Global
   label_need_help: Besoin d'aide?
   label_open_issue: Ouvrir une demande
-  label_openproject_git_hosting_wiki: Redmine Git Hosting - Wiki
-  label_openproject_git_hosting_issue: Redmine Git Hosting - Ouvrir une demande
+  label_openproject_revisions_git_wiki: Redmine Git Hosting - Wiki
+  label_openproject_revisions_git_issue: Redmine Git Hosting - Ouvrir une demande
 
   # Gitolite SSH Config
   label_tab_ssh: SSH
@@ -340,8 +228,8 @@ fr:
   label_gitolite_log_level: Niveau de journalisation
   label_gitolite_log_split: Séparer les journaux dans plusieurs fichiers
   label_gitolite_log_split_desc: (Redémarrez Redmine et Sidekiq après les changements)
-  label_gitolite_log_split_on: (Seront stockés dans « rails root/logs/git_hosting/git_*.log »)
-  label_gitolite_log_split_off: (Seront stockés dans « rails root/logs/git_hosting.log »)
+  label_gitolite_log_split_on: (Seront stockés dans « rails root/logs/revisions_git/git_*.log »)
+  label_gitolite_log_split_off: (Seront stockés dans « rails root/logs/revisions_git.log »)
 
   label_debug: Débogue
   label_info: Info
@@ -367,18 +255,6 @@ fr:
   label_http_only: HTTP seulement
   label_https_only: HTTPS seulement
   label_https_and_http: HTTPS et HTTP
-
-  label_gitolite_download_revision_enabled: Activer le téléchargement des révisions Git
-
-  # Gitolite Hooks Config
-  label_tab_hooks: Hooks
-  label_gitolite_hooks_config: Configuration des hooks de Gitolite
-
-  label_gitolite_hooks_are_asynchronous: Lancer les hooks de manière asynchrone
-  label_gitolite_force_hooks_update: Forcer la mise à jour des hooks
-  label_gitolite_hooks_debug: Lancer les hooks en mode debug
-  label_gitolite_hooks_url: URL des hooks
-  label_gitolite_hooks_namespace: Espace de nom Git des hooks
 
   # Gitolite Cache Config
   label_tab_cache: Cache
@@ -431,8 +307,6 @@ fr:
   label_gitolite_version: Version de Gitolite
   label_gitolite_banner: Gitolite banner
   label_path_directories: Répertoires du PATH
-  label_gitolite_hooks_params_installed: Paramètres des hooks installés?
-  label_gitolite_hooks_installed: Hooks installés?
   label_redmine_user: Nom d'utilisateur Redmine
   label_sudo_version: Version de Sudo
   label_git_version: Version de Git

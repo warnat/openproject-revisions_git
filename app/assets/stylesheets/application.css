@@ -24,7 +24,7 @@ table.git_mailing_list td ul { padding-left: 0px; list-style-type: none; }
 /*
 PLUGIN SETTINGS
 */
-.git_hosting_access_box {
+.revisions_git_access_box {
   border: 2px solid;
   background-color: #dfffdf;
   border-color: #9fcf9f;
@@ -33,18 +33,18 @@ PLUGIN SETTINGS
   padding: 4px;
 }
 
-.git_hosting_access_box p {
+.revisions_git_access_box p {
   padding-left:100px;
   margin-top: 8px;
   margin-bottom: 8px;
 }
 
-.git_hosting_access_box label {
+.revisions_git_access_box label {
   margin-left: -100px;
   width: 95px;
 }
 
-.git_hosting_access_box em {
+.revisions_git_access_box em {
   font-style: italic;
   font-weight: bold;
   font-size: 110%;
@@ -72,7 +72,7 @@ REPOSITORY EDIT
   padding-right: 10px;
 }
 
-#git_hosting_settings div.split { display: block; float: left; width: 40%; }
+#revisions_git_settings div.split { display: block; float: left; width: 40%; }
 
 
 /*
@@ -89,11 +89,11 @@ REPOSITORY VIEW
   list-style-type: none;
 }
 
-#git_hosting_download_buttons {
+#revisions_git_download_buttons {
   margin-top: 20px;
 }
 
-#git_hosting_download_buttons ul li {
+#revisions_git_download_buttons ul li {
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -102,18 +102,18 @@ REPOSITORY VIEW
   margin: 0;
 }
 
-.git_hosting_urls {
+.revisions_git_urls {
   display: block;
   height: 90px;
   margin-bottom: 20px;
 }
 
-#git_hosting_download_buttons i {
+#revisions_git_download_buttons i {
   color: #FFFFFF;
   padding-right: 10px;
 }
 
-#git_hosting_download_buttons .button {
+#revisions_git_download_buttons .button {
   background: none repeat scroll 0 0 #2996CC;
   border: 1px solid #E0E2E3;
   border-color: rgba(0, 0, 0, 0);
@@ -142,14 +142,14 @@ div.flash.warning, .conflict {
 /*
 REPOSITORY SETTINGS
 */
-#git_hosting_settings label {
+#revisions_git_settings label {
   margin-left: -190px;
   padding-left: 5px;
   padding-right: 10px;
   width: 190px;
 }
 
-.git_hosting {
+.revisions_git {
   height: auto;
   min-height: 80px;
 }

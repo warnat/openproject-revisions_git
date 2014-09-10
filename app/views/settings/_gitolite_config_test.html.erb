@@ -4,49 +4,17 @@
 
   <tr>
     <td><%= l(:label_openproject_user) %></td>
-    <td><span class="label label-success"><%= OpenProject::GitHosting::GitoliteWrapper.openproject_user %></span></td>
+    <td><span class="label label-success"><%= OpenProject::Revisions::Git::GitoliteWrapper.openproject_user %></span></td>
   </tr>
 
   <tr>
     <td><%= l(:label_gitolite_user) %></td>
-    <td><span class="label label-success"><%= OpenProject::GitHosting::GitoliteWrapper.gitolite_user %></span></td>
+    <td><span class="label label-success"><%= OpenProject::Revisions::Git::GitoliteWrapper.gitolite_user %></span></td>
   </tr>
 
   <tr>
     <td><%= l(:label_sudo_redmine_to_gitolite_user) %></td>
-    <td><%= icon_wrapper (OpenProject::GitHosting::GitoliteWrapper.can_sudo_to_gitolite_user? ? 'icon-yes' : 'icon-warning'), l(:label_sudo_redmine_to_gitolite_user) %></td>
-  </tr>
-
-  <% hooks_manager = OpenProject::GitHosting::GitoliteHook.instance %>
-
-  <tr>
-    <td><%= l(:label_gitolite_hooks_params_installed) %></td>
-    <td>
-      <% params_installed = hooks_manager.hook_params_installed? %>
-      <% params_installed.each do |param, installed| %>
-        <%= icon_wrapper((installed ? 'icon-yes' : 'icon-warning'), param) %>
-        <%# image_tag((installed ? 'true.png' : 'exclamation.png'), :style => "vertical-align: bottom;") %>
-        <em><%= param %></em>
-        <br />
-      <% end %>
-    </td>
-  </tr>
-
-  <tr>
-    <td><%= l(:label_gitolite_hooks_installed) %></td>
-    <td>
-      <% hooks_installed  = hooks_manager.hooks_installed? %>
-      <% hooks_installed.each do |hook, installed| %>
-        <%= icon_wrapper((installed ? 'icon-yes' : 'icon-warning'), hook) %>
-        <em><%= hook %></em>
-        <br />
-      <% end %>
-    </td>
-  </tr>
-
-  <tr>
-    <td><%= l(:label_mirroring_keys_installed) %></td>
-    <td><%= icon_wrapper (OpenProject::GitHosting::GitoliteWrapper.mirroring_keys_installed?(:reset => true) ? 'icon-yes' : 'icon-warning'), l(:label_mirroring_keys_installed) %></td>
+    <td><%= icon_wrapper (OpenProject::Revisions::Git::GitoliteWrapper.can_sudo_to_gitolite_user? ? 'icon-yes' : 'icon-warning'), l(:label_sudo_redmine_to_gitolite_user) %></td>
   </tr>
 
   <tr>
@@ -57,7 +25,7 @@
   <tr>
     <td><%= l(:label_gitolite_version) %></td>
     <td>
-      <% gitolite_version = OpenProject::GitHosting::GitoliteWrapper.gitolite_version %>
+      <% gitolite_version = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_version %>
       <span class="label label-<%= gitolite_version.nil? ? 'important' : 'success' %>">
         <%= gitolite_version.nil? ? l(:label_unknown_gitolite_version) : gitolite_version %>
       </span>
@@ -70,7 +38,7 @@
 
 <div class="box">
 <pre>
-<%= raw OpenProject::GitHosting::GitoliteWrapper.gitolite_banner %>
+<%= raw OpenProject::Revisions::Git::GitoliteWrapper.gitolite_banner %>
 </pre>
 </div>
 

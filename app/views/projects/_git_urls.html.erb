@@ -1,8 +1,8 @@
 <% if project.module_enabled?(:repository) %>
   <% if project.repository && project.repository.is_a?(Repository::Git) %>
-    <% if OpenProject::GitHosting::GitoliteWrapper.true?(:show_repositories_url) && User.current.allowed_to?(:view_changesets, project) %>
+    <% if OpenProject::Revisions::Git::GitoliteWrapper.true?(:show_repositories_url) && User.current.allowed_to?(:view_changesets, project) %>
 
-      <div class="git_hosting box">
+      <div class="revisions_git box">
         <h3><%= l(:label_main_git_repository) %></h3>
         <%= render :partial => 'common/git_urls', :locals => {:repository => project.repository} %>
 

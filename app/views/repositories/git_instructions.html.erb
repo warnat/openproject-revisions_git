@@ -54,8 +54,8 @@
     </li>
   </ul>
 
-  <% if @repository.is_a?(Repository::Git) && OpenProject::GitHosting::GitoliteWrapper.true?(:show_repositories_url) && User.current.allowed_to?(:view_changesets, @project) %>
-    <div class="git_hosting_urls">
+  <% if @repository.is_a?(Repository::Git) && OpenProject::Revisions::Git::GitoliteWrapper.true?(:show_repositories_url) && User.current.allowed_to?(:view_changesets, @project) %>
+    <div class="revisions_git_urls">
       <h3><%= l(:label_repository_access_url) %></h3>
       <%= render :partial => 'common/git_urls', :locals => {:repository => @repository} %>
     </div>

@@ -20,28 +20,6 @@ module GitHostingHelper
   end
 
 
-  # Post-receive Mode
-  def post_receive_mode(prurl)
-    if prurl.active == 0
-      l(:label_mirror_inactive)
-    elsif prurl.mode == :github
-      l(:label_github_post)
-    else
-      l(:label_empty_get)
-    end
-  end
-
-
-  # Mirror Mode
-  def mirror_mode(mirror)
-    if mirror.active == 0
-      l(:label_mirror_inactive)
-    else
-      [l(:label_mirror), l(:label_forced), l(:label_unforced)][mirror.push_mode]
-    end
-  end
-
-
   # Refspec for mirrors
   def refspec(mirror, max_refspec = 0)
     if mirror.push_mode == RepositoryMirror::PUSHMODE_MIRROR
@@ -58,7 +36,7 @@ module GitHostingHelper
 
 
   def plugin_asset_link(asset_name)
-    File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'openproject_git_hosting', 'images', asset_name)
+    File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'openproject_revisions_git', 'images', asset_name)
   end
 
 
@@ -75,21 +53,6 @@ module GitHostingHelper
     css_class = 'icon icon-git'
 
     case feature
-
-      when :repository_deployment_credentials
-        label = l(:label_deployment_credentials)
-        css_class << ' icon-deployment-credentials'
-        enabled = repository.repository_deployment_credentials.active.any?
-
-      when :repository_post_receive_urls
-        label = l(:label_post_receive_urls)
-        css_class << ' icon-post-receive-urls'
-        enabled = repository.repository_post_receive_urls.active.any?
-
-      when :repository_mirrors
-        label = l(:label_repository_mirrors)
-        css_class << ' icon-mirrors'
-        enabled = repository.repository_mirrors.active.any?
 
       when :git_daemon
         label = l(:label_git_daemon)

@@ -1,6 +1,4 @@
-# OpenProject Git Hosting Plugin
-
-
+# OpenProject Revisions/Git Plugin
 
 This plugin aims to provide extensive features for managing Git repositories within [OpenProject](http://www.openproject.org).
 Forked from [jbox-web's version](https://jbox-web.github.io/redmine_git_hosting/) of the long-lived, often-forked redmine-git_hosting plugin (formerly redmine-gitosis).
@@ -8,7 +6,6 @@ Forked from [jbox-web's version](https://jbox-web.github.io/redmine_git_hosting/
 As OpenProject has diverted quite a bit in terms of project management (e.g., redmine allows multiple repositories per project), some features have been removed in the fork.
 
 **Disclaimer**: This fork is still in progress. While some things work, it is by no means stable.
-
 
 ## Overview
 
@@ -61,7 +58,7 @@ I'm assuming you have some basic knowledge of Gitolite and:
 
 Add a Gemfile.plugins to your OpenProject root with the following contents:
 
-	gem "openproject-git_hosting", :git => "https://github.com/oliverguenther/openproject-git_hosting.git", :branch => "dev"
+	gem "openproject-revisions_git", :git => "https://github.com/oliverguenther/openproject-revisions_git.git", :branch => "dev"
 
 ##### 2. Sudo rights
 
@@ -95,23 +92,23 @@ Note that many of the settings are not yet functional, and some values on config
 
 #### Managing SSH keys
 
-1. Log in, go to My Account (top right). [as an admin, got to Administration > Users > User x]
+1. Log in, go to My Account (top right).
 2. Select 'Public Keys' in the menu on the left.
 3. Add/Manage your public key using the form.
 
 #### Managing repositories
 
-1. Create project. 
+1. Create project.
 2. Go to repositories settings and select Git + click create. This should automatically create the corresponding entry in the gitolite configuration.
 3. Use members to add a member to the repository. If that user has a public key on record, the corresponding access rights will be written to Gitolite.
 
 
 ## Copyrights & License
-OpenProject Git Hosting is completely free and open source and released under the [MIT License](https://github.com/oliverguenther/openproject_git_hosting/blob/devel/LICENSE).
+OpenProject Git Hosting is completely free and open source and released under the [MIT License](https://github.com/oliverguenther/openproject_revisions_git/blob/devel/LICENSE).
 
 Copyright (c) 2014 Oliver Günther (mail@oliverguenther.de)
 
-This plugin bases on the [Redmine Git Hosting plugin by Nicolas Rodriguez](https://github.com/jbox-web/openproject_git_hosting)
+This plugin bases on the [Redmine Git Hosting plugin by Nicolas Rodriguez](https://github.com/jbox-web/redmine_git_hosting)
 
 Copyright (c) 2013-2014 Nicolas Rodriguez (nrodriguez@jbox-web.com), JBox Web (http://www.jbox-web.com)
 

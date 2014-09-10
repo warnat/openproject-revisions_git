@@ -331,7 +331,7 @@ class SmartHttpController < ApplicationController
 
   ## Note: command must be started with a quote!
   def run_git_prefix
-    return "#{OpenProject::GitHosting::GitoliteWrapper.shell_cmd_runner} 'cd #{@repository.gitolite_repository_path}"
+    return "#{OpenProject::Revisions::Git::GitoliteWrapper.shell_cmd_runner} 'cd #{@repository.gitolite_repository_path}"
   end
 
 
@@ -444,7 +444,7 @@ class SmartHttpController < ApplicationController
 
 
   def logger
-    OpenProject::GitHosting::GitHosting.logger
+    OpenProject::Revisions::Git::GitoliteWrapper.logger
   end
 
 end

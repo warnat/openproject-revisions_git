@@ -1,5 +1,5 @@
 <% if @repository && @repository.is_a?(Repository::Git) %>
-  <div class="git_hosting box">
+  <div class="revisions_git box">
     <h3><%= l(:label_repository_access_url) %></h3>
     <%= render :partial => 'common/git_urls', :locals => {:repository => @repository} %>
   </div>
@@ -15,27 +15,6 @@
 
   <div id="repository-tabs">
     <ul>
-      <% if user_allowed_to(:view_deployment_keys, @repository.project) %>
-        <li id="tab-repository_deployment_credentials">
-          <%= link_to "<i class=\"fa fa-ticket\"></i>".html_safe + l(:label_deployment_credentials),
-                      repository_deployment_credentials_path(@repository) %>
-        </li>
-      <% end %>
-
-      <% if user_allowed_to(:view_repository_mirrors, @repository.project) %>
-        <li id="tab-repository_mirrors">
-          <%= link_to "<i class=\"fa fa-sitemap\"></i>".html_safe + l(:label_repository_mirrors),
-                      repository_mirrors_path(@repository) %>
-        </li>
-      <% end %>
-
-      <% if user_allowed_to(:view_repository_post_receive_urls, @repository.project) %>
-        <li id="tab-repository_post_receive_urls">
-          <%= link_to "<i class=\"fa fa-external-link\"></i>".html_safe + l(:label_post_receive_urls),
-                      repository_post_receive_urls_path(@repository) %>
-        </li>
-      <% end %>
-
       <% if user_allowed_to(:view_repository_git_config_keys, @repository.project) %>
         <li id="tab-repository_git_config_keys">
           <%= link_to "<i class=\"fa fa-th-list\"></i>".html_safe + l(:label_git_config_keys),

@@ -10,84 +10,6 @@ en:
         blank_default_exists: "Cannot make repository the default because current default has blank identifier."
         error_wrong_config_key_format: "Wrong key format (must contain at least one '.')."
 
-  ########### MIRRORS ###########
-  # Basics labels
-  label_repository_mirrors: Repository Mirrors
-  label_mirror_add: Add Repository Mirror
-  label_mirror_create: Create Repository Mirror
-  label_mirror_edit: Edit Repository Mirror
-  label_mirror_delete: Delete Repository Mirror
-
-  # Basics notices
-  notice_mirror_created: Mirror was successfully created.
-  notice_mirror_updated: Mirror was successfully updated.
-  notice_mirror_deleted: Mirror was successfully deleted.
-  notice_mirror_create_failed: Failed to create mirror.
-  notice_mirror_update_failed: Failed to update mirror.
-
-  # Misc
-  label_mirror_push_mode: Mirror update mode
-  label_mirror_full_mirror: Complete Mirroring
-  label_mirror_forced_update: Force Update Remote
-  label_mirror_fast_forward: Fast Forward (Unforced)
-
-  label_mirror_inactive: Inactive
-  label_mirror_help: Mirrors must grant write access to the following public key
-
-  label_mirror_push_title: Push to mirror
-  label_mirror_push_info_html: "Pushing changes to mirror <b>%{mirror_url}</b> : <span class=\"label label-%{status_css}\">%{status}</span>"
-  label_mirror_push_output: Output
-  label_mirror_push_sucess: Success
-  label_mirror_push_fail: Failed
-
-  label_mirror: Mirror
-  label_mirror_push: Push
-  label_mirror_refspec: Refspec
-  label_mirror_include_all_branches: Push all Branches
-  label_mirror_include_all_tags: Push all Tags
-  label_mirror_explicit_refspec: Explicit Reference Spec
-  label_mirror_url_accepted_format: Accepted URL format
-
-  all_references: All&nbsp;Refs
-  all_branches: All&nbsp;Branches
-  all_tags: All&nbsp;Tags
-
-
-  ########### DEPLOYMENT CREDENTIALS ###########
-  # Basics labels
-  label_deployment_credentials: Deployment Credentials
-  label_deployment_credential_add: Add Deployment Credential
-  label_deployment_credential_create: Create New Deployment Credential
-  label_deployment_credential_edit: Edit Deployment Credential
-  label_deployment_credential_delete: Delete Deployment Credential
-
-  # Basics notices
-  notice_deployment_credential_created: Deployment Credential was successfully created.
-  notice_deployment_credential_updated: Deployment Credential was successfully updated.
-  notice_deployment_credential_deleted: Deployment Credential was successfully deleted.
-  notice_deployment_credential_deleted_with_key: Both Deployment Credential and Key were successfully deleted.
-  notice_deployment_credential_create_failed: Failed to create deployment credential
-  notice_deployment_credential_update_failed: Failed to update deployment credential
-
-  # Basics fields
-  field_perm: Access Permissions
-
-  # Misc
-  label_deployment_credential_create_key_first: Deployment key(s) not detected. You should create one first.
-  label_deployment_credential_permissions: Access Permissions
-  label_deployment_credential_delete_when_unused: Delete key when unused?
-  label_deployment_credential_select_deploy_key: Select Deployment Key
-
-  label_deployment_credential_owner: Owner
-  label_deployment_credential_public_key_name: Public key name
-  label_deployment_credential_public_key_file: Public key file
-  label_deployment_credential_permissions: Permissions
-  label_deployment_credential_honored: Honored?
-  label_deployment_credential_active: Active?
-
-  select_other_keys: Other keys
-
-
   ########### GIT CONFIG KEYS ###########
   # Basics labels
   label_git_config_keys: Git Config Keys
@@ -106,21 +28,6 @@ en:
   label_key: Key
   label_value: Value
 
-
-  ########### POST RECEIVE URL ###########
-  # Basics labels
-  label_post_receive_urls: Post Receive URLs
-  label_post_receive_url_add: Add Post Receive URL
-  label_post_receive_url_create: Create Repository Post-receive URL
-  label_post_receive_url_edit: Edit Repository Post-receive URL
-  label_post_receive_url_delete: Delete Repository Post-receive URL
-
-  # Basics notices
-  notice_post_receive_url_created: Post-receive URL was successfully created.
-  notice_post_receive_url_updated: Post-receive URL was successfully updated.
-  notice_post_receive_url_deleted: Post-receive URL was successfully deleted.
-  notice_post_receive_url_create_failed: Failed to create post-receive URL.
-  notice_post_receive_url_update_failed: Failed to update post-receive URL.
 
   # Basics fields
   field_mode: Mode
@@ -177,7 +84,7 @@ en:
 
   ########### REPOSITORIES ###########
 
-  text_scm_command_not_available_git_hosting: SCM command is not available. Please check settings on the administration panel of Redmine Git Hosting plugin.
+  text_scm_command_not_available_revisions_git: SCM command is not available. Please check settings on the administration panel of Redmine Git Hosting plugin.
 
   # Create Repository
   label_repository_options: Repository options
@@ -193,10 +100,6 @@ en:
 
   # Repository list view
   label_repository_enabled_capabilities: Repository Enabled Capabilities
-
-  # Repository code browser
-  label_download_format: Download as %{archive_format}
-  error_download_revision_no_such_commit: "No such commit %{commit}"
 
   # Repositories URL (labels)
   label_copy_to_clipboard: Copy to clipboard
@@ -216,10 +119,6 @@ en:
   label_read_only_permission: Read Only
 
   notice_empty_repository: Repository is empty. Get started by following the instructions below.
-
-  # Gitolite Hooks
-  error_project_not_found: "No project with this identifier was found"
-  error_repository_not_found: "No repository with this identifier was found"
 
   # Statistics
   label_repository_statistics_global: Global statistics
@@ -269,19 +168,6 @@ en:
   label_hour: Hour
   button_ok: OK
 
-  ## Permissions
-  permission_create_repository_mirrors: Create repository mirrors
-  permission_view_repository_mirrors: View repository mirrors
-  permission_edit_repository_mirrors: Edit repository mirrors
-
-  permission_create_repository_post_receive_urls: Create post-receive URLs
-  permission_view_repository_post_receive_urls: View post-receive URLs
-  permission_edit_repository_post_receive_urls: Edit post-receive URLs
-
-  permission_create_deployment_keys: Create deployment keys
-  permission_view_deployment_keys: View deployment keys
-  permission_edit_deployment_keys: Edit deployment keys
-
   permission_create_repository_git_config_keys: Create Git config keys
   permission_view_repository_git_config_keys: View Git config keys
   permission_edit_repository_git_config_keys: Edit Git config keys
@@ -295,8 +181,8 @@ en:
   label_tab_openproject: OpenProject
   label_need_help: Need Help?
   label_open_issue: Open Issue
-  label_openproject_git_hosting_wiki: OpenProject Git Hosting - Wiki
-  label_openproject_git_hosting_issue: OpenProject Git Hosting - Open Issue
+  label_openproject_revisions_git_wiki: OpenProject Git Hosting - Wiki
+  label_openproject_revisions_git_issue: OpenProject Git Hosting - Open Issue
 
   # Gitolite SSH Config
   label_tab_gitolite: Gitolite
@@ -351,8 +237,8 @@ en:
   label_gitolite_log_level: Gitolite log level
   label_gitolite_log_split: Split logs into multiple files?
   label_gitolite_log_split_desc: (Need to restart both Redmine and Sidekiq after change)
-  label_gitolite_log_split_on: (Will be store in 'rails root/logs/git_hosting/git_*.log')
-  label_gitolite_log_split_off: (Will be store in 'rails root/logs/git_hosting.log')
+  label_gitolite_log_split_on: (Will be store in 'rails root/logs/revisions_git/git_*.log')
+  label_gitolite_log_split_off: (Will be store in 'rails root/logs/revisions_git.log')
 
   label_debug: Debug
   label_info: Info
@@ -378,18 +264,6 @@ en:
   label_http_only: HTTP Only
   label_https_only: HTTPS Only
   label_https_and_http: HTTPS and HTTP
-
-  label_gitolite_download_revision_enabled: Enable Git revisions download
-
-  # Gitolite Hooks Config
-  label_tab_hooks: Hooks
-  label_gitolite_hooks_config: Gitolite Hooks Configuration
-
-  label_gitolite_hooks_are_asynchronous: Run hooks asynchronously
-  label_gitolite_force_hooks_update: Force hooks to be updated
-  label_gitolite_hooks_debug: Run hooks in Debug mode
-  label_gitolite_hooks_url: Hooks URL
-  label_gitolite_hooks_namespace: Hooks Git namespace
 
   # Gitolite Cache Config
   label_tab_cache: Cache
@@ -442,8 +316,6 @@ en:
   label_gitolite_version: Gitolite version
   label_gitolite_banner: Gitolite banner
   label_path_directories: PATH directories
-  label_gitolite_hooks_params_installed: Hooks parameters installed?
-  label_gitolite_hooks_installed: Hooks installed?
   label_openproject_user: OpenProject username
   label_sudo_version: Sudo version
   label_git_version: Git version

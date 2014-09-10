@@ -1,16 +1,15 @@
 <% settings_tabs = [
                     {:name => 'gitolite_config',             :partial => 'settings/gitolite_config',             :label => :label_tab_gitolite},
                     {:name => 'gitolite_config_access',      :partial => 'settings/gitolite_config_access',      :label => :label_tab_access},
-                    {:name => 'gitolite_config_hooks',       :partial => 'settings/gitolite_config_hooks',       :label => :label_tab_hooks},
                     {:name => 'gitolite_config_test',        :partial => 'settings/gitolite_config_test',        :label => :label_tab_config_test},
                     {:name => 'gitolite_rescue',             :partial => 'settings/gitolite_rescue',             :label => :label_tab_gitolite_rescue},
                    ] %>
 
-<span><%= l(:label_need_help) %> : <%= link_to l(:label_openproject_git_hosting_wiki), OpenProject::GitHosting::GitHosting::GITHUB_WIKI, :target => '_blank' %></span>
+<span><%= l(:label_need_help) %> : <%= link_to l(:label_openproject_revisions_git_wiki), OpenProject::Revisions::Git::GITHUB_WIKI, :target => '_blank' %></span>
 
 <br />
 
-<span><%= l(:label_open_issue) %> : <%= link_to l(:label_openproject_git_hosting_issue), OpenProject::GitHosting::GitHosting::GITHUB_ISSUE, :target => '_blank' %></span>
+<span><%= l(:label_open_issue) %> : <%= link_to l(:label_openproject_revisions_git_issue), OpenProject::Revisions::Git::GITHUB_ISSUE, :target => '_blank' %></span>
 
 <br />
 <br />
@@ -24,7 +23,7 @@
     $.each(groups, function(key, elem) {
       $(elem).on('click', function(){
         if ("replaceState" in window.history) {
-          window.history.replaceState(null, document.title, 'redmine_git_hosting?tab=' + $(this).attr('id').replace('tab-', ''));
+          window.history.replaceState(null, document.title, 'redmine_revisions_git?tab=' + $(this).attr('id').replace('tab-', ''));
         }
       });
     });

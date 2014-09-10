@@ -1,13 +1,12 @@
 <%
   # Gitolite Access Config
-  ssh_server_domain   = Setting.plugin_openproject_git_hosting[:ssh_server_domain]
-  https_server_domain = Setting.plugin_openproject_git_hosting[:https_server_domain]
+  ssh_server_domain   = Setting.plugin_openproject_revisions_git[:ssh_server_domain]
+  https_server_domain = Setting.plugin_openproject_revisions_git[:https_server_domain]
 
-  gitolite_http_by_default   = Setting.plugin_openproject_git_hosting[:gitolite_http_by_default]
+  gitolite_http_by_default   = Setting.plugin_openproject_revisions_git[:gitolite_http_by_default]
 
-  show_repositories_url      = OpenProject::GitHosting::GitoliteWrapper.true?(:show_repositories_url)
-  gitolite_daemon_by_default = OpenProject::GitHosting::GitoliteWrapper.true?(:gitolite_daemon_by_default)
-  download_revision_enabled  = OpenProject::GitHosting::GitoliteWrapper.true?(:download_revision_enabled)
+  show_repositories_url      = OpenProject::Revisions::Git::GitoliteWrapper.true?(:show_repositories_url)
+  gitolite_daemon_by_default = OpenProject::Revisions::Git::GitoliteWrapper.true?(:gitolite_daemon_by_default)
 %>
 
 <h3><%= l(:label_gitolite_access_config) %></h3>
@@ -43,14 +42,5 @@
     <%= check_box_tag "settings[gitolite_daemon_by_default]", gitolite_daemon_by_default, gitolite_daemon_by_default %>
   </span>
 </p>
-
-<p>
-  <label><%= l(:label_gitolite_download_revision_enabled) %></label>
-  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
-    <%= hidden_field_tag "settings[download_revision_enabled]", "false" %>
-    <%= check_box_tag "settings[download_revision_enabled]", download_revision_enabled, download_revision_enabled %>
-  </span>
-</p>
-
 
 <%= render :partial => "gitolite_display_access" %>

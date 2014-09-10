@@ -7,7 +7,6 @@
   DEPLOY_PSEUDO_USER = "deploy_key"
 
   belongs_to :user
-  has_many   :repository_deployment_credentials, :dependent => :destroy
 
   scope :user_key,   -> { where key_type: KEY_TYPE_USER }
   scope :deploy_key, -> { where key_type: KEY_TYPE_DEPLOY }
@@ -18,7 +17,6 @@
   validates_uniqueness_of :title,      :scope => :user_id
   validates_uniqueness_of :identifier, :scope => :user_id
 
-  validates_associated :repository_deployment_credentials
   validates_format_of :title, :with => /\A[a-z0-9_\-]*\z/i
 
   validate :has_not_been_changed
@@ -86,16 +84,16 @@
   protected
 
   def add_ssh_key
-    OpenProject::GitHosting::GitoliteWrapper.update(:add_ssh_key, self)
+    OpenProject::Revisions::Git::GitoliteWrapper.update(:add_ssh_key, self)
   end
 
 
   def destroy_ssh_key
-    OpenProject::GitHosting::GitHosting.logger.info("User '#{User.current.login}' has deleted a SSH key")
+    OpenProject::Revisions::Git::GitoliteWrapper.logger.info("User '#{User.current.login}' has deleted a SSH key")
 
     repo_key = { title: self.title, key: self.key, location: self.title, owner: self.identifier, identifier: self.identifier }
 
-    OpenProject::GitHosting::GitoliteWrapper.update(:delete_ssh_key, repo_key)
+    OpenProject::Revisions::Git::GitoliteWrapper.update(:delete_ssh_key, repo_key)
   end
 
 
@@ -106,11 +104,11 @@
     file.write(key)
     file.close
     # This will throw if exitcode != 0
-    output = OpenProject::GitHosting::GitHosting.capture('ssh-keygen', '-l', '-f', file.path)
+    output = OpenProject::Revisions::Shell.capture_out('ssh-keygen', '-l', '-f', file.path)
     if output
       self.fingerprint = output.split[1]
     end
-  rescue OpenProject::GitHosting::GitHosting::GitHostingException => e
+  rescue => e
     errors.add(:key, l(:error_key_corrupted))
   ensure
     file.unlink
