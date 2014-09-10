@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = "Oliver Günther"
   s.email       = "mail@oliverguenther.de"
   s.homepage    = "https://www.github.com/oliverguenther/openproject-revisions_git"
-  s.summary     = 'OpenProject Git Hosting'
+  s.summary     = 'OpenProject Revisions/Git'
   s.description = "This plugin allows straightforward management of Gitolite within OpenProject."
   s.license     = "MIT"
 

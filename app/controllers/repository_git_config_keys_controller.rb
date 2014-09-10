@@ -1,4 +1,4 @@
-class RepositoryGitConfigKeysController < RedmineGitHostingController
+class RepositoryGitConfigKeysController < RevisionsGitControllerBase
   unloadable
 
   before_filter :set_current_tab

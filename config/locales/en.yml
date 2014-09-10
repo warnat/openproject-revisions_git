@@ -1,5 +1,4 @@
 en:
-  module_name: Redmine Git Hosting
   activerecord:
     errors:
       messages:
@@ -83,8 +82,6 @@ en:
 
 
   ########### REPOSITORIES ###########
-
-  text_scm_command_not_available_revisions_git: SCM command is not available. Please check settings on the administration panel of Redmine Git Hosting plugin.
 
   # Create Repository
   label_repository_options: Repository options
@@ -181,8 +178,7 @@ en:
   label_tab_openproject: OpenProject
   label_need_help: Need Help?
   label_open_issue: Open Issue
-  label_openproject_revisions_git_wiki: OpenProject Git Hosting - Wiki
-  label_openproject_revisions_git_issue: OpenProject Git Hosting - Open Issue
+  label_openproject_revisions_git_issue: OpenProject Revisions/Git - Bug Tracker
 
   # Gitolite SSH Config
   label_tab_gitolite: Gitolite

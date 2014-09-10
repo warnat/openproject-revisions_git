@@ -51,18 +51,6 @@
   <em><%= l(:label_gitolite_global_storage_dir_desc) %></em>
 </p>
 
-<p>
-  <label><%= l(:label_init_repositories_on_create).html_safe %></label>
-  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
-    <%= hidden_field_tag "settings[init_repositories_on_create]", "false" %>
-    <%  init_repositories_on_create = Setting.plugin_openproject_revisions_git[:init_repositories_on_create] %>
-    <%= check_box_tag "settings[init_repositories_on_create]",
-      init_repositories_on_create, init_repositories_on_create %>
-  </span>
-</p>
-
-
-
 <h3><%= l(:label_gitolite_git_config) %></h3>
 
 <p>

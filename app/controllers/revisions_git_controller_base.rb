@@ -1,4 +1,4 @@
-class RedmineGitHostingController < ApplicationController
+class RevisionsGitControllerBase < ApplicationController
   unloadable
 
   before_filter :require_login

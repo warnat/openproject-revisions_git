@@ -79,7 +79,7 @@ Make sure you can ssh into gitolite from the openproject user. If you run the fo
 	    
 ##### 4. Configuration in OpenProject
 
-Run OpenProject, go to **Admin > Plugins > OpenProject Git Hosting** (click on configure)
+Run OpenProject, go to **Admin > Plugins > OpenProject Revisions/Git** (click on configure)
 
 Alter you configuration for Gitolite (Gitolite path, gitolite-admin.git path, etc.) accordingly and click save.
 
@@ -104,7 +104,7 @@ Note that many of the settings are not yet functional, and some values on config
 
 
 ## Copyrights & License
-OpenProject Git Hosting is completely free and open source and released under the [MIT License](https://github.com/oliverguenther/openproject_revisions_git/blob/devel/LICENSE).
+OpenProject Revisions/Git is completely free and open source and released under the [MIT License](https://github.com/oliverguenther/openproject_revisions_git/blob/devel/LICENSE).
 
 Copyright (c) 2014 Oliver Günther (mail@oliverguenther.de)
 

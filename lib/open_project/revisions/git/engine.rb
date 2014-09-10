@@ -1,4 +1,7 @@
 module OpenProject::Revisions::Git
+
+  GITHUB_ISSUE = 'https://github.com/oliverguenther/openproject-revisions_git/issues'
+
   class Engine < ::Rails::Engine
     engine_name :openproject_revisions_git
 

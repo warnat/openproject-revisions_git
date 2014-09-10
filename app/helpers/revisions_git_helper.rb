@@ -1,4 +1,4 @@
-module GitHostingHelper
+module RevisionsGitHelper
 
   include Redmine::I18n
 
