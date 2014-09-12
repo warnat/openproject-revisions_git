@@ -2,6 +2,7 @@
 $:.push File.expand_path("../lib", __FILE__)
 
 require 'open_project/revisions/git/version'
+
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = "openproject-revisions_git"
@@ -9,13 +10,14 @@ Gem::Specification.new do |s|
   s.authors     = "Oliver Günther"
   s.email       = "mail@oliverguenther.de"
   s.homepage    = "https://www.github.com/oliverguenther/openproject-revisions_git"
-  s.summary     = 'OpenProject Revisions/Git'
+  s.summary     = 'Revisions/Git'
   s.description = "This plugin allows straightforward management of Gitolite within OpenProject."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*"] + %w(README.md)
 
   s.add_dependency "rails", "~> 3.2.14"
+  s.add_dependency "openproject-revisions"
   s.add_dependency "gitolite-rugged"
 
 end

@@ -58,6 +58,7 @@ I'm assuming you have some basic knowledge of Gitolite and:
 
 Add a Gemfile.plugins to your OpenProject root with the following contents:
 
+	gem "openproject-revisions", :git => "https://github.com/oliverguenther/openproject-revisions.git", :branch => "dev"
 	gem "openproject-revisions_git", :git => "https://github.com/oliverguenther/openproject-revisions_git.git", :branch => "dev"
 
 ##### 2. Sudo rights
