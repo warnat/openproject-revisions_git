@@ -69,16 +69,15 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
         t.column :value, :string, :null => false
       end
 
-    Migration::SettingRenamer.rename(OLD_PLUGIN_NAME, "plugin_openproject_revisions_git")
+      Migration::SettingRenamer.rename(OLD_PLUGIN_NAME, "plugin_openproject_revisions_git")
+    end
   end
 
   def down
-
-
     drop_table :gitolite_public_keys
     drop_table :repository_git_extras
     drop_table :repository_git_config_keys
-
+  end
 end
 
 
