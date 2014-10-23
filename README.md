@@ -47,21 +47,41 @@ As OpenProject has diverted quite a bit in terms of project management (e.g., re
 
 ## Installation
 
-##### 0. (preliminary) [Setup Gitolite v2/v3](http://gitolite.com/gitolite/install.html)
+#### 0. (preliminary) [Setup Gitolite v2/v3](http://gitolite.com/gitolite/install.html)
 
 I'm assuming you have some basic knowledge of Gitolite and:
 
 * are in possession of a SSH key pair set up for use with gitolite.
 * have successfully cloned the gitolite-admin.git repository from the user running OpenProject.
 
-##### 1. Gemfile.plugins
+
+You must add add two manual changes to the gitolite setup for this plugin to work. **These changes are crucial**:
+
+**0.a. Add include 'openproject.conf'** to gitolite
+OpenProject uses a separate gitolite config file to declare repositories. This allows you to define your own stuff in <gitolite-admin.git>/conf/gitolite.conf and allows OpenProject to override its own configuration at all times.
+
+Thus, you need to add the following line to 'conf/gitolite.conf' under the gitolite-admin.git repository:
+
+    include 'openproject.conf'
+
+**0.b. Allow OpenProject's git config keys**
+
+OpenProject identifies project identifiers in gitolite through git config keys, thus you need to alter the .gitolite.rc (In the git user's $HOME) to allow that:
+
+a. As the git user, open $HOME/.gitolite.rc
+b. Search for the line ``GIT_CONFIG_KEYS``
+c. Change the line to look like ``GIT_CONFIG_KEYS                 =>  '.*',``
+d. Save the changes
+
+
+#### 1. Gemfile.plugins
 
 Add a Gemfile.plugins to your OpenProject root with the following contents:
 
 	gem "openproject-revisions", :git => "https://github.com/oliverguenther/openproject-revisions.git", :branch => "dev"
 	gem "openproject-revisions_git", :git => "https://github.com/oliverguenther/openproject-revisions_git.git", :branch => "dev"
 
-##### 2. Sudo rights
+#### 2. Sudo rights
 
 Ensure the user running OpenProject can sudo to the gitolite user.
 
@@ -69,7 +89,7 @@ Assuming that user is called *openproject* and the gitolite user is *git*, open 
 
 	openproject        ALL=(git)      NOPASSWD:ALL
 	
-##### 3. Gitolite access
+#### 3. Gitolite access
 
 Make sure you can ssh into gitolite from the openproject user. If you run the following command, the output below (or similar for gitolite2) should appear. **If it does not, this is a gitolite configuration error.**
 
@@ -78,13 +98,13 @@ Make sure you can ssh into gitolite from the openproject user. If you run the fo
 	    R W  gitolite-admin
 	    R W  testing
 	    
-##### 4. Configuration in OpenProject
+#### 4. Configuration in OpenProject
 
 Run OpenProject, go to **Admin > Plugins > OpenProject Revisions/Git** (click on configure)
 
 Alter you configuration for Gitolite (Gitolite path, gitolite-admin.git path, etc.) accordingly and click save.
 
-##### 5. Config Test
+#### 5. Config Test
 
 Check that the output on the tab 'Config Test' looks good.
 Note that many of the settings are not yet functional, and some values on config test are thus irrelevant (Hooks, for example).
