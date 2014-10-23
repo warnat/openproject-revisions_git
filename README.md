@@ -68,10 +68,13 @@ Thus, you need to add the following line to 'conf/gitolite.conf' under the gitol
 
 OpenProject identifies project identifiers in gitolite through git config keys, thus you need to alter the .gitolite.rc (In the git user's $HOME) to allow that:
 
-a. As the git user, open $HOME/.gitolite.rc
-b. Search for the line ``GIT_CONFIG_KEYS``
-c. Change the line to look like ``GIT_CONFIG_KEYS                 =>  '.*',``
-d. Save the changes
+  a. As the git user, open $HOME/.gitolite.rc
+  
+  b. Search for the line ``GIT_CONFIG_KEYS``
+  
+  c. Change the line to look like ``GIT_CONFIG_KEYS                 =>  '.*',``
+  
+  d. Save the changes
 
 
 #### 1. Gemfile.plugins
