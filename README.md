@@ -51,6 +51,7 @@ As OpenProject has diverted quite a bit in terms of project management (e.g., re
 
 I'm assuming you have some basic knowledge of Gitolite and:
 
+* **have built libgit2/rugged WITH SSH Transport support** (see https://github.com/libgit2/rugged/issues/299). This requires ``libssh2-dev`` to be installed on your system.
 * are in possession of a SSH key pair set up for use with gitolite.
 * have successfully cloned the gitolite-admin.git repository from the user running OpenProject.
 
