@@ -100,14 +100,24 @@ Make sure you can ssh into gitolite from the openproject user. If you run the fo
 	hello openproject, this is git@dev running gitolite3 v3.x-x on git x.x.x
 	    R W  gitolite-admin
 	    R W  testing
+
+#### 4. Starting delayed_jobs
+
+This plugin depends on delayed_jobs to run interactions with ``gitolite-admin.git`` asynchronously. Start the worker using this command (change ``RAILS_ENV``, if necessary) :
+
+```
+RAILS_ENV=production script/delayed_job start
+```
+
+[See the documentation of delayed_job for further options](https://github.com/collectiveidea/delayed_job#running-jobs).
 	    
-#### 4. Configuration in OpenProject
+#### 5. Configuration in OpenProject
 
 Run OpenProject, go to **Admin > Plugins > OpenProject Revisions/Git** (click on configure)
 
 Alter you configuration for Gitolite (Gitolite path, gitolite-admin.git path, etc.) accordingly and click save.
 
-#### 5. Config Test
+#### 6. Config Test
 
 Check that the output on the tab 'Config Test' looks good.
 Note that many of the settings are not yet functional, and some values on config test are thus irrelevant (Hooks, for example).
