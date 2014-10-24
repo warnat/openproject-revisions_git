@@ -19,23 +19,14 @@ module OpenProject::Revisions::Git
       [gitolite_user, '@localhost'].join
     end
 
-    def self.gitolite_command
-      if gitolite_version == 2
-        'gl-setup'
-      else
-        'gitolite setup'
-      end
-    end
-
     def self.gitolite_version
-      Rails.cache.fetch(cache_key('gitolite_version')) do
-        logger.debug("Gitolite updating version")
-        out, err, code = ssh_shell('info')
-        return 3 if out.include?('running gitolite3')
-        return 2 if out =~ /gitolite[ -]v?2./
-        logger.error("Couldn't retrieve gitolite version through SSH.")
-        logger.debug("Gitolite version error output: #{err}") unless err.nil?
-      end
+      logger.debug("Gitolite updating version")
+      out, err, code = ssh_shell('info')
+      return 3 if out.include?('running gitolite3')
+      return 2 if out =~ /gitolite[ -]v?2./
+      logger.error("Couldn't retrieve gitolite version through SSH.")
+      logger.debug("Gitolite version error output: #{err}") unless err.nil?
+      'unknown'
     end
 
     # Returns a rails cache identifier with the key as its last part
@@ -294,29 +285,20 @@ module OpenProject::Revisions::Git
     #
     # Upon error, returns the shell error code instead.
     def self.gitolite_banner
-      Rails.cache.fetch(cache_key('gitolite_banner')) {
-        logger.debug("Retrieving gitolite banner")
-        begin
-          GitoliteWrapper.ssh_capture('info')
-        rescue => e
-          errstr = "Error while getting Gitolite banner: #{e.message}"
-          logger.error(errstr)
-          errstr
-        end
-      }
+      GitoliteWrapper.ssh_capture('info')
+    rescue => e
+      errstr = "Error while getting Gitolite banner: #{e.message}"
+      logger.error(errstr)
+      errstr
     end
 
     # Test if the current user can sudo to the gitolite user
     def self.can_sudo_to_gitolite_user?
-      Rails.cache.fetch(cache_key('test_gitolite_sudo')) {
-        begin
-          test = GitoliteWrapper.sudo_capture('whoami')
-          test =~ /#{GitoliteWrapper.gitolite_user}/i
-        rescue => e
-          logger.error("Exception during sudo config test: #{e.message}")
-          false
-        end
-      }
+      test = GitoliteWrapper.sudo_capture('whoami')
+      test =~ /#{GitoliteWrapper.gitolite_user}/i
+    rescue => e
+      logger.error("Exception during sudo config test: #{e.message}")
+      false
     end
 
 
