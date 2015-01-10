@@ -53,10 +53,13 @@ I'm assuming you have some basic knowledge of Gitolite and:
 
 * **have built libgit2/rugged WITH SSH Transport support** (see https://github.com/libgit2/rugged/issues/299). This requires ``libssh2-dev`` to be installed on your system.
 * are in possession of a SSH key pair set up for use with gitolite.
-* have successfully cloned the gitolite-admin.git repository from the user running OpenProject.
+* have successfully cloned the gitolite-admin.git repository from the user running OpenProject as follows:
+```
+git clone git@localhost:gitolite-admin /home/openproject/gitolite-admin.git
+```
 
 
-You must add add two manual changes to the gitolite setup for this plugin to work. **These changes are crucial**:
+You must now add two manual changes to the gitolite setup for this plugin to work. **These changes are crucial**:
 
 **0.a. Add include 'openproject.conf'** to gitolite
 OpenProject uses a separate gitolite config file to declare repositories. This allows you to define your own stuff in <gitolite-admin.git>/conf/gitolite.conf and allows OpenProject to override its own configuration at all times.
@@ -64,6 +67,11 @@ OpenProject uses a separate gitolite config file to declare repositories. This a
 Thus, you need to add the following line to 'conf/gitolite.conf' under the gitolite-admin.git repository:
 
     include 'openproject.conf'
+    
+The ``openproject.conf`` is created and updated from this plugin and contains all projects with Git repositories later defined within OpenProject. Thus, the ``<gitolite-admin.git>/conf/`` folder will contain two files:
+
+* ``gitolite.conf``: If you want to manually add projects outside the scope of OpenProject to gitolite, define them here.
+* ``openproject.conf``: Contains all projects defined from OpenProject, is generated automatically. (*Non-existant until this plugin creates it*)
 
 **0.b. Allow OpenProject's git config keys**
 
