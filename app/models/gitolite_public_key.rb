@@ -15,7 +15,6 @@
   validates_inclusion_of  :key_type, :in => [KEY_TYPE_USER, KEY_TYPE_DEPLOY]
 
   validates_uniqueness_of :title,      :scope => :user_id
-  validates_uniqueness_of :identifier, :scope => :user_id
 
   validates_format_of :title, :with => /\A[a-z0-9_\-]*\z/i
 

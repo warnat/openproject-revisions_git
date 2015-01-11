@@ -105,18 +105,6 @@ module OpenProject::Revisions::Git
             end
 
 
-            # Normalize Redmine Subdirectory path, should be either empty or relative and end in '/'
-            if valuehash[:gitolite_storage_subdir]
-              normalizedFile  = File.expand_path(valuehash[:gitolite_storage_subdir].lstrip.rstrip, "/")
-              if (normalizedFile != "/")
-                # Clobber leading '/' add trailing '/'
-                valuehash[:gitolite_storage_subdir] = normalizedFile[1..-1] + "/"
-              else
-                valuehash[:gitolite_storage_subdir] = ''
-              end
-            end
-
-
             # Exclude bad expire times (and exclude non-numbers)
             if valuehash[:gitolite_recycle_bin_expiration_time]
               if valuehash[:gitolite_recycle_bin_expiration_time].to_f > 0
@@ -179,7 +167,6 @@ module OpenProject::Revisions::Git
 
             ## Storage infos has changed, move repositories!
             if @@old_valuehash[:gitolite_global_storage_dir] != valuehash[:gitolite_global_storage_dir] ||
-               @@old_valuehash[:gitolite_storage_subdir] != valuehash[:gitolite_storage_subdir] ||
                @@old_valuehash[:hierarchical_organisation] != valuehash[:hierarchical_organisation]
                 # Need to update everyone!
                 projects = Project.active.includes(:repositories).all.select { |x| x if x.parent_id.nil? }

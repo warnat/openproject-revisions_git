@@ -199,8 +199,6 @@ fr:
   label_gitolite_global_storage_dir_desc: (Relatif au répertoire personnel de l'utilisateur Gitolite)
   label_gitolite_recycle_bin_dir: Chemin de la corbeille Gitolite
   label_gitolite_recycle_bin_dir_desc: (Relatif au répertoire personnel de l'utilisateur Gitolite)
-  label_gitolite_storage_subdir: Sous-répertoire pour les dépôts gérés par Redmine
-  label_gitolite_storage_subdir_desc: (Relatif au répertoire personnel de l'utilisateur Gitolite)
 
   # Gitolite Config File
   label_tab_config_file: Fichier de configuration

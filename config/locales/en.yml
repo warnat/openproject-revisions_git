@@ -161,6 +161,7 @@ en:
   label_backup_in_progress: Saving...
   label_delete_in_progress: Deleting...
   label_url: URL
+  label_git_clone_url: SSH Clone URL
   label_mode: Mode
   label_hour: Hour
   button_ok: OK
@@ -199,8 +200,6 @@ en:
   label_gitolite_global_storage_dir_desc: (Relative to Gitolite user home)
   label_gitolite_recycle_bin_dir: Gitolite recycle bin base path
   label_gitolite_recycle_bin_dir_desc: (Relative to Gitolite user home)
-  label_gitolite_storage_subdir: Subdirectory for Redmine-managed repositories
-  label_gitolite_storage_subdir_desc: (Relative to Gitolite repositories base path)
 
   # Gitolite Config File
   label_gitolite_include_config_file: Separate Gitolite config
@@ -248,7 +247,9 @@ en:
   label_ssh_server_domain: SSH server domain
   label_http_server_domain: HTTP server domain
   label_https_server_domain: HTTPS server domain
-  label_https_server_domain_desc: "(don't set it if you don't use it)"
+  label_https_server_domain_desc: "HTTPS access URL root"
+  ssh_server_domain: "SSH Hostname"
+  label_ssh_server_domain_desc: "SSH access URL root, contributes to the git-ssh clone URL (see below)"
   label_default_domain_name: Default domain name
   label_http_server_subdir: Subdirectory for HTTP access
   label_http_server_subdir_desc: (Relative to Redmine root url)

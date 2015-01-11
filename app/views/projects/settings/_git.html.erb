@@ -1,8 +1,5 @@
 <p>
-	<%# TODO show only admin? %>
-	<%= form.text_field(:url, :size => 100, :value => repository.git_path, :disabled => true) %>
-	<br />
-	<em>The repository path for Gitolite this project resides under.</em>
+	<%= form.text_field(:url, label: :label_git_clone_url, :size => 100, :value => repository.ssh_clone_command, :disabled => true) %>
 </p>
 <%= form.fields_for :extra_attributes do |e| %>
 	<p>

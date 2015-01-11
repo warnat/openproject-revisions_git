@@ -1,9 +1,16 @@
+require 'socket'
 module OpenProject::Revisions::Git
 
   GITHUB_ISSUE = 'https://github.com/oliverguenther/openproject-revisions_git/issues'
 
   class Engine < ::Rails::Engine
     engine_name :openproject_revisions_git
+
+    def self.default_hostname
+      Socket.gethostname || 'localhost'
+    rescue
+      nil
+    end
 
 
     def self.settings
@@ -17,7 +24,6 @@ module OpenProject::Revisions::Git
 
         # Gitolite Storage Config
         :gitolite_global_storage_dir    => 'repositories',
-        :gitolite_storage_subdir   => '',
 
         # Gitolite Config File
         :gitolite_admin_dir                    => File.join(Dir.home, 'gitolite-admin'),
@@ -31,9 +37,8 @@ module OpenProject::Revisions::Git
         :git_config_email                      => 'openproject@localhost',
 
         # Gitolite Access Config
-        :ssh_server_domain                => 'localhost',
-        :https_server_domain              => 'localhost',
-        :show_repositories_url            => true,
+        :ssh_server_domain                => self.default_hostname,
+        :https_server_domain              => self.default_hostname,
         :gitolite_daemon_by_default       => false,
         :gitolite_http_by_default         => 1,
 

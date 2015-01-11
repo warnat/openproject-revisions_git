@@ -28,14 +28,6 @@
 </p>
 
 <p>
-  <label><%= l(:label_show_repositories_url) %></label>
-  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
-    <%= hidden_field_tag "settings[show_repositories_url]", "false" %>
-    <%= check_box_tag "settings[show_repositories_url]", show_repositories_url, show_repositories_url %>
-  </span>
-</p>
-
-<p>
   <label><%= l(:label_gitolite_daemon_by_default) %></label>
   <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
     <%= hidden_field_tag "settings[gitolite_daemon_by_default]", "false" %>
@@ -43,4 +35,11 @@
   </span>
 </p>
 
-<%= render :partial => "gitolite_display_access" %>
+<p>
+  <label><%= l(:ssh_server_domain) %></label>
+  <%= text_field_tag("settings[ssh_server_domain]", ssh_server_domain, :size => 60) %>
+  <br />
+  <em><%= l(:label_ssh_server_domain_desc) %></em>
+</p>
+
+<%= render partial: "gitolite_display_access" %>

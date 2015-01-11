@@ -81,6 +81,10 @@ module OpenProject::Revisions::Git
           "ssh://#{Setting.plugin_openproject_revisions_git[:gitolite_user]}@#{Setting.plugin_openproject_revisions_git[:ssh_server_domain]}/#{git_path}"
         end
 
+        def ssh_clone_command
+          "git clone #{ssh_url}"
+        end
+
 
         def git_url
           "git://#{Setting.plugin_openproject_revisions_git[:ssh_server_domain]}/#{git_path}"
