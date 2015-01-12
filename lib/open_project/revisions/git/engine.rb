@@ -86,6 +86,10 @@ module OpenProject::Revisions::Git
       end
     end
 
+    initializer 'revisons_git.precompile_assets' do
+      Rails.application.config.assets.precompile += %w(revisions_git/revisions_git.css)
+    end
+
     initializer 'revisions_git.hooks' do
       require 'open_project/revisions/git/hooks'
       require 'open_project/revisions/git/hooks/gitolite_updater'

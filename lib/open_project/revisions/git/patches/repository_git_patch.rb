@@ -99,7 +99,7 @@ module OpenProject::Revisions::Git
         def available_urls
           hash = {}
 
-          commiter = User.current.allowed_to?(:commit_access, project) ? 'true' : 'false'
+          commiter = User.current.allowed_to?(:commit_access, project)
 
           ssh_access = {
             :url      => ssh_url,
@@ -113,7 +113,7 @@ module OpenProject::Revisions::Git
 
           git_access = {
             :url      => git_url,
-            :commiter => 'false'
+            :commiter => false,
           }
 
           if !User.current.anonymous?

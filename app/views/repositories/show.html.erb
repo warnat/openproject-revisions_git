@@ -1,3 +1,4 @@
+<%= stylesheet_link_tag 'revisions_git/revisions_git' %>
 <%= call_hook(:view_repositories_show_contextual, { :repository => @repository, :project => @project }) %>
 
 <div class="contextual">
@@ -59,14 +60,7 @@
 <% end %>
 
 <% content_for :sidebar do %>
-  <h3><%= l(:label_repository_plural) %></h3>
-  <ul class="repository git">
-    <li class="repository git"><%= link_to h(@repository.project.name), {:controller => 'repositories', :action => 'show', :id => @project, :repository_id => @repository.id, :rev => nil, :path => nil},
-        :class => 'repository' + (@repository.is_a?(Repository::Git) ? ' git' : '') +  ' selected' %>
-    </li>
-  </ul>
-
-  <% if @repository.is_a?(Repository::Git) && OpenProject::Revisions::Git::GitoliteWrapper.true?(:show_repositories_url) %>
+  <% if @repository.is_a?(Repository::Git) %>
     <div class="revisions_git_urls">
       <h3><%= l(:label_repository_access_url) %></h3>
       <%= render :partial => 'common/git_urls', :locals => {:repository => @repository} %>

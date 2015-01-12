@@ -1,27 +1,4 @@
 /*
-PLUGIN ICONS
-*/
-#admin-menu a.redmine-git-hosting { background-image: url(../images/git_icon.png); }
-
-.icon-git-logo { background-image: url("../images/git_icon.png"); padding-right: 5px; }
-.icon-push { background-image: url("../images/icon-divide.png"); }
-.icon-deployment-credentials { background-image: url("../images/textfield_key.png"); }
-.icon-post-receive-urls { background-image: url("../images/link.png"); }
-.icon-mirrors { background-image: url("../images/table_multiple.png"); }
-.icon-git-daemon { background-image: url("../images/changeset.png"); }
-.icon-git-smarthttp { background-image: url("../images/web.png"); }
-.icon-git-notify { background-image: url("../images/email.png"); }
-
-.icon-git { padding-right: 15px; }
-.icon-git-disabled { opacity: 0.5; }
-
-table.git_mailing_list { width: 100%; margin-top: 15px; }
-table.git_mailing_list th { width: 25%; }
-table.git_mailing_list td { text-align: center; }
-table.git_mailing_list td ul { padding-left: 0px; list-style-type: none; }
-
-
-/*
 PLUGIN SETTINGS
 */
 .revisions_git_access_box {
@@ -89,55 +66,16 @@ REPOSITORY VIEW
   list-style-type: none;
 }
 
-#revisions_git_download_buttons {
-  margin-top: 20px;
+#sidebar input.revisions-git-url {
+  width: 90%;
+  padding: 5px;
 }
 
-#revisions_git_download_buttons ul li {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
 
-#sidebar li.git_url {
-  margin: 0;
-}
-
-.revisions_git_urls {
-  display: block;
-  height: 90px;
-  margin-bottom: 20px;
-}
-
-#revisions_git_download_buttons i {
+ad_buttons i {
   color: #FFFFFF;
   padding-right: 10px;
 }
-
-#revisions_git_download_buttons .button {
-  background: none repeat scroll 0 0 #2996CC;
-  border: 1px solid #E0E2E3;
-  border-color: rgba(0, 0, 0, 0);
-  border-radius: 4px;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  height: 32px;
-  line-height: 30px;
-  margin-bottom: 1px;
-  margin-top: 1px;
-  -moz-appearance: none;
-  padding: 0 14px;
-  vertical-align: middle;
-  text-align: center;
-  transition: background-color 0.2s ease-in-out 0s, color 0.2s ease-in-out 0s, opacity 0.2s ease-in-out 0s;
-}
-
-div.flash.warning, .conflict {
-  background: url("../images/warning.png") no-repeat scroll 8px 18px #FFEBC1;
-}
-
 
 /*
 REPOSITORY SETTINGS

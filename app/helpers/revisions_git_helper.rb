@@ -36,7 +36,7 @@ module RevisionsGitHelper
 
 
   def plugin_asset_link(asset_name)
-    File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'openproject_revisions_git', 'images', asset_name)
+    File.join(OpenProject::Configuration.rails_relative_url_root, 'plugin_assets', 'openproject_revisions_git', 'images', asset_name)
   end
 
 
