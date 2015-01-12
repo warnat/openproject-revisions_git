@@ -90,6 +90,10 @@ module OpenProject::Revisions::Git
           "git://#{Setting.plugin_openproject_revisions_git[:ssh_server_domain]}/#{git_path}"
         end
 
+        def git_clone_command
+          "git clone #{ssh_url}"
+        end
+
 
         def https_url
           "https://#{http_user_login}#{Setting.plugin_openproject_revisions_git[:https_server_domain]}/#{http_access_path}"
@@ -103,16 +107,19 @@ module OpenProject::Revisions::Git
 
           ssh_access = {
             :url      => ssh_url,
+            :command  => ssh_clone_command,
             :commiter => commiter
           }
 
           https_access = {
             :url      => https_url,
+            :command  => https_url,
             :commiter => commiter
           }
 
           git_access = {
             :url      => git_url,
+            :command  => git_clone_command,
             :commiter => false,
           }
 
