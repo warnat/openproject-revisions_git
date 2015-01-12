@@ -132,9 +132,8 @@ module OpenProject::Revisions::Git
           exitcode = thr.value.exitstatus
           if exitcode != 0
             logger.error("sudo call with '#{params.join(" ")}' returned exit #{exitcode}. Error was: #{stderr.read}")
-          else
-            block.call(stdout)
           end
+          block.call(stdout)
         ensure
           stdout.close
           stdin.close
