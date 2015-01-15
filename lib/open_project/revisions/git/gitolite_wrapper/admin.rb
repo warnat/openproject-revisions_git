@@ -1,9 +1,8 @@
 module OpenProject::Revisions::Git::GitoliteWrapper
   class Admin
-
     attr_reader :admin
 
-    def initialize(action, object_id, options={})
+    def initialize(action, object_id, options = {})
       @object_id      = object_id
       @action         = action
       @options        = options
@@ -12,8 +11,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     end
 
     def run
-      logger.info("Running delayed job '#{@action}'")
-
       # Created here to avoid serialization of these heavy objects
       # before delayed_job.
       @admin = OpenProject::Revisions::Git::GitoliteWrapper.admin
@@ -21,7 +18,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
 
       send(@action)
     end
-    handle_asynchronously :run
 
     def logger
       Rails.logger
@@ -33,6 +29,5 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     rescue => e
       logger.error { "#{e.message}" }
     end
-
   end
- end
+end
