@@ -124,9 +124,7 @@ module OpenProject::Revisions::Git
           }
 
           if !User.current.anonymous?
-            if User.current.allowed_to?(:create_gitolite_ssh_key, nil, :global => true)
-              hash[:ssh] = ssh_access
-            end
+            hash[:ssh] = ssh_access
           end
 
           if extra[:git_http] == 1
