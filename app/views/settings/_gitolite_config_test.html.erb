@@ -32,9 +32,15 @@
   <tr>
     <td><%= l(:label_found_repositories) %></td>
     <td>
-      <span class="label label-<%= (gitolite_repos.nil? || gitolite_repos.empty?) ? 'error' : 'success' %>">
-        <%= gitolite_repos.nil? ? l(:label_none_repositories) : gitolite_repos.length %>
+      <% if gitolite_repos[:error] %>
+      <span class="label label-error"><%= l(:label_error) %></span>
+      <br/>
+      <strong><%= gitolite_repos[:error] %></strong>
+      <% else %>
+      <span class="label label-success">
+        <%= gitolite_repos[:repos].nil? ? l(:label_none_repositories) : gitolite_repos[:repos].length %>
       </span>
+      <% end %>
     </td>
   </tr>
 </table>
@@ -47,14 +53,17 @@
 </pre>
 </div>
 
-<div class="box">
-<pre>
-<% gitolite_repos.first(20).each do |repo| %>
-<%= repo %>
+<% if gitolite_repos[:repos] %>
+  <% repos = gitolite_repos[:repos] %>
+  <div class="box">
+  <pre>
+  <% repos.first(20).each do |repo| %>
+  <%= repo %>
+  <% end %>
+  </pre>
+  <strong><%= repos.length > 20 ? '(showing only first 20 entries)' : "Total: #{repos.length}" %></strong>
+  </div>
 <% end %>
-</pre>
-<strong><%= gitolite_repos.length > 20 ? '(showing only first 20 entries)' : "Total: #{gitolite_repos.length}" %></strong>
-</div>
 
 <p><%= label_tag  "", l(:label_path_directories) %></p>
 

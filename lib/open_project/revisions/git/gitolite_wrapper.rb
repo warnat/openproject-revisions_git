@@ -194,12 +194,12 @@ module OpenProject::Revisions::Git
 
     def self.git_repositories
       Dir.chdir(gitolite_global_storage_path) do
-        Dir.glob('**/*.git')
+        { repos: Dir.glob('**/*.git') }
       end
     rescue => e
       errstr = "Error while getting Gitolite repositories: #{e.message}"
       logger.error(errstr)
-      errstr
+      { error: errstr }
     end
   end
 end
