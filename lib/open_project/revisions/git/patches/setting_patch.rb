@@ -20,7 +20,7 @@ module OpenProject::Revisions::Git
         begin
           @@old_valuehash = Setting.plugin_openproject_revisions_git.clone
         rescue
-          @@old_valuehash = []
+          @@old_valuehash = {}
         end
 
         @@resync_projects = false
