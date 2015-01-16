@@ -8,7 +8,7 @@ Forked from [jbox-web's version](https://jbox-web.github.io/redmine_git_hosting/
 
 As OpenProject has diverted quite a bit in terms of project management (e.g., redmine allows multiple repositories per project), some features have been removed in the fork.
 
-**Disclaimer**: This fork is still in progress. While some things work, it is by no means stable.
+**Disclaimer**: This fork is still in progress. While some things work, it is by no means stable - Features may change anytime.
 
 ## Overview
 
@@ -110,15 +110,16 @@ This is required for two reasons:
 We have already changed the configuration file ``gitolite.rc`` to set future permissions on repositories to 0770.
 To set the permissions of the existing repositories folder.
 
-  chmod -R 770 <git home>/repositories
+    chmod -R 770 <git home>/repositories
 
 Next, add OpenProject to the ``git`` group (assuming your gitolite user is ``git`` and your OpenProject user is ``openproject``) to allow OpenProject to access the repositories.
 
-  addgroup openproject git
+    addgroup openproject git
 
 Make sure you can access the repositories from openproject:
 
-  su - openproject -c 'ls <git home>/repositories'
+    su - openproject 
+    ls -l <git home>/repositories
 
 #### 3. Gitolite access
 
