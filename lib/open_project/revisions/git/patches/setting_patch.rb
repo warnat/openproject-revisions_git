@@ -17,7 +17,12 @@ module OpenProject::Revisions::Git
       module InstanceMethods
         private
 
-        @@old_valuehash = Setting.plugin_openproject_revisions_git.clone
+        begin
+          @@old_valuehash = Setting.plugin_openproject_revisions_git.clone
+        rescue
+          @@old_valuehash = []
+        end
+
         @@resync_projects = false
         @@resync_ssh_keys = false
         @@delete_trash_repo = []
