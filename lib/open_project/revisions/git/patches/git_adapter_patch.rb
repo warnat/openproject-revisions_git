@@ -26,7 +26,7 @@ module OpenProject::Revisions::Git
           full_args += args
           ret = run_scm_cmd(full_args.map { |e| shell_quote e.to_s }.join(' '), &block)
           if $? && $?.exitstatus != 0
-            raise ScmCommandAborted, "git exited with non-zero status: #{$?.exitstatus}"
+            raise Redmine::Scm::Adapters::GitAdapter::ScmCommandAborted, "git exited with non-zero status: #{$?.exitstatus}"
           end
           ret
         end
