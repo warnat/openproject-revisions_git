@@ -17,12 +17,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
       add_repository
     end
 
-    # Remove the given repositories from gitolite-admin
-    # Does NOT remove the repository from filesystem.
-    def remove_repositories
-      handle_repository_delete(@object_id)
-    end
-
     # Delete the given repositories.
     #
     # As the project/repo model may be deleted already,
@@ -33,11 +27,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # 2. Delete the physical repository
     # (and all empty parent directories within the repository storage)
     def delete_repositories
-      handle_repository_delete(@object_id) do |repo|
-        # Delete all empty parent directories
-        # From the lowermost repository
-        clean_repo_dir(repo[:path])
-      end
+      handle_repository_delete(@object_id)
     end
   end
 end

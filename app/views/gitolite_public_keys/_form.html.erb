@@ -32,7 +32,7 @@
       <p><%= f.text_field :title, label: :label_identifier_can_be_arbitrary, required: true, style: 'width: 97%;' %></p>
       <% if target == 'gitolite_public_keys' %>
         <p>
-          <%= f.hidden_field :user_id, value: @user.id, %>
+          <%= f.hidden_field :user_id, value: @user.id %>
           <%= f.text_field :user, label: l('activerecord.models.user'), value: @user.name, disabled: true, style: 'width: 97%;' %>
         </p>
       <% end %>
@@ -45,8 +45,8 @@
                                       [ l(:label_deploy_key), 1 ]
                                     ],
                                   ),
-                                  { required: true,, label: :label_key_type, },
-                                  { class: 'select_key_type', } %>
+                                  { required: true, label: :label_key_type },
+                                  { class: 'select_key_type' } %>
 
 
         </p>

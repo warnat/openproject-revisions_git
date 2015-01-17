@@ -94,16 +94,16 @@ module OpenProject::Revisions::Git
             'https://', http_user_login,
             Setting.plugin_openproject_revisions_git[:https_server_domain],
             '/',
-            http_access_path
+            git_path
           ].join
         end
 
         def available_urls
           hash = available_url_hash
 
-          delete hash[:ssh] if User.current.anonymous?
-          delete hash[:https] unless extra[:git_http]
-          delete hash[:git] unless extra[:git_daemon]
+          hash.delete :ssh if User.current.anonymous?
+          hash.delete :https unless extra[:git_http]
+          hash.delete :git unless extra[:git_daemon]
 
           hash
         end

@@ -86,7 +86,7 @@ module OpenProject::Revisions::Git
       [
         :user, :setting, :settings_controller,
         :users_controller, :my_controller, :repositories_helper, :users_helper,
-        :repository_git
+        :git_adapter, :repository_git
       ].each do |sym|
         require_dependency "open_project/revisions/git/patches/#{sym}_patch"
       end

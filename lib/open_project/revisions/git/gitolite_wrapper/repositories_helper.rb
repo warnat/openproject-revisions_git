@@ -7,6 +7,10 @@ module OpenProject::Revisions::Git::GitoliteWrapper
       if @gitolite_config.repos[repo_name]
         logger.warn("#{@action} : repository '#{repo_name}' already exists in Gitolite, removing first")
         @gitolite_config.rm_repo(repo_name)
+
+        # Clean any remaining repositories in that path
+        # if the user did not remove it.
+        clean_repo_dir(repository.git_path)
       end
 
       # Create new repo object
@@ -44,11 +48,11 @@ module OpenProject::Revisions::Git::GitoliteWrapper
             # Delete from in-memory gitolite
             @gitolite_config.rm_repo(repo[:name])
 
-            # Allow post-processing of removed repo
-            yield repo
-
             # Commit changes
             gitolite_admin_repo_commit(repo[:name])
+
+            # Delete physical repo
+            clean_repo_dir(repo[:path])
           else
             logger.warn("#{@action} : '#{repo[:name]}' does not exist in Gitolite")
           end
@@ -132,22 +136,33 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # (i.e., if moving foo/bar/repo.git to foo/repo.git, foo/bar remains and is possibly abandoned)
     # This moves up from the lowermost point, and deletes all empty directories.
     def clean_repo_dir(path)
-      parent = Pathname.new(path).parent
-      repo_root = Pathname.new(OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path)
+      repo_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
+      full_path = File.join(repo_root, path)
 
-      # Delete the repository project itself.
-      FileUtils.rm_rf(path)
+      Dir.chdir(repo_root) do
+        # If no repository was created, break early
+        break unless File.directory?(path)
 
-      loop do
-        # Stop deletion upon finding a non-empty parent repository
-        break unless parent.children(false).empty?
+        # Delete the repository project itself.
+        logger.info("Deleting obsolete repository #{full_path}")
+        FileUtils.remove_dir(path)
 
-        # Stop if we're in the project root
-        break if parent == repo_root
+        # Traverse all parent directories within repositories,
+        # searching for empty project directories.
+        parent = Pathname.new(full_path).parent
 
-        logger.info("#{@action} : Cleaning repository directory #{parent} ... ")
-        FileUtils.rmdir(parent)
-        parent = parent.parent
+        loop do
+          # Stop deletion upon finding a non-empty parent repository
+          break unless parent.children(false).empty?
+
+          # Stop if we're in the project root
+          break if parent == repo_root
+
+          logger.info("#{@action} : Cleaning repository parent #{parent} ... ")
+          FileUtils.rmdir(parent)
+
+          parent = parent.parent
+        end
       end
     end
   end

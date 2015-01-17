@@ -55,16 +55,16 @@ module OpenProject::Revisions::Git::Hooks
 
     def repository_edited(context)
       repository = context[:repository]
-      OpenProject::Revisions::Git::GitoliteWrapper.logger.info("User '#{User.current.login}' created a \
-        new repository '#{repository.gitolite_repository_name}'")
+      OpenProject::Revisions::Git::GitoliteWrapper.logger.info("User '#{User.current.login}
+        created a new repository '#{repository.gitolite_repository_name}'")
 
       OpenProject::Revisions::Git::GitoliteWrapper.update(:add_repository, repository)
     end
 
     def repository_destroyed(context)
       repository = context[:repository]
-      OpenProject::Revisions::Git::GitoliteWrapper.logger.info("User '#{User.current.login}' has removed \
-        repository '#{repository.gitolite_repository_name}'")
+      OpenProject::Revisions::Git::GitoliteWrapper.logger.info("User '#{User.current.login}'
+        has removed repository '#{repository.gitolite_repository_name}'")
 
       repository_data = {
         name: repository.gitolite_repository_name,
