@@ -167,18 +167,24 @@ class GitolitePublicKey < ActiveRecord::Base
 
     existing = GitolitePublicKey.find_by_fingerprint(fingerprint)
     if existing
-      # Hm.... have a duplicate key!
-      if existing.user == User.current
-        errors.add(:key, l(:error_key_in_use_by_you, name: existing.title))
-        return false
-      elsif User.current.admin?
-        errors.add(:key, l(:error_key_in_use_by_other, login: existing.user.login, name: existing.title))
-        return false
-      else
-        errors.add(:key, l(:error_key_in_use_by_someone))
-        return false
-      end
+      determine_duplicate_error(existing)
+      false
+    else
+      true
     end
-    true
+  end
+
+  # Determine the reason of a duplicate error
+  # and print it to the user.
+  # Avoids display the username of the existing fingerprint
+  # unless current user is admin
+  def determine_duplicate_error(existing)
+    if existing.user == User.current
+      errors.add(:key, l(:error_key_in_use_by_you, name: existing.title))
+    elsif User.current.admin?
+      errors.add(:key, l(:error_key_in_use_by_other, login: existing.user.login, name: existing.title))
+    else
+      errors.add(:key, l(:error_key_in_use_by_someone))
+    end
   end
 end

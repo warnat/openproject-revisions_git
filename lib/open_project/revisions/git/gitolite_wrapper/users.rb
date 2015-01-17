@@ -33,7 +33,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     private
 
     def add_gitolite_key(key)
-      parts = key.key.split
       repo_keys = @admin.ssh_keys[key.identifier]
       repo_key = repo_keys.select { |k| k.location == key.title && k.ownidentifierer == key.identifier }.first
       if repo_key
@@ -41,6 +40,11 @@ module OpenProject::Revisions::Git::GitoliteWrapper
         @admin.rm_key(repo_key)
       end
 
+      save_key(key)
+    end
+
+    def save_key(key)
+      parts = key.key.split
       repo_key = Gitolite::SSHKey.new(parts[0], parts[1], parts[2], key.identifier, key.title)
       @admin.add_key(repo_key)
     end

@@ -39,36 +39,46 @@ class AggregatedGitHostingMigrations < ActiveRecord::Migration
       MIGRATION_FILES, OLD_PLUGIN_NAME
     )
     Migration::MigrationSquasher.squash(migration_names) do
-      create_table :gitolite_public_keys do |t|
-        t.column :title, :string, null: false
-        t.column :identifier, :string, null: false
-        t.column :key, :text, null: false
-        t.column :key_type, :integer, null: false, default: GitolitePublicKey::KEY_TYPE_USER
-        t.column :delete_when_unused, :boolean, default: true
-        t.references :user, null: false
-        t.timestamps
-      end
-
-      add_index :gitolite_public_keys, :user_id
-      add_index :gitolite_public_keys, :identifier
-
-      create_table :repository_git_extras do |t|
-        t.references :repository, null: false
-        t.column :git_daemon, :boolean, default: true
-        t.column :git_http,   :boolean, default: true
-        t.column :git_notify, :boolean, default: false
-        t.column :default_branch, :string, null: false
-        t.column :key, :string, null: false
-      end
-
-      create_table :repository_git_config_keys do |t|
-        t.references :repository, null: false
-        t.column :key,   :string, null: false
-        t.column :value, :string, null: false
-      end
+      create_public_keys_schema
+      create_repository_git_extras
+      create_repository_config_keys
 
       Migration::SettingRenamer.rename(OLD_PLUGIN_NAME, 'plugin_openproject_revisions_git')
     end
+  end
+
+  def create_repository_config_keys
+    create_table :repository_git_config_keys do |t|
+      t.references :repository, null: false
+      t.column :key,   :string, null: false
+      t.column :value, :string, null: false
+    end
+  end
+
+  def create_repository_git_extras
+    create_table :repository_git_extras do |t|
+      t.references :repository, null: false
+      t.column :git_daemon, :boolean, default: true
+      t.column :git_http,   :boolean, default: true
+      t.column :git_notify, :boolean, default: false
+      t.column :default_branch, :string, null: false
+      t.column :key, :string, null: false
+    end
+  end
+
+  def create_public_keys_schema
+    create_table :gitolite_public_keys do |t|
+      t.column :title, :string, null: false
+      t.column :identifier, :string, null: false
+      t.column :key, :text, null: false
+      t.column :key_type, :integer, null: false, default: GitolitePublicKey::KEY_TYPE_USER
+      t.column :delete_when_unused, :boolean, default: true
+      t.references :user, null: false
+      t.timestamps
+    end
+
+    add_index :gitolite_public_keys, :user_id
+    add_index :gitolite_public_keys, :identifier
   end
 
   def down
