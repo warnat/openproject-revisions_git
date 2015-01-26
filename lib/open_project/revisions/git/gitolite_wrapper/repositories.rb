@@ -8,7 +8,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
         handle_repository_add(repository)
 
         gitolite_admin_repo_commit("#{repository.gitolite_repository_name}")
-        logger.info { "#{@action} : let Gitolite create empty repository '#{repository.git_path}'" }
       end
     end
 

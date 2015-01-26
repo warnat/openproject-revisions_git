@@ -5,12 +5,8 @@ module OpenProject::Revisions::Git::GitoliteWrapper
       repo_name = repository.gitolite_repository_name
 
       if @gitolite_config.repos[repo_name]
-        logger.warn("#{@action} : repository '#{repo_name}' already exists in Gitolite, removing first")
+        logger.warn("#{@action} : repository '#{repo_name}' already exists in Gitolite configuration, overriding")
         @gitolite_config.rm_repo(repo_name)
-
-        # Clean any remaining repositories in that path
-        # if the user did not remove it.
-        clean_repo_dir(repository.git_path)
       end
 
       # Create new repo object
