@@ -113,8 +113,8 @@ en:
   label_read_write_permission: Read+Write
   label_read_only_permission: Read Only
 
-  notice_empty_repository: Repository is empty. Get started by following the instructions below.
-
+  notice_empty_repository: The Repository seems to be empty. Get started by cloning the repository using the URLs from the sidebar.
+  title_repository_empty: Repository empty
   # Statistics
   label_repository_statistics_global: Global statistics
   label_repository_statistics_commits: Commits statistics

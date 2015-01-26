@@ -5,6 +5,13 @@
   <%= render partial: 'navigation' %>
 </div>
 
+<% if @entries.nil? %>
+<div class='flash warning'>
+  <strong><%= l(:title_repository_empty) %></strong>
+  <p><%= l(:notice_empty_repository) %></p>
+</div>
+<% end %>
+
 <h2><%= render partial: 'breadcrumbs',
                locals: { path: @path, kind: 'dir', revision: @rev } %></h2>
 

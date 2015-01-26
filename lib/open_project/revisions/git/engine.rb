@@ -85,7 +85,8 @@ module OpenProject::Revisions::Git
       # act_as_op_engine doesn't like the hierarchical plugin/engine name :)
       [
         :user, :setting, :settings_controller,
-        :users_controller, :my_controller, :repositories_helper, :users_helper,
+        :repositories_controller, :users_controller, :my_controller,
+        :repositories_helper, :users_helper,
         :git_adapter, :repository_git
       ].each do |sym|
         require_dependency "open_project/revisions/git/patches/#{sym}_patch"
