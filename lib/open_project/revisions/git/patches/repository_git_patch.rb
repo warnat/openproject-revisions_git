@@ -102,8 +102,8 @@ module OpenProject::Revisions::Git
           hash = available_url_hash
 
           hash.delete :ssh if User.current.anonymous?
-          hash.delete :https unless extra[:git_http]
-          hash.delete :git unless extra[:git_daemon]
+          hash.delete :https unless extra.present? && extra[:git_http]
+          hash.delete :git unless extra.present? && extra[:git_daemon]
 
           hash
         end
