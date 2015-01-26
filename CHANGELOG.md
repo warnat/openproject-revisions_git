@@ -23,6 +23,6 @@ Organizational Changes:
 
 The Requirement for sudo from `openproject` to `git` user has been replaced with direct read/write access through gitolite.rc's `$UMASK` directive. When upgrading, follow these steps:
 
- 1. The ``$UMASK`` directive within the `gitolite.rc` must be changed to `0770` for any subsequent updates to the repositories
- 2. The `<git home>/repositories` directory permissions must be extended to `770`.
+ 1. The ``$UMASK`` directive within the `gitolite.rc` must be changed to `0007` for any subsequent updates to the repositories
+ 2. Any repository under `<git home>/repositories` directory permissions must be extended to `770`.
  3. The openproject user must be added to the git user group.

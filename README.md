@@ -86,7 +86,7 @@ OpenProject identifies project identifiers in gitolite through git config keys, 
   
   b. Change the configuration ``$GIT_CONFIG_KEYS`` to ``'.*',``
 
-  c. Change the configuration for ``$REPO_UMASK`` to ``0770`` to set group rxw permissions
+  c. Change the configuration for ``$REPO_UMASK`` to ``0007`` to add group rxw permissions
 
   d. Save the changes
 
