@@ -15,7 +15,9 @@
   background: #C0392B;
 }
 
-
+table.list-aleft th {
+  text-align: left;
+}
 
 #sidebar input.revisions-git-url {
   width: 90%;

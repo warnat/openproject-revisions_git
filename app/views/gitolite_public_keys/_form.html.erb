@@ -29,7 +29,11 @@
           url: { controller: target, action: 'create' },
           method: :post ) do |f| %>
 
-      <p><%= f.text_field :title, label: :label_identifier_can_be_arbitrary, required: true, style: 'width: 97%;' %></p>
+      <p>
+        <%= f.text_field :title, label: :label_identifier_can_be_arbitrary, required: true, style: 'width: 97%;' %>
+        <br/>
+        <em><%= l(:label_identifier_can_be_arbitrary_desc) %></em>
+      </p>
       <% if target == 'gitolite_public_keys' %>
         <p>
           <%= f.hidden_field :user_id, value: @user.id %>

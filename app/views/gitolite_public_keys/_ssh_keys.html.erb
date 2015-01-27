@@ -1,4 +1,5 @@
-<table class="list">
+<%= stylesheet_link_tag 'revisions_git/revisions_git' %>
+<table class="list list-aleft">
   <% if ssh_keys.nil? || ssh_keys.empty? %>
     <tr>
       <td colspan=4>
@@ -9,7 +10,7 @@
     <thead>
       <tr>
         <th><%= l :label_public_key_title %></th>
-        <th><%= l :label_identifier_can_be_arbitrary %></th>
+        <th><%= l :label_gitolite_identifier %></th>
         <th><%= l :label_public_key_fingerprint %></th>
         <th></th>
     </thead>
@@ -17,7 +18,7 @@
     <% ssh_keys.each do |key| %>
       <tr class="<%= curcycle=cycle('odd', 'even') %>">
         <td><%= h(key) %></td>
-        <td><%= "#{key.identifier}.pub" %></td>
+        <td><%= "#{key.title}/#{key.identifier}.pub" %></td>
         <td><%= "#{key.fingerprint}" %></td>
         <td class="buttons">
           <%= link_to l(:button_delete),

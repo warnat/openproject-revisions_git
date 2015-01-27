@@ -59,7 +59,8 @@ en:
   label_current_deploy_keys: Current deployment keys
   label_no_public_keys: No public keys defined
   label_public_key_new: Enter new public key
-  label_identifier_can_be_arbitrary: Identifier
+  label_identifier_can_be_arbitrary: Title / Location
+  label_gitolite_identifier: Key path
   label_identifier_can_be_arbitrary_desc: (Can be any meaningful string)
   label_key_type: Public key type
   label_user_key: User key
