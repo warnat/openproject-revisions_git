@@ -13,7 +13,7 @@ class MyPublicKeysController < ApplicationController
   def create
     @gitolite_public_key = GitolitePublicKey.new(gitolite_keys_allowed_params.merge(user: User.current))
     save_and_flash
-    redirect_to url_for(action: 'index')
+    redirect_to action: 'index'
   end
 
   def destroy
@@ -21,7 +21,7 @@ class MyPublicKeysController < ApplicationController
       if @gitolite_public_key.destroy
         flash[:notice] = l(:notice_public_key_deleted, title: view_context.keylabel(@gitolite_public_key)).html_safe
       end
-      redirect_to url_for(action: 'index')
+      redirect_to action: 'index'
 
     end
   end
