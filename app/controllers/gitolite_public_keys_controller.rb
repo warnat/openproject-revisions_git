@@ -1,6 +1,4 @@
 class GitolitePublicKeysController < ApplicationController
-  unloadable
-
   include GitolitePublicKeysHelper
 
   before_filter :require_admin

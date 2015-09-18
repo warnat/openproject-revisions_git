@@ -3,7 +3,6 @@ module OpenProject::Revisions::Git
     module UserPatch
       def self.included(base)
         base.class_eval do
-          unloadable
 
           include InstanceMethods
 
@@ -32,10 +31,10 @@ module OpenProject::Revisions::Git
 
         def update_repositories
           if status_has_changed
-            git_projects = projects.uniq.select { |p| p.gitolite_repos.any? }
-
-            OpenProject::Revisions::Git::GitoliteWrapper.logger.info('User status has changed, update projects')
-            OpenProject::Revisions::Git::GitoliteWrapper.update(:update_projects, git_projects)
+            OpenProject::Revisions::Git::GitoliteWrapper.logger.info(
+              "User '#{login}' status has changed, update projects"
+            )
+            OpenProject::Revisions::Git::GitoliteWrapper.update(:update_projects, projects)
           end
         end
 
@@ -43,7 +42,8 @@ module OpenProject::Revisions::Git
 
         def delete_ssh_keys
           OpenProject::Revisions::Git::GitoliteWrapper.logger.info(
-            "User '#{login}' has been deleted from Redmine delete membership and SSH keys !")
+            "User '#{login}' has been deleted from Redmine delete membership and SSH keys !"
+          )
         end
 
         def check_if_status_changed

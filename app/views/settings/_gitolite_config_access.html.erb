@@ -11,35 +11,25 @@
 
 <h3><%= l(:label_gitolite_access_config) %></h3>
 
-<p>
-  <label><%= l(:label_https_server_domain) %></label>
-  <%= text_field_tag("settings[https_server_domain]", https_server_domain, size: 60) %>
+<div class="form--field">
+  <%= styled_label_tag 'settings[https_server_domain]', l(:label_https_server_domain) %>
+  <%= styled_text_field_tag("settings[https_server_domain]", https_server_domain, size: 60) %>
   <br />
-  <em><%= l(:label_https_server_domain_desc) %></em>
-</p>
+  <div class="form--field-instructions"><%= l(:label_https_server_domain_desc) %></div>
+</div>
 
-<p>
-  <label><%= l(:label_gitolite_http_by_default) %></label>
-  <%= select_tag("settings[gitolite_http_by_default]", 
-    options_for_select([
-      [l(:label_disabled), "0"],
-      [l(:label_https_only), "1"],
-    ], gitolite_http_by_default)) %>
-</p>
-
-<p>
-  <label><%= l(:label_gitolite_daemon_by_default) %></label>
+<div class="form--field">
+  <%= styled_label_tag 'settings[gitolite_daemon_by_default]', l(:label_gitolite_daemon_by_default) %>
   <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
     <%= hidden_field_tag "settings[gitolite_daemon_by_default]", "false" %>
     <%= check_box_tag "settings[gitolite_daemon_by_default]", gitolite_daemon_by_default, gitolite_daemon_by_default %>
   </span>
-</p>
+</div>
 
-<p>
-  <label><%= l(:ssh_server_domain) %></label>
-  <%= text_field_tag("settings[ssh_server_domain]", ssh_server_domain, size: 60) %>
-  <br />
-  <em><%= l(:label_ssh_server_domain_desc) %></em>
-</p>
+<div class="form--field">
+  <%= styled_label_tag 'settings[ssh_server_domain]', l(:ssh_server_domain) %>
+  <%= styled_text_field_tag("settings[ssh_server_domain]", ssh_server_domain, size: 60) %>
+  <div class="form--field-instructions"><%= l(:label_ssh_server_domain_desc) %></div>
+</div>
 
 <%= render partial: "gitolite_display_access" %>

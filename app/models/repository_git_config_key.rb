@@ -1,6 +1,4 @@
 class RepositoryGitConfigKey < ActiveRecord::Base
-  unloadable
-
   belongs_to :repository
 
   validates_presence_of :key

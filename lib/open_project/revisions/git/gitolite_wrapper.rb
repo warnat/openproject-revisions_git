@@ -20,12 +20,12 @@ module OpenProject::Revisions::Git
 
     def self.gitolite_version
       logger.debug('Gitolite updating version')
-      out, err, _ = ssh_shell('info')
+      out, err, _ = ssh_capture('info')
       return 3 if out.include?('running gitolite3')
       return 2 if out =~ /gitolite[ -]v?2./
-      logger.error("Couldn't retrieve gitolite version through SSH.")
-      logger.debug("Gitolite version error output: #{err}") unless err.nil?
-      'unknown'
+    rescue => e
+      logger.error("Couldn't retrieve gitolite version through SSH: #{e.message}")
+      nil
     end
 
     # Returns a rails cache identifier with the key as its last part
@@ -103,23 +103,29 @@ module OpenProject::Revisions::Git
       Setting.plugin_openproject_revisions_git[:gitolite_global_storage_path]
     end
 
-    ##########################
-    #                        #
-    #       SSH Wrapper      #
-    #                        #
-    ##########################
-
-    # Execute a command in the gitolite forced environment through this user
-    # i.e., executes 'ssh git@localhost <command>'
-    #
-    # Returns stdout, stderr and the exit code
-    def self.ssh_shell(*params)
-      OpenProject::Revisions::Shell.capture('ssh', *ssh_shell_params.concat(params))
+    def self.capture_out(command, *params)
+      Open3.capture3(command, *params)
+    rescue => e
+      error_msg = "Exception occured executing `#{command} #{params.join(' ')}`: #{e.message}"
+      logger.error(error_msg)
+      raise ::OpenProject::Scm::Exceptions::CommandFailed.new(command, error_msg)
     end
 
-    # Return only the output from the ssh command and checks
+    # Executes the given command and a list of parameters on the shell
+    # and returns the result.
+    #
+    # If the operation throws an exception or the operation yields a non-zero exit code
+    # we rethrow a +ScmError+ with a meaningful error message.
     def self.ssh_capture(*params)
-      OpenProject::Revisions::Shell.capture_out('ssh', *ssh_shell_params.concat(params))
+      output, err, code = capture_out('ssh', *ssh_shell_params.concat(params))
+      if code != 0
+        error_msg = "Non-zero exit code #{code} for `ssh #{params.join(' ')}`"
+        logger.error(error_msg)
+        logger.debug("Error output is #{err}")
+        raise ::OpenProject::Scm::Exceptions::CommandFailed.new('ssh', error_msg)
+      end
+
+      output
     end
 
     # Returns the ssh prefix arguments for all ssh_* commands
@@ -145,7 +151,7 @@ module OpenProject::Revisions::Git
 
     def self.admin
       admin_dir = Setting.plugin_openproject_revisions_git[:gitolite_admin_dir]
-      logger.info { "Acessing gitolite-admin.git at '#{admin_dir}'" }
+      logger.info("Acessing gitolite-admin.git at '#{admin_dir}'")
       Gitolite::GitoliteAdmin.new(admin_dir, gitolite_admin_settings)
     end
 
@@ -185,7 +191,7 @@ module OpenProject::Revisions::Git
     #
     # Upon error, returns the shell error code instead.
     def self.gitolite_banner
-      GitoliteWrapper.ssh_capture('info')
+      ssh_capture('info')
     rescue => e
       errstr = "Error while getting Gitolite banner: #{e.message}"
       logger.error(errstr)

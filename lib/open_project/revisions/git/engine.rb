@@ -84,23 +84,35 @@ module OpenProject::Revisions::Git
     config.to_prepare do
       # act_as_op_engine doesn't like the hierarchical plugin/engine name :)
       [
-        :user, :setting, :settings_controller,
-        :repositories_controller, :users_controller, :my_controller,
-        :repositories_helper, :users_helper,
-        :git_adapter, :repository_git
+        :user, :setting,
+        :users_controller, :my_controller,
+        :users_helper,
       ].each do |sym|
         require_dependency "open_project/revisions/git/patches/#{sym}_patch"
       end
+    end
+
+    initializer 'revisions_git.scm_vendor' do
+      require 'open_project/scm/manager'
+      OpenProject::Scm::Manager.add :gitolite
+    end
+
+    initializer 'revisions_git.configuration' do
+      config = Setting.repository_checkout_data.presence || {}
+      Setting.repository_checkout_data = config.merge('gitolite' => { 'enabled' => 1 })
     end
 
     initializer 'revisons_git.precompile_assets' do
       Rails.application.config.assets.precompile += %w(revisions_git/revisions_git.css)
     end
 
-    initializer 'revisions_git.hooks' do
-      require 'open_project/revisions/git/hooks'
-      require 'open_project/revisions/git/hooks/gitolite_updater'
-      OpenProject::Revisions::ProxiedRepositoryHook.delegate(Hooks::GitoliteUpdaterHook)
+    initializer 'revisions_git.notification_listeners' do
+      %i(member_updated
+         member_removed
+         project_deletion_imminent
+         project_updated).each do |sym|
+        ::OpenProject::Notifications.subscribe(sym.to_s, &NotificationHandlers.method(sym))
+      end
     end
   end
 end

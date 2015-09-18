@@ -1,6 +1,4 @@
 class MyPublicKeysController < ApplicationController
-  unloadable
-
   include GitolitePublicKeysHelper
 
   layout 'my'

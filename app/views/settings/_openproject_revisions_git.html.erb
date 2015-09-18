@@ -13,21 +13,3 @@
 <br />
 
 <%= render_tabs settings_tabs %>
-
-<%= javascript_tag do %>
-  $(document).ready(function() {
-    groups = $('[id^=tab-gitolite_]');
-
-    $.each(groups, function(key, elem) {
-      $(elem).on('click', function(){
-        if ("replaceState" in window.history) {
-          window.history.replaceState(null, document.title, 'redmine_revisions_git?tab=' + $(this).attr('id').replace('tab-', ''));
-        }
-      });
-    });
-
-    $('.bootstrap-switch').each(function(index, element) {
-      installBootstrapSwitch(element);
-    });
-  });
-<% end %>

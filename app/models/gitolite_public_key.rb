@@ -1,5 +1,4 @@
 class GitolitePublicKey < ActiveRecord::Base
-  unloadable
 
   KEY_TYPE_USER = 0
   KEY_TYPE_DEPLOY = 1
@@ -97,18 +96,22 @@ class GitolitePublicKey < ActiveRecord::Base
   private
 
   def set_fingerprint
-    file = Tempfile.new('keytest')
-    file.write(key)
-    file.close
-    # This will throw if exitcode != 0
-    output = OpenProject::Revisions::Shell.capture_out('ssh-keygen', '-l', '-f', file.path)
-    if output
-      self.fingerprint = output.split[1]
+    Tempfile.create('gitolite_publickey') do |f|
+      f.write(key)
+      f.close
+      # This will throw if exitcode != 0
+      output, = OpenProject::Revisions::Git::GitoliteWrapper.capture_out('ssh-keygen', '-lf',
+                                                                        f.path)
+      if output
+        self.fingerprint = output.split[1]
+      end
     end
-  rescue
-    errors.add(:key, l(:error_key_corrupted))
+  rescue => e
+    Rails.logger.error("Could not validate SSH public key: #{e.message}")
   ensure
-    file.unlink
+    if !fingerprint
+      errors.add(:key, l(:error_key_corrupted))
+    end
   end
 
   # Strip leading and trailing whitespace

@@ -1,6 +1,4 @@
 class RevisionsGitControllerBase < ApplicationController
-  unloadable
-
   before_filter :require_login
   before_filter :set_repository_variable
   before_filter :set_project_variable

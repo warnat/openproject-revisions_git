@@ -1,6 +1,4 @@
 class RepositoryGitConfigKeysController < RevisionsGitControllerBase
-  unloadable
-
   before_filter :set_current_tab
   before_filter :can_view_config_keys,   only: [:index]
   before_filter :can_create_config_keys, only: [:new, :create]

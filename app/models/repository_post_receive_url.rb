@@ -1,14 +1,10 @@
 require 'uri'
 
 class RepositoryPostReceiveUrl < ActiveRecord::Base
-  unloadable
-
   belongs_to :repository
 
   scope :active,   -> { where active: true }
   scope :inactive, -> { where active: false }
-
-  attr_accessible :url, :mode, :active
 
   validates_presence_of :repository_id
 

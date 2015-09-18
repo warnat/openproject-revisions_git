@@ -39,6 +39,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     def handle_repository_delete(repos)
       @admin.transaction do
         repos.each do |repo|
+          byebug
           if @gitolite_config.repos[repo[:name]]
 
             # Delete from in-memory gitolite
@@ -48,7 +49,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
             gitolite_admin_repo_commit(repo[:name])
 
             # Delete physical repo
-            clean_repo_dir(repo[:path])
+            clean_repo_dir(repo[:relative_path])
           else
             logger.warn("#{@action} : '#{repo[:name]}' does not exist in Gitolite")
           end
@@ -85,8 +86,8 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # 3. Add the repository using +repo.gitolite_repository_name+
     #
     def do_move_repository(repo, old_path, old_name)
-      new_name  = repo.gitolite_repository_name
-      new_path  = repo.absolute_repository_path
+      new_name  = repo.repository_identifier
+      new_path  = repo.managed_repository_path
 
       logger.info("#{@action} : Moving '#{old_name}' -> '#{new_name}'")
       logger.debug("-- On filesystem, this means '#{old_path}' -> '#{new_path}'")
