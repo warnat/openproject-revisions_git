@@ -79,6 +79,24 @@ module OpenProject::Revisions::Git
         html: { class: 'icon2 icon-folder-locked' },
         caption: :label_public_keys
       )
+
+      #Create the menu in "projects/:project_id/projects"
+      menu(
+        :project_menu,
+        :manage_git_repositories,
+        { controller: 'manage_git_repositories', action: 'index' },
+        caption: 'Manage Git repository',
+        param: :project_id,
+        parent: :repository,
+        if: Proc.new { |p| p.repository && p.repository.is_a?(Repository::Git) },
+        html: { class: 'icon2 icon-locked-folder' }
+      )
+        
+      #To show the menu as a submenu within another module
+      project_module :repository do
+        permission :view_manage_git_repositories, manage_git_repositories: :index
+      end  
+
     end
 
     config.to_prepare do
