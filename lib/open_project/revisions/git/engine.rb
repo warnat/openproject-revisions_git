@@ -68,7 +68,8 @@ module OpenProject::Revisions::Git
         permission :edit_repository_git_config_keys, repository_git_config_keys: :edit
 
         permission :create_gitolite_ssh_key, my: :account
-        permission :download_git_revision, download_git_revision: :index
+        #Next line is not valid because there is not controller "download_git_revision"
+        #permission :download_git_revision, download_git_revision: :index
       end
 
       # Public Keys under user account
@@ -80,7 +81,8 @@ module OpenProject::Revisions::Git
         caption: :label_public_keys
       )
 
-      #Create the menu in "projects/:project_id/projects"
+      #Extends "project_menu": add the "manage_git_repositories" tab (menu option) to the project menu
+      #It only shows the tab (menu option) if the repository is a Git repository with the "if" sentence
       menu(
         :project_menu,
         :manage_git_repositories,
@@ -92,9 +94,16 @@ module OpenProject::Revisions::Git
         html: { class: 'icon2 icon-locked-folder' }
       )
         
-      #To show the menu as a submenu within another module
+      #To show the menu as a submenu within another module we need to enable the permissions:
+      #We declare one project based permission: view for manage git repositories.
+      #The permission is not public (with ", :public => true"), so we have to anable it to every role we want in the settings of OpenProject
+      #We wrap the permissions declaration inside a call to "project_module" to create a module, now we have to enable the module "repository" (already existing) for the projects we want to use it in
+      #In other words, "manage_git_repository" will be enabled if "repository" is enabled
       project_module :repository do
-        permission :view_manage_git_repositories, manage_git_repositories: :index
+        permission :view_manage_git_repositories, manage_git_repositories: :index #This seems not to work with ", :public => true"
+        #permission :manage_git_repositories, { :manage_git_repositories => [:index] }#, :public => true #MabEntwickeltSich: Public for testint
+        #Template for one general permission that may involve many controllers and actions: 
+        #permission :permission_name, {:controller => [:action, :action, ...]}, :public => true
       end  
 
     end

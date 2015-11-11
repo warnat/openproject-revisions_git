@@ -8,8 +8,11 @@ OpenProject::Application.routes.draw do
     resources :public_keys, controller: 'gitolite_public_keys', except: [:edit, :show, :update]
   end
   
-  #The route will be "projects/:project_id/manage_git_repository"
+  #The route will have the prefix "projects/:project_id/" plus our controller "manage_git_repository"
   scope 'projects/:project_id' do
+    #Rails will create all routes (HTTP method, Path, Controller) if we just use "resources"
+    #In this case, we create routes only for "index" and it translates to:
+    #"get 'projects/:project_id/manage_git_repositories', :to => 'manage_git_repositories#index'"
     resources :manage_git_repository, controller: 'manage_git_repositories', only: :index
   end
 

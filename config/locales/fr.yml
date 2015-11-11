@@ -321,3 +321,7 @@ fr:
   # Misc
   label_select_all: Tout sélectionner
   label_etcetera: etc
+
+  # GWDG
+  label_manage_git_repository: Gérer le dépôt Git
+  

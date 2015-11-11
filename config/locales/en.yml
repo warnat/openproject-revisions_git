@@ -349,3 +349,6 @@ en:
     checkout:
       default_instructions:
         gitolite: 'You can access this repository through Git with Gitolite.'
+  
+  # GWDG
+  label_manage_git_repository: Manage Git repository
