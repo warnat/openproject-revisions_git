@@ -37,11 +37,19 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     end
 
     def gitweb_enabled?
-      User.anonymous.allowed_to?(:browse_repository, @project) && @repository.extra[:git_http] != 0
+      User.anonymous.allowed_to?(:browse_repository, @project) &&
+        extra_given? &&
+        @repository.extra[:git_http] != 0
     end
 
     def git_daemon_enabled?
-      User.anonymous.allowed_to?(:view_changesets, @project) && repository.extra[:git_daemon]
+      User.anonymous.allowed_to?(:view_changesets, @project) &&
+        extra_given? &&
+        @repository.extra[:git_daemon] != 0
+    end
+
+    def extra_given?
+      !@repository.extra.nil?
     end
 
     # Builds the set of permissions for all
