@@ -3,9 +3,12 @@ class RepositoryDeploymentCredentialsController < ApplicationController #Revisio
 
 
   before_filter :find_project
+  #before_filter :find_project_by_project_id
   before_filter :find_repository
   before_filter :set_my_keys
   before_filter :find_credentials
+  before_filter :find_deployment_credential, only: [:edit, :update, :destroy]
+  before_filter :find_key,                   only: [:edit, :update, :destroy]
 
   def index
 #    @repository_deployment_credentials = @repository.repository_deployment_credentials.all
@@ -30,10 +33,25 @@ class RepositoryDeploymentCredentialsController < ApplicationController #Revisio
     
     save_and_flash
     redirect_to controller: 'manage_git_repositories', action: 'index'
-end
+  end
 
   def edit
     
+  end
+
+  def destroy
+    #Commented code to prevent deleting the unused keys, there is no field in table to indicate if key should be deleted
+#    will_delete_key = @key.deploy_key? && @key.delete_when_unused && @key.repository_deployment_credentials.count == 1
+    @credential.destroy
+#    if will_delete_key && @key.repository_deployment_credentials.empty?
+#      # Key no longer used -- delete it!
+#      @key.destroy
+#      flash[:notice] = 'Deployment credential and key deleted'
+#    else
+      flash[:notice] = 'Deployment credential deleted'
+#    end
+
+    redirect_to controller: 'manage_git_repositories', action: 'index'
   end
 
 
@@ -78,4 +96,30 @@ end
   end
 
   
+  def find_key
+    key = @credential.gitolite_public_key
+    if key && key.user && (User.current.admin? || key.user == User.current)
+      @key = key
+    elsif key
+      render_403
+    else
+      render_404
+    end
+  end
+  
+  def find_deployment_credential
+    begin
+      credential = @repository.repository_deployment_credentials.find(params[:credential])
+    rescue ActiveRecord::RecordNotFound => e
+      render_404
+    else
+      if credential.user && (User.current.admin? || credential.user == User.current)
+        @credential = credential
+      else
+        render_403
+      end
+    end
+  end
+
+
 end

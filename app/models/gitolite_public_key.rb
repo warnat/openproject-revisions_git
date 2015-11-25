@@ -6,6 +6,7 @@ class GitolitePublicKey < ActiveRecord::Base
   DEPLOY_PSEUDO_USER = 'deploy_key'
 
   belongs_to :user
+  has_many   :repository_deployment_credentials, dependent: :destroy
 
   scope :user_key,   -> { where key_type: KEY_TYPE_USER }
   scope :deploy_key, -> { where key_type: KEY_TYPE_DEPLOY }
