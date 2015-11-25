@@ -14,6 +14,8 @@ OpenProject::Application.routes.draw do
     #In this case, we create routes only for "index" and it translates to:
     #"get 'projects/:project_id/manage_git_repositories', :to => 'manage_git_repositories#index'"
     resources :manage_git_repository, controller: 'manage_git_repositories', only: :index
+
+    resources :repository_deployment_credentials, controller: 'repository_deployment_credentials'
   end
 
 end

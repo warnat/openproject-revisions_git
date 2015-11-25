@@ -1,0 +1,19 @@
+
+   <div id="validation_messages"><%= error_messages_for 'credential' %></div>
+
+    <p>
+      <%= f.select :gitolite_public_key_id, build_list_of_keys(@gitolite_deploy_keys),
+                              { required: true, label: 'Select deployment key' },
+                              { class: 'select_key_type' } %>
+    </p>
+    
+    <p>
+      <%= f.hidden_field :repository_id, value: @repository.id %>
+      <%= f.hidden_field :user_id, value: @user.id %>
+    </p>
+
+    <p>
+      <%= f.select :perm, options_for_select(RepositoryDeploymentCredential::VALID_PERMS, RepositoryDeploymentCredential::DEFAULT_PERM),
+                              { required: true, label: 'Access permissions' },
+                              { class: 'select_key_type' } %>
+    </p>

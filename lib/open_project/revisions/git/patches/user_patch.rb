@@ -27,6 +27,14 @@ module OpenProject::Revisions::Git
           [login.underscore.gsub(/[^0-9a-zA-Z\-]/, '_'), '_', id].join
         end
 
+        def git_allowed_to?(permission, repository)
+          if repository.project.active?
+            allowed_to?(permission, repository.project)
+          else
+            allowed_to?(permission, nil, global: true)
+          end
+        end
+
         protected
 
         def update_repositories

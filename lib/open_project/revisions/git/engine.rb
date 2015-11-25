@@ -68,6 +68,8 @@ module OpenProject::Revisions::Git
         permission :edit_repository_git_config_keys, repository_git_config_keys: :edit
 
         permission :create_gitolite_ssh_key, my: :account
+        permission :create_deployment_keys, my: :account
+        permission :create_repository_deployment_credentials, my: :account
         #Next line is not valid because there is not controller "download_git_revision"
         #permission :download_git_revision, download_git_revision: :index
       end
@@ -100,14 +102,16 @@ module OpenProject::Revisions::Git
       #We wrap the permissions declaration inside a call to "project_module" to create a module, now we have to enable the module "repository" (already existing) for the projects we want to use it in
       #In other words, "manage_git_repository" will be enabled if "repository" is enabled
       project_module :repository do
-        permission :view_manage_git_repositories, manage_git_repositories: :index #This seems not to work with ", :public => true"
-        #permission :manage_git_repositories, { :manage_git_repositories => [:index] }#, :public => true #MabEntwickeltSich: Public for testint
+        #permission :view_manage_git_repositories, manage_git_repositories: :index #This seems not to work with ", :public => true"
+        permission :manage_git_repositories, { :manage_git_repositories => [:index] }, :public => true #MabEntwickeltSich: Public for testing
         #Template for one general permission that may involve many controllers and actions: 
         #permission :permission_name, {:controller => [:action, :action, ...]}, :public => true
+        permission :repository_deployment_credentials, { :repository_deployment_credentials => [:index] }, :public => true #MabEntwickeltSich: Public for testing
       end  
 
     end
 
+    #The patch for "repository" should be in the beginning, otherwise it will not work.
     config.to_prepare do
       # act_as_op_engine doesn't like the hierarchical plugin/engine name :)
       [

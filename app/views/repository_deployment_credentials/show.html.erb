@@ -1,0 +1,36 @@
+<% if @repository_deployment_credentials.nil? || @repository_deployment_credentials.empty? %>
+  <table class="list" style="margin:1px 2px; width:99%">
+    <thead><tr><th style="text-align:center;">No deployment credentials defined for this repository</td></th></thead>
+  </table>
+<% else %>
+  <table class="list list-aleft">
+    <thead>
+      <tr>
+        <th><%= 'Owner' %></th>
+        <th><%= 'Gitolite identifier' %></th>
+        <th><%= 'Permissions' %></th>
+        <th><%= 'Honored' %></th>
+        <th><%= 'Active' %></th>
+        <th></th>
+    </thead>
+    <tbody>
+    <% @repository_deployment_credentials.sort_by {|x| [x.user.login, x.gitolite_public_key.title]}.each do |credential| %>
+      <tr class="<%= curcycle=cycle('odd', 'even') %>">
+        <td class="center" style="text-align:center;"><%= credential.user.login %></td>
+        <td class="center" style="text-align:center;"><%= "#{credential.gitolite_public_key.title}/#{credential.gitolite_public_key.identifier}.pub" %></td>
+        <td class="center" style="text-align:center;"><%= credential.perm %></td>
+        <td class="center" style="text-align:center;"><%=checked_image credential.honored? %></td>
+        <td class="center" style="text-align:center;"><%=checked_image credential.active? %></td>
+        <td class="buttons">
+        <%= link_to l(:button_delete),
+                 { controller: 'repository_deployment_credentials', action: 'destroy', credential: credential },
+                 method: :delete,
+                 class: 'icon icon-delete',
+                 confirm: "Are you sure you want to delete the credential '#{credential.gitolite_public_key.title}' => #{credential.perm}" %>
+	                 
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>

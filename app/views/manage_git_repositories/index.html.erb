@@ -3,19 +3,26 @@
 <%= toolbar title: 'Manage Git repository' %>
 
 
+
+
+<p>
 <fieldset class="fs_deployment_credentials">
-  <legend><%= 'Deploment credentials' %></legend>
+  <legend><%= 'Deployment credentials' %></legend>
 
-  <%= render :partial => "manage" %>
+  <%= render template: "repository_deployment_credentials/index" %>
 </fieldset>
+</p>
 
-
+<p>
 <fieldset class="fs_post_receive_urls">
   <legend><%= 'Post receive URLs' %></legend>
 
 </fieldset>
+</p>
 
+<p>
 <fieldset class="fs_repositor_mirrors">
   <legend><%= 'Repository mirrors' %></legend>
 
 </fieldset>
+</p>
