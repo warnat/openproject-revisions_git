@@ -29,6 +29,8 @@ class ManageGitRepositoriesController < ApplicationController
     @user = User.current
     @gitolite_deploy_keys = @user.gitolite_public_keys.deploy_key.order('title ASC, created_at ASC')
     
+    @disabled_deployment_keys = @repository.repository_deployment_credentials.map(&:gitolite_public_key)
+    
     @other_deployment_keys = []
     # Admin can use other's deploy keys as well
     @other_deployment_keys = other_deployment_keys if User.current.admin?
@@ -51,7 +53,7 @@ class ManageGitRepositoriesController < ApplicationController
   end
 
   def users_allowed_to_create_deployment_keys
-    @project.users.select { |user| user != User.current && user.git_allowed_to?(:create_repository_deployment_credentials, @repository) }
+    @project.users.select { |user| user != User.current && user.allowed_to?(:create_repository_deployment_credentials, @project) }
   end
 
 

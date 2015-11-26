@@ -31,6 +31,15 @@ class RepositoryDeploymentCredentialsController < ApplicationController #Revisio
   def create
     @credential = RepositoryDeploymentCredential.new(repository_deployment_credentials_allowed_params)
     
+    key = GitolitePublicKey.find_by_id(params[:repository_deployment_credential][:gitolite_public_key_id])
+
+    # If admin, let credential be owned by owner of key...
+    if User.current.admin?
+      @credential.user = key.user if !key.nil?
+    else
+      @credential.user = User.current
+    end
+
     save_and_flash
     redirect_to controller: 'manage_git_repositories', action: 'index'
   end
