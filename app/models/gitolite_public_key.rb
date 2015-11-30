@@ -22,8 +22,8 @@ class GitolitePublicKey < ActiveRecord::Base
   validate :key_correctness
   validate :key_uniqueness
 
-  before_validation :set_identifier
   before_validation :set_fingerprint
+  before_validation :set_identifier
   before_validation :strip_whitespace
   before_validation :remove_control_characters
 
@@ -54,15 +54,18 @@ class GitolitePublicKey < ActiveRecord::Base
   # Returns the unique identifier for this key based on the key_type
   #
   # For user public keys, this simply is the user's gitolite_identifier.
-  # For deployment keys, we use an incrementing number.
+  # For deployment keys, this is a combination of the user's gitolite_identifier, the key's fingerprint and current time.
   def set_identifier
+    time_tag = "#{Time.now.to_s}".gsub(/[^0-9]/,'')[0,14]
+    fingerprint_tag = "#{fingerprint}".gsub(/[^0-9a-zA-Z]/,'')[-6,6]
     self.identifier ||=
       begin
         case key_type
         when KEY_TYPE_USER
           user.gitolite_identifier
+          #"#{user.gitolite_identifier}_#{fingerprint_tag}_#{time_tag}"
         when KEY_TYPE_DEPLOY
-          "#{user.gitolite_identifier}_#{DEPLOY_PSEUDO_USER}"
+          "#{user.gitolite_identifier}_#{fingerprint_tag}_#{time_tag}_#{DEPLOY_PSEUDO_USER}"
         end
       end
   end
