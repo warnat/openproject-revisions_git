@@ -6,6 +6,8 @@ class RepositoryPostReceiveUrl < ActiveRecord::Base
   scope :active,   -> { where active: true }
   scope :inactive, -> { where active: false }
 
+  attr_accessible :repository_id, :active, :url, :mode
+
   validates_presence_of :repository_id
 
   validates_format_of :url, with: URI::regexp(%w(http https)), allow_blank: false

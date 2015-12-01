@@ -8,6 +8,7 @@ module OpenProject::Revisions::Git
           include InstanceMethods
 
           has_many :repository_deployment_credentials, dependent: :destroy
+          has_many :repository_post_receive_urls, dependent: :destroy
 
         end
       end

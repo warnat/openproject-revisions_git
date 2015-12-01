@@ -1,0 +1,11 @@
+<%= labelled_tabular_form_for(:repository_post_receive_url,
+          url: { controller: 'repository_post_receive_urls', action: 'create' },
+          method: :post ) do |f| %>
+
+  <fieldset class="new_repository_post_receive_url">
+    <legend><%= 'Create new repository post receive URL' %></legend>
+      <%= render :partial => 'repository_post_receive_urls/form', :locals => { :f => f} %>
+      <%= styled_button_tag l(:button_create), class: '-highlight -with-icon icon-yes' %>
+  </fieldset>
+<% end %>
+ 

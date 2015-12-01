@@ -1,5 +1,5 @@
 
-   <div id="validation_messages"><%= error_messages_for 'credential' %></div>
+    <div id="validation_messages"><%= error_messages_for 'credential' %></div>
 
     <p>
       <%= f.select :gitolite_public_key_id, build_list_of_keys(@gitolite_deploy_keys, @other_deployment_keys, @disabled_deployment_keys),

@@ -16,6 +16,7 @@ OpenProject::Application.routes.draw do
     resources :manage_git_repository, controller: 'manage_git_repositories', only: :index
 
     resources :repository_deployment_credentials, controller: 'repository_deployment_credentials'
+    resources :repository_post_receive_urls, controller: 'repository_post_receive_urls'
   end
 
 end
