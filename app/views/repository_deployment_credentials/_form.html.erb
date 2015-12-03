@@ -5,6 +5,11 @@
       <%= f.select :gitolite_public_key_id, build_list_of_keys(@gitolite_deploy_keys, @other_deployment_keys, @disabled_deployment_keys),
                               { required: true, label: 'Select deployment key' },
                               { class: 'select_key_type' } %>
+      <%= link_to 'Create new deployment key',
+               { controller: "my_public_keys", action: 'index'},
+               method: :get,
+               class: 'icon icon-add',
+               confirm: "You will be redirected to 'My account | Public keys'\n Are you sure?" %>
     </p>
     
     <p>

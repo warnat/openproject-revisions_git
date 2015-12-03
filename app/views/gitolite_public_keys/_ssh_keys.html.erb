@@ -1,34 +1,37 @@
-<%= stylesheet_link_tag 'revisions_git/revisions_git' %>
-<table class="list list-aleft">
-  <% if ssh_keys.nil? || ssh_keys.empty? %>
-    <tr>
-      <td colspan=4>
-        <label><%= l(:label_no_public_keys) %></label>
-      </td>
-    </tr>
-  <% else %>
+<%#= stylesheet_link_tag 'revisions_git/revisions_git' %>
+<% if ssh_keys.nil? || ssh_keys.empty? %>
+  <table class="list" style="margin:1px 2px; width:100%">
     <thead>
       <tr>
-        <th><%= l :label_public_key_title %></th>
-        <th><%= l :label_gitolite_identifier %></th>
-        <th><%= l :label_public_key_fingerprint %></th>
+        <th style="text-align:center;"><%= l(:label_no_public_keys) %></th>
+      </tr>
+    </thead>
+  </table>
+<% else %>
+  <table class="list list-aleft" style="width:100%">
+    <thead>
+      <tr>
+        <th><%= l(:label_public_key_title) %></th>
+        <th><%= l(:label_gitolite_identifier) %></th>
+        <th><%= l(:label_public_key_fingerprint) %></th>
         <th></th>
+      </tr>
     </thead>
     <tbody>
-    <% ssh_keys.each do |key| %>
-      <tr class="<%= curcycle=cycle('odd', 'even') %>">
-        <td><%= h(key) %></td>
-        <td><%= "#{key.title}/#{key.identifier}.pub" %></td>
-        <td><%= "#{key.fingerprint}" %></td>
-        <td class="buttons">
-          <%= link_to l(:button_delete),
-                 { controller: target, action: 'destroy', id: key.id },
-                 method: :delete,
-                 class: 'icon icon-delete',
-                 confirm: l(:text_gitolite_key_destroy_confirmation, title: keylabel(key)) %>
-        </td>
-      </tr>
-    <% end %>
+      <% ssh_keys.each do |key| %>
+        <tr class="<%= curcycle=cycle('odd', 'even') %>">
+          <td><%= h(key) %></td>
+          <td style="text-align:center;"><%= "#{key.title}/#{key.identifier}.pub" %></td>
+          <td style="text-align:center;"><%= "#{key.fingerprint}"[-8,8] %></td>
+          <td class="buttons">
+            <%= link_to l(:button_delete),
+                   { controller: target, action: 'destroy', id: key.id },
+                   method: :delete,
+                   class: 'icon icon-delete',
+                   confirm: l(:text_gitolite_key_destroy_confirmation, title: keylabel(key)) %>
+          </td>
+        </tr>
+      <% end %>
     </tbody>
-  <% end %>
-</table>
+  </table>
+<% end %>

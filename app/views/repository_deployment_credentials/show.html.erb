@@ -1,9 +1,13 @@
 <% if @repository_deployment_credentials.nil? || @repository_deployment_credentials.empty? %>
-  <table class="list" style="margin:1px 2px; width:99%">
-    <thead><tr><th style="text-align:center;">No deployment credentials defined for this repository</td></th></thead>
+  <table class="list" style="margin:1px 2px; width:100%">
+    <thead>
+      <tr>
+        <th style="text-align:center;">No deployment credentials defined for this repository</th>
+      </tr>
+    </thead>
   </table>
 <% else %>
-  <table class="list list-aleft">
+  <table class="list list-aleft" style="width:100%">
     <thead>
       <tr>
         <th><%= 'Owner' %></th>

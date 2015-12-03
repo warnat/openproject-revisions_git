@@ -8,7 +8,7 @@
     <fieldset class="new_repository_deployment_credential">
       <legend><%= 'Create new deployment credential' %></legend>
         <%= render :partial => 'repository_deployment_credentials/form', :locals => { :f => f} %>
-        <%= styled_button_tag l(:button_create), class: '-highlight -with-icon icon-yes' %>
+        <%= styled_button_tag 'Create credential', class: '-highlight -with-icon icon-yes' %>
     </fieldset>
   <%# end %>
 <% end %>
