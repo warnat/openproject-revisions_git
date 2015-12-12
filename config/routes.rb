@@ -17,6 +17,7 @@ OpenProject::Application.routes.draw do
 
     resources :repository_deployment_credentials, controller: 'repository_deployment_credentials'
     resources :repository_post_receive_urls, controller: 'repository_post_receive_urls'
+    resources :repository_mirrors, controller: 'repository_mirrors'
   end
 
 end

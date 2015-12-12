@@ -9,6 +9,7 @@ module OpenProject::Revisions::Git
 
           has_many :repository_deployment_credentials, dependent: :destroy
           has_many :repository_post_receive_urls, dependent: :destroy
+          has_many :repository_mirrors, dependent: :destroy
 
         end
       end

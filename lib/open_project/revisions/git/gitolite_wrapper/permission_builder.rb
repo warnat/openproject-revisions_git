@@ -88,7 +88,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     end
 
     def active_project_gitolite_access
-      @read << 'DUMMY_REDMINE_KEY' if @read.empty? && @write.empty? && @rewind.empty?&& @rewind_deploy.empty? && @read_deploy.empty?
+      @read << 'DUMMY_REDMINE_KEY' if @read.empty? && @write.empty? && @rewind.empty? && @rewind_deploy.empty? && @read_deploy.empty?
       @read << 'gitweb' if gitweb_enabled?
       @read << 'daemon' if git_daemon_enabled?
     end

@@ -1,0 +1,45 @@
+<% if @repository_mirrors.nil? || @repository_mirrors.empty? %>
+  <table class="list" style="margin:1px 2px; width:100%">
+    <thead>
+      <tr>
+        <th style="text-align:center;">No mirrors defined for this repository</th>
+      </tr>
+    </thead>
+  </table>
+<% else %>
+  <table class="list list-aleft" style="width:100%">
+    <thead>
+      <tr>
+        <th><%= 'URL' %></th>
+        <th><%= 'Refspec' %></th>
+        <th><%= 'Mode' %></th>
+        <th><%= 'Active' %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @repository_mirrors.sort_by {|x| [x.url]}.each do |mirror| %>
+        <tr class="<%= curcycle=cycle('odd', 'even') %>">
+          <td class="center" style="text-align:left;"><%= mirror.url %></td>
+          <td class="center" style="text-align:center;"><%= refspec mirror, 64 %></td>
+          <td class="center" style="text-align:center;"><%= mirror_mode mirror %></td>
+          <td class="center" style="text-align:center;"><%= checked_image mirror.active? %></td>
+          <td class="buttons">
+            <% if User.current.admin? || User.current.allowed_to?(:create_repository_mirrors, @project) %>
+              <%= link_to "Push to mirror",
+                       { controller: "projects/#{@project}/repository_mirrors", action: 'push', mirror: mirror},
+                       method: :get,
+                       class: 'icon icon-double-arrow-right',
+                       confirm: "Are you sure you want to push the latest commits to mirror '#{mirror.url}'" %>
+              <%= link_to l(:button_delete),
+                       { controller: "projects/#{@project}/repository_mirrors", action: 'destroy', mirror: mirror},
+                       method: :delete,
+                       class: 'icon icon-delete',
+                       confirm: "Are you sure you want to delete the mirror '#{mirror.url}'" %>
+  	        <% end %>       
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

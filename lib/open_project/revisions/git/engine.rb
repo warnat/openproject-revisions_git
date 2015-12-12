@@ -71,6 +71,7 @@ module OpenProject::Revisions::Git
         permission :create_deployment_keys, my: :account
         permission :create_repository_deployment_credentials, my: :account
         permission :create_repository_post_receive_urls, my: :account
+        permission :create_repository_mirrors, my: :account
         #Next line is not valid because there is not controller "download_git_revision"
         #permission :download_git_revision, download_git_revision: :index
       end
@@ -109,6 +110,7 @@ module OpenProject::Revisions::Git
         #permission :permission_name, {:controller => [:action, :action, ...]}, :public => true
         permission :repository_deployment_credentials, { :repository_deployment_credentials => [:index] }, :public => true #MabEntwickeltSich: Public for testing
         permission :repository_post_receive_urls, { :repository_post_receive_urls => [:index] }, :public => true #MabEntwickeltSich: Public for testing
+        permission :repository_mirrors, { :repository_mirrors => [:index] }, :public => true #MabEntwickeltSich: Public for testing
       end  
 
     end
