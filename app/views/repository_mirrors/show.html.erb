@@ -27,12 +27,12 @@
           <td class="buttons">
             <% if User.current.admin? || User.current.allowed_to?(:create_repository_mirrors, @project) %>
               <%= link_to "Push to mirror",
-                       { controller: "projects/#{@project}/repository_mirrors", action: 'push', mirror: mirror},
+                       { controller: "projects/#{@project.identifier}/repository_mirrors", action: 'push', mirror: mirror},
                        method: :get,
                        class: 'icon icon-double-arrow-right',
                        confirm: "Are you sure you want to push the latest commits to mirror '#{mirror.url}'" %>
               <%= link_to l(:button_delete),
-                       { controller: "projects/#{@project}/repository_mirrors", action: 'destroy', mirror: mirror},
+                       { controller: "projects/#{@project.identifier}/repository_mirrors", action: 'destroy', mirror: mirror},
                        method: :delete,
                        class: 'icon icon-delete',
                        confirm: "Are you sure you want to delete the mirror '#{mirror.url}'" %>
