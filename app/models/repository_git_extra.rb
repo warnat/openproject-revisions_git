@@ -7,6 +7,16 @@ class RepositoryGitExtra < ActiveRecord::Base
 
   after_initialize :set_values
 
+  def set_values_for_existing_repo
+    if !repository.nil?
+      #When the default branch is null, it means that the proper configuration was not made for this repository when it was created
+      if default_branch.nil?
+        generate
+        setup_defaults
+      end
+    end
+  end
+
   private
 
   def set_values
