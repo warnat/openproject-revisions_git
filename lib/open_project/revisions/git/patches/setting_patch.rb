@@ -135,22 +135,29 @@ module OpenProject::Revisions::Git
         def fix_project_settings
           # Need to fix some projects!
           projects = Project.active.includes(:repository).all
+          total_project_fixed = 0
           if projects.length > 0
             OpenProject::Revisions::Git::GitoliteWrapper.logger.info(
-              "Forced configuration of projects (#{projects.length})..."
+              "Forced configuration of projects. Analyzing #{projects.length} project(s) with Git repositories..."
             )
 
             projects.each do |project|
               next unless project.repository.is_a?(Repository::Git)
     
               if project.repository.extra.nil?
-                OpenProject::Revisions::Git::GitoliteWrapper.logger.info("Project #{project.name} not configured properly, generating configuration...*****" )
+                total_project_fixed += 1
+                OpenProject::Revisions::Git::GitoliteWrapper.logger.info("Project #{project.name} not configured properly, generating configuration..." )
                 project.repository.build_extra
                 project.repository.extra.set_values_for_existing_repo
                 project.repository.save
               end
               
             end
+            OpenProject::Revisions::Git::GitoliteWrapper.logger.info(
+              "Forced configuration of projects finished. A total of #{total_project_fixed} project(s) with errors were found and fixed."
+            )
+            
+            
           end
         end
 

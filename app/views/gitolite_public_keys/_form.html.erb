@@ -1,5 +1,11 @@
 <%#= stylesheet_link_tag 'revisions_git/revisions_git', plugin: 'openproject_revisions_git' %>
 
+<% if params[:deploy] != nil && params[:deploy] == 'true'%>
+  <% default_key_type = 1 %>
+<% else %>
+  <% default_key_type = 0 %>
+<% end %>
+
 <%# Controller is overriden for user key management /my/account/keys %>
 <% target ||= 'gitolite_public_keys' %>
 
@@ -47,7 +53,7 @@
                                     [
                                       [ l(:label_user_key), 0 ],
                                       [ l(:label_deploy_key), 1 ]
-                                    ],
+                                    ], default_key_type
                                   ),
                                   { required: true, label: :label_key_type },
                                   { class: 'select_key_type' } %>

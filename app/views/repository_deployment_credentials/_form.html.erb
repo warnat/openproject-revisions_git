@@ -6,10 +6,10 @@
                               { required: true, label: 'Select deployment key' },
                               { class: 'select_key_type' } %>
       <%= link_to 'Create new deployment key',
-               { controller: "my_public_keys", action: 'index'},
+               { controller: "my_public_keys", action: 'index', deploy: 'true'},
                method: :get,
                class: 'icon icon-add',
-               confirm: "You will be redirected to 'My account | Public keys'\n Are you sure?" %>
+               confirm: "You will be redirected to 'My account | Public keys'\nUnsaved data will be lost\nAre you sure?" %>
     </p>
     
     <p>

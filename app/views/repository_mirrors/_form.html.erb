@@ -10,7 +10,7 @@
     </p>
 
     <p>
-      <%= f.select :push_mode, options_for_select([['Complete mirroring', 0], ['Force update remote', 1], ['Fast forward (unforced)', 2]], 'Complete mirroring'),
+      <%= f.select :push_mode, options_for_select([['Complete mirroring', 0], ['Force update remote', 1], ['Fast forward (unforced)', 2]], 0),
                               { required: true, label: 'Mirror update mode' },
                               { class: 'select_key_type' } %>
     </p>

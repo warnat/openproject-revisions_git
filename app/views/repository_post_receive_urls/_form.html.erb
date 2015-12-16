@@ -10,7 +10,7 @@
     </p>
 
     <p>
-      <%= f.select :mode, options_for_select([['Github-style POST', :github], ['Empty GET request', :get]], 'Github-style POST'),
+      <%= f.select :mode, options_for_select([['Github-style POST', :github], ['Empty GET request', :get]], :github),
                               { required: true, label: 'Mode' },
                               { class: 'select_key_type' } %>
     </p>
