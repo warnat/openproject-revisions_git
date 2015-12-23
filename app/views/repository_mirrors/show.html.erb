@@ -21,7 +21,7 @@
       <% @repository_mirrors.sort_by {|x| [x.url]}.each do |mirror| %>
         <tr class="<%= curcycle=cycle('odd', 'even') %>">
           <td class="center" style="text-align:left;"><%= mirror.url %></td>
-          <td class="center" style="text-align:center;"><%= refspec mirror, 64 %></td>
+          <td class="center" style="text-align:center;"><%= raw(refspec mirror, 64) %></td>
           <td class="center" style="text-align:center;"><%= mirror_mode mirror %></td>
           <td class="center" style="text-align:center;"><%= checked_image mirror.active? %></td>
           <td class="buttons">

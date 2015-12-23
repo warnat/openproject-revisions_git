@@ -5,7 +5,15 @@ class RepositoryMirror < ActiveRecord::Base
   PUSHMODE_FORCE        = 1
   PUSHMODE_FAST_FORWARD = 2
   
-  GIT_SSH_URL_REGEX = /\A(ssh:\/\/)([\w\-\.@]+)(\:[\d]+)?([\w\/\-\.~]+)(\.git)?\z/i
+  ## Only allow SSH format
+  ## ssh://git@redmine.example.org/project1/project2/project3/project4.git
+  ## ssh://git@redmine.example.org:project1/project2/project3/project4.git
+  ## ssh://git@redmine.example.org:/project1/project2/project3/project4.git
+  ## ssh://git@redmine.example.org:2222/project1/project2/project3/project4.git
+  GIT_SSH_URL_REGEX = /\A(ssh:\/\/)([\w\-\.@]+)(\:[\d]*)?([\w\/\-\.~]+)(\.git)?\z/i
+  # Validate a Git refspec
+  # [+]<src>:<dest>
+  # [+]refs/<name>/<ref>:refs/<name>/<ref>
   GIT_REFSPEC_REGEX = /\A\+?([^:]*)(:([^:]*))?\z/
   
   ## Attributes
