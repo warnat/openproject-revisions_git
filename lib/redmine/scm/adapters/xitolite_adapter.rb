@@ -52,7 +52,7 @@ module Redmine
 
           # Change from the original method
           def scm_version_from_command_line
-            RedmineGitHosting::Commands.git_version
+            OpenProject::Revisions::Git::Commands.git_version
           end
 
         end
@@ -478,7 +478,7 @@ module Redmine
         def mirror_push(mirror_url, branch = nil, args = [])
           cmd_args = git_mirror_cmd.concat(['push', *args, mirror_url, branch]).compact
           cmd = cmd_args.shift
-          RedmineGitHosting::Utils::Exec.capture(cmd, cmd_args, { merge_output: true })
+          OpenProject::Revisions::Git::Utils::Exec.capture(cmd, cmd_args, { merge_output: true })
         end
 
 
@@ -494,7 +494,7 @@ module Redmine
 
 
           def logger
-            RedmineGitHosting.logger
+            OpenProject::Revisions::Git.logger
           end
 
 
@@ -507,7 +507,7 @@ module Redmine
 
             # Insert cache between shell execution and caller
             if !git_cache_id.nil? && git_cache_enabled? && !bypass_cache
-              RedmineGitHosting::ShellRedirector.execute(cmd_str, git_cache_id, options, &block)
+              OpenProject::Revisions::Git::ShellRedirector.execute(cmd_str, git_cache_id, options, &block)
             else
               Redmine::Scm::Adapters::AbstractAdapter.shellout(cmd_str, options, &block)
             end
@@ -538,17 +538,17 @@ module Redmine
 
 
           def base_args
-            RedmineGitHosting::Commands.sudo_git_args_for_repo(repo_path).concat(git_args)
+            OpenProject::Revisions::Git::Commands.sudo_git_args_for_repo(repo_path).concat(git_args)
           end
 
 
           def git_mirror_cmd
-            RedmineGitHosting::Commands.sudo_git_args_for_repo(repo_path, git_push_args)
+            OpenProject::Revisions::Git::Commands.sudo_git_args_for_repo(repo_path, git_push_args)
           end
 
 
           def git_push_args
-            ['env', "GIT_SSH=#{RedmineGitHosting::Config.gitolite_mirroring_script}"]
+            ['env', "GIT_SSH=#{OpenProject::Revisions::Git::Config.gitolite_mirroring_script}"]
           end
 
 
@@ -563,7 +563,7 @@ module Redmine
 
 
           def git_cache_enabled?
-            RedmineGitHosting::Config.gitolite_cache_max_time != 0
+            OpenProject::Revisions::Git::Config.gitolite_cache_max_time != 0
           end
 
       end

@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     module RedmineConfig
       extend self

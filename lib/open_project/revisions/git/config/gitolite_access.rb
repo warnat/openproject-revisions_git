@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     module GitoliteAccess
       extend self
@@ -49,7 +49,7 @@ module RedmineGitHosting
 
 
       def redmine_root_url
-        Redmine::Utils::relative_url_root
+        OpenProject::Revisions::Git::Utils::relative_url_root
       end
 
 

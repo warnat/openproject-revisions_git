@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Error
 
     # Used to register errors when pulling and pushing the conf file

@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module GitoliteHooks
 
     class << self
@@ -38,7 +38,7 @@ module RedmineGitHosting
 
 
       def gitolite_hook(&block)
-        @gitolite_hooks << RedmineGitHosting::GitoliteHook.new(@source_dir, &block)
+        @gitolite_hooks << OpenProject::Revisions::Git::GitoliteHook.new(@source_dir, &block)
       end
 
     end

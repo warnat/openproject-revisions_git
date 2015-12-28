@@ -1,6 +1,6 @@
 require 'securerandom'
 
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Utils
     module Crypto
       extend self

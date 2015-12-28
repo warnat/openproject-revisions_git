@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Commands
     module Git
       extend self
@@ -34,7 +34,7 @@ module RedmineGitHosting
         begin
           _, _, code = sudo_shell('git', 'config', '--global', '--unset', key)
           return true
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           if code == 5
             return true
           else
@@ -56,7 +56,7 @@ module RedmineGitHosting
         begin
           sudo_git('config', '--global', key, value)
           return true
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error("Error while setting Git global parameter : #{key} (#{value})")
           logger.error(e.output)
           return false
@@ -68,7 +68,7 @@ module RedmineGitHosting
       def sudo_get_git_global_params(namespace)
         begin
           params = sudo_git('config', '-f', '.gitconfig', '--get-regexp', namespace).split("\n")
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error("Problems to retrieve Gitolite hook parameters in Gitolite config 'namespace : #{namespace}'")
           params = []
         end
@@ -80,7 +80,7 @@ module RedmineGitHosting
       def git_version
         begin
           sudo_git('--version', '--no-color')
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error("Can't retrieve Git version: #{e.output}")
           'unknown'
         end

@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Utils
     module Ssh
       extend self
@@ -10,8 +10,8 @@ module RedmineGitHosting
 
         begin
           output = Utils::Exec.capture('ssh-keygen', ['-l', '-f', file.path])
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
-          raise RedmineGitHosting::Error::InvalidSshKey.new("Invalid Ssh Key : #{key}")
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
+          raise OpenProject::Revisions::Git::Error::InvalidSshKey.new("Invalid Ssh Key : #{key}")
         else
           output.split[1]
         ensure

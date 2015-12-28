@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     module Base
       extend self
@@ -21,7 +21,7 @@ module RedmineGitHosting
 
       def reload_from_file!
         ## Get default config from init.rb
-        default_hash = Redmine::Plugin.find('redmine_git_hosting').settings[:default]
+        default_hash = Redmine::Plugin.find('openproject_revisions_git').settings[:default]
         do_reload_config(default_hash)
       end
 
@@ -40,12 +40,12 @@ module RedmineGitHosting
           ## Wrap this in a begin/rescue statement because Setting table
           ## may not exist on first migration
           begin
-            value = Setting.plugin_redmine_git_hosting[setting]
+            value = Setting.plugin_openproject_revisions_git[setting]
           rescue => e
-            value = Redmine::Plugin.find('redmine_git_hosting').settings[:default][setting]
+            value = Redmine::Plugin.find('openproject_revisions_git').settings[:default][setting]
           else
             ## The Setting table exist but does not contain the value yet, fallback to default
-            value = Redmine::Plugin.find('redmine_git_hosting').settings[:default][setting] if value.nil?
+            value = Redmine::Plugin.find('openproject_revisions_git').settings[:default][setting] if value.nil?
           end
 
           value
@@ -57,7 +57,7 @@ module RedmineGitHosting
           Setting.check_cache
 
           ## Get actual values
-          valuehash = (Setting.plugin_redmine_git_hosting).clone rescue {}
+          valuehash = (Setting.plugin_openproject_revisions_git).clone rescue {}
 
           ## Update!
           changes = 0
@@ -82,7 +82,7 @@ module RedmineGitHosting
           console_logger.info('Committing changes ... ')
           begin
             ## Update Settings
-            Setting.plugin_redmine_git_hosting = valuehash
+            Setting.plugin_openproject_revisions_git = valuehash
             ## Refresh Settings cache
             Setting.check_cache
             console_logger.info('Success!')
@@ -94,12 +94,12 @@ module RedmineGitHosting
 
 
         def console_logger
-          RedmineGitHosting::ConsoleLogger
+          OpenProject::Revisions::Git::ConsoleLogger
         end
 
 
         def file_logger
-          RedmineGitHosting.logger
+          OpenProject::Revisions::Git.logger
         end
 
     end

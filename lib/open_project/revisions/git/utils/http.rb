@@ -3,7 +3,7 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Utils
     module Http
       extend self

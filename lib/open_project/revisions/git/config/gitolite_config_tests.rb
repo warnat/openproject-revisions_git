@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     module GitoliteConfigTests
       extend self
@@ -69,7 +69,7 @@ module RedmineGitHosting
         return true if gitolite_user == redmine_user
         file_logger.info("Testing if Redmine user '#{redmine_user}' can sudo to Gitolite user '#{gitolite_user}'...")
         result = execute_sudo_test(gitolite_user) do
-          RedmineGitHosting::Commands.sudo_capture('whoami')
+          OpenProject::Revisions::Git::Commands.sudo_capture('whoami')
         end
         result ? file_logger.info('OK!') : file_logger.error('Error while testing can_redmine_sudo_to_gitolite_user')
         result
@@ -79,7 +79,7 @@ module RedmineGitHosting
       def execute_sudo_test(user, &block)
         begin
           test = yield if block_given?
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           return false
         else
           if test.match(/#{user}/)

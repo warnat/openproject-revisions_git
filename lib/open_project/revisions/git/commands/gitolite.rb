@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Commands
     module Gitolite
       extend self
@@ -24,7 +24,7 @@ module RedmineGitHosting
         begin
           sudo_shell(*gitolite_command)
           return true
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error(e.output)
           return false
         end
@@ -48,7 +48,7 @@ module RedmineGitHosting
       def sudo_git_objects_count(repo_path)
         begin
           sudo_capture('eval', 'find', repo_path, '-type', 'f', '|', 'wc', '-l')
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error("Can't retrieve Git objects count : #{e.output}")
           0
         end
@@ -59,12 +59,12 @@ module RedmineGitHosting
 
 
         def gitolite_command
-          RedmineGitHosting::Config.gitolite_command
+          OpenProject::Revisions::Git::Config.gitolite_command
         end
 
 
         def gitolite_home_dir
-          RedmineGitHosting::Config.gitolite_home_dir
+          OpenProject::Revisions::Git::Config.gitolite_home_dir
         end
 
     end

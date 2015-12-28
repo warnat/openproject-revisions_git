@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   class GitoliteHook
 
     class << self
@@ -89,43 +89,43 @@ module RedmineGitHosting
 
 
       def force_update?
-        RedmineGitHosting::Config.gitolite_overwrite_existing_hooks?
+        OpenProject::Revisions::Git::Config.gitolite_overwrite_existing_hooks?
       end
 
 
       def logger
-        RedmineGitHosting.logger
+        OpenProject::Revisions::Git.logger
       end
 
 
       def hook_file_has_changed?
-        RedmineGitHosting::Commands.sudo_file_changed?(source_path, destination_path)
+        OpenProject::Revisions::Git::Commands.sudo_file_changed?(source_path, destination_path)
       end
 
 
       def file_exists?
-        RedmineGitHosting::Commands.sudo_file_exists?(destination_path)
+        OpenProject::Revisions::Git::Commands.sudo_file_exists?(destination_path)
       end
 
 
       def install_hook_file
         logger.info("Installing hook '#{source_path}' in '#{destination_path}'")
-        RedmineGitHosting::Commands.sudo_install_file(File.read(source_path), destination_path, filemode)
+        OpenProject::Revisions::Git::Commands.sudo_install_file(File.read(source_path), destination_path, filemode)
       end
 
 
       def update_gitolite
-        RedmineGitHosting::Commands.sudo_update_gitolite!
+        OpenProject::Revisions::Git::Commands.sudo_update_gitolite!
       end
 
 
       def gitolite_hooks_dir
-        RedmineGitHosting::Config.gitolite_hooks_dir
+        OpenProject::Revisions::Git::Config.gitolite_hooks_dir
       end
 
 
       def directory_exists?
-        RedmineGitHosting::Commands.sudo_dir_exists?(parent_path)
+        OpenProject::Revisions::Git::Commands.sudo_dir_exists?(parent_path)
       end
 
 
@@ -133,9 +133,9 @@ module RedmineGitHosting
         logger.info("Installing hook directory '#{parent_path}'")
 
         begin
-          RedmineGitHosting::Commands.sudo_mkdir_p(parent_path)
+          OpenProject::Revisions::Git::Commands.sudo_mkdir_p(parent_path)
           return true
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error("Problems installing hook directory '#{parent_path}'")
           logger.error(e.output)
           return false

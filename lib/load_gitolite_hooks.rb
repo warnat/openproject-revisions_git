@@ -1,6 +1,6 @@
-RedmineGitHosting::GitoliteHooks.register_hooks do
+OpenProject::Revisions::Git::GitoliteHooks.register_hooks do
   # Set source dir
-  source_dir    Rails.root.join('plugins', 'redmine_git_hosting', 'contrib', 'hooks').to_s
+  source_dir    File.join(Gem.loaded_specs['openproject-revisions_git'].full_gem_path.to_s, 'contrib', 'hooks').to_s
 
   # Declare GitoliteHooks to install
 

@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module GitoliteParams
     class GlobalParams
 
@@ -14,12 +14,12 @@ module RedmineGitHosting
 
       def initialize
         # Params to set
-        @gitolite_hooks_url = RedmineGitHosting::Config.gitolite_hooks_url
-        @debug_mode         = RedmineGitHosting::Config.gitolite_hooks_debug.to_s
-        @async_mode         = RedmineGitHosting::Config.gitolite_hooks_are_asynchronous.to_s
+        @gitolite_hooks_url = OpenProject::Revisions::Git::Config.gitolite_hooks_url
+        @debug_mode         = OpenProject::Revisions::Git::Config.gitolite_hooks_debug.to_s
+        @async_mode         = OpenProject::Revisions::Git::Config.gitolite_hooks_are_asynchronous.to_s
 
         # Namespace where to set params
-        @namespace = RedmineGitHosting::Config.gitolite_hooks_namespace
+        @namespace = OpenProject::Revisions::Git::Config.gitolite_hooks_namespace
 
         # Get current params
         @current_params = get_git_config_params(@namespace)

@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Commands
     extend Commands::Base
     extend Commands::Git

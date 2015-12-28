@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Commands
     module Ssh
       extend self
@@ -47,9 +47,9 @@ module RedmineGitHosting
             '-o', 'BatchMode=yes',
             '-o', 'UserKnownHostsFile=/dev/null',
             '-o', 'StrictHostKeyChecking=no',
-            '-p', RedmineGitHosting::Config.gitolite_server_port,
-            '-i', RedmineGitHosting::Config.gitolite_ssh_private_key,
-            RedmineGitHosting::Config.gitolite_url
+            '-p', OpenProject::Revisions::Git::Config.gitolite_server_port,
+            '-i', OpenProject::Revisions::Git::Config.gitolite_ssh_private_key,
+            OpenProject::Revisions::Git::Config.gitolite_url
           ]
         end
 

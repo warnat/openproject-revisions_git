@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     module GitoliteHooks
       extend self
@@ -9,7 +9,7 @@ module RedmineGitHosting
 
 
       def gitolite_hooks_url
-        [get_setting(:gitolite_hooks_url), '/githooks/post-receive/redmine'].join
+        [get_setting(:gitolite_hooks_url), '/githooks/post-receive/openproject'].join
       end
 
 
@@ -44,24 +44,24 @@ module RedmineGitHosting
 
       def check_hooks_install!
         {
-          hook_files:    RedmineGitHosting::GitoliteHooks.hooks_installed?,
-          global_params: RedmineGitHosting::GitoliteParams::GlobalParams.new.installed?,
-          mailer_params: RedmineGitHosting::GitoliteParams::MailerParams.new.installed?
+          hook_files:    OpenProject::Revisions::Git::GitoliteHooks.hooks_installed?,
+          global_params: OpenProject::Revisions::Git::GitoliteParams::GlobalParams.new.installed?,
+          mailer_params: OpenProject::Revisions::Git::GitoliteParams::MailerParams.new.installed?
         }
       end
 
 
       def install_hooks!
         {
-          hook_files:    RedmineGitHosting::GitoliteHooks.install_hooks!,
-          global_params: RedmineGitHosting::GitoliteParams::GlobalParams.new.install!,
-          mailer_params: RedmineGitHosting::GitoliteParams::MailerParams.new.install!
+          hook_files:    OpenProject::Revisions::Git::GitoliteHooks.install_hooks!,
+          global_params: OpenProject::Revisions::Git::GitoliteParams::GlobalParams.new.install!,
+          mailer_params: OpenProject::Revisions::Git::GitoliteParams::MailerParams.new.install!
         }
       end
 
 
       def update_hook_params!
-        RedmineGitHosting::GitoliteParams::GlobalParams.new.install!
+        OpenProject::Revisions::Git::GitoliteParams::GlobalParams.new.install!
       end
 
     end

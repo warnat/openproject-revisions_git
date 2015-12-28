@@ -1,6 +1,6 @@
 require 'logger'
 
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   class Logger < ::Logger
 
     LOG_LEVELS = [

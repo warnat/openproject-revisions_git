@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Commands
     module Base
       extend self
@@ -7,7 +7,7 @@ module RedmineGitHosting
       #
       def capture(args = [], opts = {})
         cmd = args.shift
-        RedmineGitHosting::Utils::Exec.capture(cmd, args, opts)
+        OpenProject::Revisions::Git::Utils::Exec.capture(cmd, args, opts)
       end
 
 
@@ -15,7 +15,7 @@ module RedmineGitHosting
       #
       def execute(args = [], opts = {})
         cmd = args.shift
-        RedmineGitHosting::Utils::Exec.execute(cmd, args, opts)
+        OpenProject::Revisions::Git::Utils::Exec.execute(cmd, args, opts)
       end
 
 
@@ -23,7 +23,7 @@ module RedmineGitHosting
 
 
         def logger
-          RedmineGitHosting.logger
+          OpenProject::Revisions::Git.logger
         end
 
     end

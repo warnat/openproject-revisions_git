@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     GITHUB_ISSUE = 'https://github.com/jbox-web/redmine_git_hosting/issues'
     GITHUB_WIKI  = 'http://redmine-git-hosting.io/configuration/variables/'

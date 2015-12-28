@@ -1,4 +1,4 @@
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Config
     module GitoliteInfos
       extend self
@@ -27,8 +27,8 @@ module RedmineGitHosting
 
       def gitolite_infos
         begin
-          RedmineGitHosting::Commands.gitolite_infos
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+          OpenProject::Revisions::Git::Commands.gitolite_infos
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           file_logger.error('Error while getting Gitolite infos, check your SSH keys (path, permissions) or your Git user.')
           nil
         end
@@ -75,8 +75,8 @@ module RedmineGitHosting
         return 'This is Gitolite v2, not implemented...' if gitolite_version != 3
         file_logger.debug('Getting Gitolite physical repositories list...')
         begin
-          RedmineGitHosting::Commands.gitolite_repository_count
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+          OpenProject::Revisions::Git::Commands.gitolite_repository_count
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           file_logger.error('Error while getting Gitolite physical repositories list')
           0
         end

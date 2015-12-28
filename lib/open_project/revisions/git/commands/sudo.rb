@@ -1,6 +1,6 @@
 require 'digest/md5'
 
-module RedmineGitHosting
+module OpenProject::Revisions::Git
   module Commands
     module Sudo
       extend self
@@ -20,14 +20,14 @@ module RedmineGitHosting
 
         begin
           sudo_pipe_data(stdin)
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
+        rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
           logger.error(e.output)
           return false
         else
           begin
             sudo_chmod(filemode, dest_file)
             return true
-          rescue RedmineGitHosting::Error::GitoliteCommandException => e
+          rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
             logger.error(e.output)
             return false
           end
@@ -56,7 +56,7 @@ module RedmineGitHosting
       def sudo_test(path, testarg)
         _, _ , code = sudo_shell('test', testarg, path)
         return code == 0
-      rescue RedmineGitHosting::Error::GitoliteCommandException => e
+      rescue OpenProject::Revisions::Git::Error::GitoliteCommandException => e
         logger.debug("File check for #{path} failed : #{e.message}")
         false
       end
@@ -180,7 +180,7 @@ module RedmineGitHosting
         # * (-u `gitolite_user`) target user
         #
         def sudo_shell_params
-          ['-n', '-u', RedmineGitHosting::Config.gitolite_user, '-i']
+          ['-n', '-u', OpenProject::Revisions::Git::Config.gitolite_user, '-i']
         end
 
 
