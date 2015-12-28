@@ -19,5 +19,10 @@ OpenProject::Application.routes.draw do
     resources :repository_post_receive_urls, controller: 'repository_post_receive_urls'
     resources :repository_mirrors, controller: 'repository_mirrors'
   end
+  
+  #get 'settings/plugin/:id/install_gitolite_hooks', to: 'settings#install_gitolite_hooks', as: 'install_gitolite_hooks'
+
+  # Post Receive Hooks
+  #mount Hrack::Bundle.new({}), at: 'githooks/post-receive/:type/:projectid', via: [:post]
 
 end

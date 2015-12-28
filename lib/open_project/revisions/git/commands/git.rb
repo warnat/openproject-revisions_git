@@ -93,7 +93,7 @@ module OpenProject::Revisions::Git
         # Return the Git command with prepend args (mainly env vars like FOO=BAR git push).
         #
         def git(args = [])
-          [*args, Repository::Xitolite.scm_command]
+          [*args, Repository::Git.scm_command]
         end
 
 
