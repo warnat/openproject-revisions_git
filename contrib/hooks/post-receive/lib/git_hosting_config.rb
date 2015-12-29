@@ -13,12 +13,12 @@ module GitHosting
 
 
     REDMINE_PARAMS = [
-      'redminegitolite.redmineurl',
-      'redminegitolite.projectid',
-      'redminegitolite.repositoryid',
-      'redminegitolite.repositorykey',
-      'redminegitolite.debugmode',
-      'redminegitolite.asyncmode',
+      'openprojectgitolite.redmineurl',
+      'openprojectgitolite.projectid',
+      'openprojectgitolite.repositoryid',
+      'openprojectgitolite.repositorykey',
+      'openprojectgitolite.debugmode',
+      'openprojectgitolite.asyncmode',
     ]
 
 
