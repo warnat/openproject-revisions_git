@@ -344,4 +344,4 @@ fr:
   label_default_gitolite_hooks_url: URL par défaut
   label_install_gitolite_hooks: Installer les hooks !
   label_gitolite_hook_untouched: hook non mis à jour
-  
+  label_gitolite_install_hooks_result: Rapport d'installation

@@ -372,4 +372,4 @@ en:
   label_default_gitolite_hooks_url: Default URL
   label_install_gitolite_hooks: Install hooks !
   label_gitolite_hook_untouched: hook left untouched
-  
+  label_gitolite_install_hooks_result: Report of installation

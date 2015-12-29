@@ -9,8 +9,10 @@
 <h3><%= "Gitolite Hooks config" %></h3>
 
 <p>
-  <%#= link_to "Install hooks", install_gitolite_hooks_path('openproject_revisions_git'), remote: true %>
-  <%= 'link_to "Install hooks" here' %>
+  <%= link_to l(:label_install_gitolite_hooks),
+           { controller: "settings/plugin/openproject_revisions_git", action: 'install_gitolite_hooks'},
+           method: :get,
+           class: 'icon icon-download1' %>
 <p/>
 
 <p>
