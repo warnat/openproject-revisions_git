@@ -261,6 +261,7 @@ en:
   label_show_repositories_url: Show checkout URL's?
 
   label_gitolite_daemon_by_default: Enable Git Daemon mode for new repositories by default?
+  label_gitolite_http_by_default: Enable Smart HTTP mode for new repositories by default?
 
   label_http_only: HTTP Only
   label_https_only: HTTPS Only
@@ -315,6 +316,9 @@ en:
   label_gitolite_version: Gitolite version
   label_gitolite_banner: Gitolite banner
   label_path_directories: PATH directories
+  label_gitolite_hooks_params_installed: Hooks parameters installed?
+  label_gitolite_mailer_params_installed: Mailer parameters installed?
+  label_gitolite_hooks_installed: Hooks installed?
   label_openproject_user: OpenProject username
   label_git_version: Git version
   label_found_repositories: Repositories found
@@ -355,3 +359,17 @@ en:
   
   # GWDG
   label_manage_git_repository: Manage Git repository
+
+  # Gitolite Hooks Config
+  label_tab_hooks: Hooks
+  label_gitolite_hooks_config: Gitolite Hooks Configuration
+
+  label_gitolite_overwrite_existing_hooks: Overwrite existing hooks
+  label_gitolite_hooks_are_asynchronous: Run hooks asynchronously
+  label_gitolite_hooks_debug: Run hooks in Debug mode
+  label_gitolite_hooks_url: Hooks URL
+  label_gitolite_hooks_namespace: Hooks Git namespace
+  label_default_gitolite_hooks_url: Default URL
+  label_install_gitolite_hooks: Install hooks !
+  label_gitolite_hook_untouched: hook left untouched
+  

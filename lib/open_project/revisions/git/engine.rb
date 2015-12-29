@@ -21,11 +21,11 @@ module OpenProject::Revisions::Git
           #gitolite_user:                  'git',
           gitolite_server_host:           default_hostname,
           #gitolite_server_port:           '22',
-          #gitolite_ssh_private_key:       Rails.root.join('plugins', 'redmine_git_hosting', 'ssh_keys', 'redmine_gitolite_admin_id_rsa').to_s,
-          #gitolite_ssh_public_key:        Rails.root.join('plugins', 'redmine_git_hosting', 'ssh_keys', 'redmine_gitolite_admin_id_rsa.pub').to_s,
+          #gitolite_ssh_private_key:       File.join(Dir.home, '.ssh', 'id_rsa').to_s,
+          #gitolite_ssh_public_key:        File.join(Dir.home, '.ssh', 'id_rsa.pub').to_s,
           
           # Gitolite Storage Config
-          #gitolite_global_storage_dir:    'repositories/',
+          #gitolite_global_storage_dir:    'repositories',
           gitolite_redmine_storage_dir:   '',
           gitolite_recycle_bin_dir:       'recycle_bin/',
           gitolite_local_code_dir:        '.gitolite/',
@@ -33,23 +33,23 @@ module OpenProject::Revisions::Git
           
           # Gitolite Config File
           gitolite_config_file:              'gitolite.conf',
-          gitolite_identifier_prefix:        'redmine_',
-          gitolite_identifier_strip_user_id: 'false',
+          gitolite_identifier_prefix:        'openproject_',
+          gitolite_identifier_strip_user_id: false,
           
           # Gitolite Global Config
-          gitolite_temp_dir:                     Rails.root, #Rails.root.join('tmp', 'openproject_revisions_git').to_s,
-          gitolite_recycle_bin_expiration_time:  '24.0',
+          gitolite_temp_dir:                     File.join(Dir.home, 'tmp', 'openproject_revisions_git').to_s,
+          gitolite_recycle_bin_expiration_time:  24.0,
           #gitolite_log_level:                    'info',
-          #git_config_username:                   'Redmine Git Hosting',
-          #git_config_email:                      'redmine@example.net',
-          #gitolite_scripts_dir:                 './',
-          #gitolite_timeout:                     '10',
-          gitolite_resync_all:                   'false',
+          #git_config_username:                   'OpenProject Revisions(Git)',
+          #git_config_email:                      'openproject@localhost',
+          #gitolite_scripts_dir:                 File.join(Dir.home, 'bin'),
+          #gitolite_timeout:                     10,
+          gitolite_resync_all:                   false,
           
           # Gitolite Hooks Config
-          gitolite_overwrite_existing_hooks: 'true',
-          gitolite_hooks_are_asynchronous:   'false',
-          gitolite_hooks_debug:              'false',
+          gitolite_overwrite_existing_hooks: true,
+          gitolite_hooks_are_asynchronous:   false,
+          gitolite_hooks_debug:              false,
           gitolite_hooks_url:                'http://localhost:3000',
           
           # Gitolite Cache Config
@@ -60,38 +60,38 @@ module OpenProject::Revisions::Git
           
           
           # Gitolite Access Config
-          #ssh_server_domain:                'localhost',
-          http_server_domain:               'localhost',
-          #https_server_domain:              'localhost',
+          #ssh_server_domain:                default_hostname,
+          http_server_domain:               default_hostname,
+          #https_server_domain:              default_hostname,
           http_server_subdir:               '',
-          show_repositories_url:            'true',
-          #gitolite_daemon_by_default:       'false',
-          #gitolite_http_by_default:         '1',
+          show_repositories_url:            true,
+          #gitolite_daemon_by_default:       false,
+          #gitolite_http_by_default:         1,
           
           # Redmine Config
-          redmine_has_rw_access_on_all_repos: 'true',
-          all_projects_use_git:               'false',
-          #init_repositories_on_create:        'false',
-          delete_git_repositories:           'true',
+          redmine_has_rw_access_on_all_repos: true,
+          all_projects_use_git:               false,
+          #init_repositories_on_create:        false,
+          delete_git_repositories:           true,
           
           # This params work together!
           # When hierarchical_organisation = true unique_repo_identifier MUST be false
           # When hierarchical_organisation = false unique_repo_identifier MUST be true
-          hierarchical_organisation:        'true',
-          unique_repo_identifier:           'false',
+          hierarchical_organisation:        true,
+          unique_repo_identifier:           false,
           
           # Download Revision Config
-          download_revision_enabled:        'true',
+          download_revision_enabled:        true,
           
           # Git Mailing List Config
-          gitolite_notify_by_default:            'false',
-          gitolite_notify_global_prefix:         '[REDMINE]',
-          gitolite_notify_global_sender_address: 'redmine@example.net',
+          gitolite_notify_by_default:            false,
+          gitolite_notify_global_prefix:         '[OPENPROJECT]',
+          gitolite_notify_global_sender_address: 'openproject@example.net',
           gitolite_notify_global_include:        [],
           gitolite_notify_global_exclude:        [],
           
           # Sidekiq Config
-          gitolite_use_sidekiq:                  'false',
+          gitolite_use_sidekiq:                  false,
           #############
           
           

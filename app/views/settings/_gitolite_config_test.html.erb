@@ -1,6 +1,7 @@
 <%= stylesheet_link_tag 'revisions_git/revisions_git' %>
 <h3><%= l(:label_permissions_header) %></h3>
 <% gitolite_repos = OpenProject::Revisions::Git::GitoliteWrapper.git_repositories %>
+<% gitolite_checks = OpenProject::Revisions::Git::Config.check_hooks_install! %>
 
 <table class="table table-hover">
 
@@ -89,3 +90,23 @@
 <%= raw (ENV['PATH']).gsub(/:/, "<br/>") %>
 </pre>
 </div>
+
+
+<p>
+  <table class="list list-aleft" style="width:100%">
+    <thead>
+      <tr>
+        <th><%= l(:label_gitolite_hooks_installed) %></th>
+        <th><%= l(:label_gitolite_hooks_params_installed) %></th>
+        <th><%= l(:label_gitolite_mailer_params_installed) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="<%= curcycle=cycle('odd', 'even') %>">
+        <td class="center" style="text-align:left;"><%= render_gitolite_params_status(gitolite_checks[:hook_files]) %></td>
+        <td class="center" style="text-align:left;"><%= render_gitolite_params_status(gitolite_checks[:global_params]) %></td>
+        <td class="center" style="text-align:left;"><%= render_gitolite_params_status(gitolite_checks[:mailer_params]) %></td>
+      </tr>
+    </tbody>
+  </table>
+</p>

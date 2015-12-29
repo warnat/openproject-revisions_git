@@ -4,7 +4,7 @@ module OpenProject::Revisions::Git
       extend self
 
       def gitolite_hooks_namespace
-        'redminegitolite'
+        'openprojectgitolite'
       end
 
 

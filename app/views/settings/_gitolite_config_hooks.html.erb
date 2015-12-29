@@ -1,0 +1,56 @@
+<%
+  # Gitolite Hooks Config
+  gitolite_overwrite_existing_hooks = OpenProject::Revisions::Git::Config.get_setting(:gitolite_overwrite_existing_hooks, true)
+  gitolite_hooks_are_asynchronous   = OpenProject::Revisions::Git::Config.get_setting(:gitolite_hooks_are_asynchronous, true)
+  gitolite_hooks_debug              = OpenProject::Revisions::Git::Config.get_setting(:gitolite_hooks_debug, true)
+  gitolite_hooks_url                = OpenProject::Revisions::Git::Config.get_setting(:gitolite_hooks_url)
+%>
+
+<h3><%= "Gitolite Hooks config" %></h3>
+
+<p>
+  <%#= link_to "Install hooks", install_gitolite_hooks_path('openproject_revisions_git'), remote: true %>
+  <%= 'link_to "Install hooks" here' %>
+<p/>
+
+<p>
+  <label><%= l(:label_gitolite_overwrite_existing_hooks) %></label>
+  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
+    <%= hidden_field_tag "settings[gitolite_overwrite_existing_hooks]", "false" %>
+    <%= check_box_tag "settings[gitolite_overwrite_existing_hooks]", gitolite_overwrite_existing_hooks, gitolite_overwrite_existing_hooks %>
+  </span>
+</p>
+
+<p>
+  <label><%= l(:label_gitolite_hooks_are_asynchronous) %></label>
+  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
+    <%= hidden_field_tag "settings[gitolite_hooks_are_asynchronous]", "false" %>
+    <%= check_box_tag "settings[gitolite_hooks_are_asynchronous]", gitolite_hooks_are_asynchronous, gitolite_hooks_are_asynchronous %>
+  </span>
+</p>
+
+<p>
+  <label><%= l(:label_gitolite_hooks_debug) %></label>
+  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
+    <%= hidden_field_tag "settings[gitolite_hooks_debug]", "false" %>
+    <%= check_box_tag "settings[gitolite_hooks_debug]", gitolite_hooks_debug, gitolite_hooks_debug %>
+  </span>
+</p>
+
+<p>
+  <label><%= l(:label_gitolite_hooks_url) %></label>
+  <%= text_field_tag("settings[gitolite_hooks_url]",
+    Setting.plugin_openproject_revisions_git[:gitolite_hooks_url], size: 60)
+  %>
+  <em><%= "(#{l(:label_default_gitolite_hooks_url)}: #{Setting.protocol}://#{Setting.host_name.split('/').first})" %></em>
+</p>
+
+<p>
+  <label><%= l(:label_gitolite_hooks_url) %> :</label>
+  <%= raw OpenProject::Revisions::Git::Config.gitolite_hooks_url %>
+</p>
+
+<p>
+  <label><%= l(:label_gitolite_hooks_namespace) %> :</label>
+  <%= raw OpenProject::Revisions::Git::Config.gitolite_hooks_namespace %>
+</p>
