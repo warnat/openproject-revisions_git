@@ -76,7 +76,7 @@ module OpenProject::Revisions::Git
         :my_menu,
         :public_keys,
         { controller: 'my_public_keys', action: 'index' },
-        html: { class: 'icon2 icon-locked-folder' },
+        html: { class: 'icon2 icon-folder-locked' },
         caption: :label_public_keys
       )
     end
@@ -109,6 +109,7 @@ module OpenProject::Revisions::Git
     initializer 'revisions_git.notification_listeners' do
       %i(member_updated
          member_removed
+         roles_changed
          project_deletion_imminent
          project_updated).each do |sym|
         ::OpenProject::Notifications.subscribe(sym.to_s, &NotificationHandlers.method(sym))

@@ -3,11 +3,30 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     include RepositoriesHelper
 
     def update_projects
-      perform_update(@object_id)
+      @admin.transaction do
+        perform_update(@object_id)
+      end
     end
 
     def update_all_projects
-      perform_update(Project)
+      @admin.transaction do
+        perform_update(Project)
+      end
+    end
+
+    ##
+    # Forces resynchronization with the gitolite config for all repositories
+    # with a current configuration.
+    #
+    # Truncates the +openproject.conf+ file prior to synchronization
+    # so that all configurations made from the plugin are reset.
+    def sync_with_gitolite
+      @admin.transaction do
+        byebug
+        admin.truncate!
+        gitolite_admin_repo_commit("Truncated configuration")
+        perform_update(@object_id)
+      end
     end
 
     def move_repositories
@@ -36,12 +55,16 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # them to gitolite.
     #
     def perform_update(projects)
-      @admin.transaction do
-        filter_gitolite(projects).each do |project|
-          handle_repository_add(project.repository)
-          gitolite_admin_repo_commit(project.identifier)
-        end
+      repos = filter_gitolite(projects)
+      return unless repos.size > 0
+
+      message = "Updated projects:\n"
+      repos.each do |project|
+        handle_repository_add(project.repository)
+        message << " - #{project.identifier}\n"
       end
+
+      gitolite_admin_repo_commit(message)
     end
   end
 end

@@ -4,8 +4,8 @@ module OpenProject::Revisions::Git
     class << self
       def member_updated(payload)
         project = payload[:member].project
-        update_membership(project) if accepts?(project) end
-
+        update_membership(project) if accepts?(project)
+      end
 
       def member_removed(payload)
         project = payload[:member].project
@@ -35,6 +35,11 @@ module OpenProject::Revisions::Git
         else
           update_repo_daemon project
         end
+      end
+
+      def roles_changed(_payload)
+        GitoliteWrapper.logger.info("Roles were changed. Resynchronizing Gitolite.")
+        GitoliteWrapper.update(:sync_with_gitolite, Project)
       end
 
       private
