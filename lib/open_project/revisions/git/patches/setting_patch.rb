@@ -82,13 +82,13 @@ module OpenProject::Revisions::Git
         def prepare_resyncs(valuehash)
           ## Rest force update requests
           @@resync_projects = valuehash[:gitolite_resync_all_projects] == 'true'
-          valuehash[:gitolite_resync_all_projects] = false
+          valuehash[:gitolite_resync_all_projects] = 'false'
         end
 
         def prepare_configurations(valuehash)
           ## Rest configuration requests
           @@configure_projects = valuehash[:gitolite_configure_projects] == 'true'
-          valuehash[:gitolite_configure_projects] = false
+          valuehash[:gitolite_configure_projects] = 'false'
         end
 
         def restore_revisions_git_values
