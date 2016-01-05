@@ -373,3 +373,18 @@ en:
   label_install_gitolite_hooks: Install hooks !
   label_gitolite_hook_untouched: hook left untouched
   label_gitolite_install_hooks_result: Report of installation
+
+  # Gitolite Storage Config
+  label_tab_storage: Storage
+  label_gitolite_storage_config: Gitolite Storage Configuration
+
+  label_gitolite_global_storage_dir: Gitolite repositories base path
+  label_gitolite_global_storage_dir_desc: Relative to Gitolite user home
+  label_gitolite_recycle_bin_dir: Gitolite recycle bin base path
+  label_gitolite_recycle_bin_dir_desc: Relative to Gitolite user home
+  label_gitolite_redmine_storage_dir: Subdirectory for Redmine-managed repositories
+  label_gitolite_redmine_storage_dir_desc: Relative to Gitolite repositories base path
+  label_gitolite_local_code_dir: Gitolite non-core hooks directory
+  label_gitolite_local_code_dir_desc: Relative to Gitolite user home
+  label_gitolite_lib_dir: Gitolite librairies directory
+  label_gitolite_lib_dir_desc: /usr/share/gitolite3/lib under Debian, bin/lib/ if installed by hand

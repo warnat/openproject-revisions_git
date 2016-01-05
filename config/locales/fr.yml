@@ -345,3 +345,18 @@ fr:
   label_install_gitolite_hooks: Installer les hooks !
   label_gitolite_hook_untouched: hook non mis à jour
   label_gitolite_install_hooks_result: Rapport d'installation
+
+  # Gitolite Storage Config
+  label_tab_storage: Stockage
+  label_gitolite_storage_config: Configuration du stockage dans Gitolite
+
+  label_gitolite_global_storage_dir: Chemin de base des dépôts Gitolite
+  label_gitolite_global_storage_dir_desc: Relatif au répertoire personnel de l'utilisateur Gitolite
+  label_gitolite_recycle_bin_dir: Chemin de la corbeille Gitolite
+  label_gitolite_recycle_bin_dir_desc: Relatif au répertoire personnel de l'utilisateur Gitolite
+  label_gitolite_redmine_storage_dir: Sous-répertoire pour les dépôts gérés par Redmine
+  label_gitolite_redmine_storage_dir_desc: Relatif au répertoire personnel de l'utilisateur Gitolite
+  label_gitolite_local_code_dir: Répertoire de stockage des hooks non-core
+  label_gitolite_local_code_dir_desc: Relatif au répertoire personnel de l'utilisateur Gitolite
+  label_gitolite_lib_dir: Répertoire contenant les librairies Gitolite
+  label_gitolite_lib_dir_desc: /usr/share/gitolite3/lib sous Debian, bin/lib/ si installé à la main
