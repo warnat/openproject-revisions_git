@@ -18,6 +18,7 @@ OpenProject::Application.routes.draw do
     resources :repository_deployment_credentials, controller: 'repository_deployment_credentials'
     resources :repository_post_receive_urls, controller: 'repository_post_receive_urls'
     resources :repository_mirrors, controller: 'repository_mirrors'
+    resources :repository_git_config_keys, controller: 'repository_git_config_keys'
   end
   
   get 'settings/plugin/:id/install_gitolite_hooks', to: 'settings#install_gitolite_hooks', as: 'install_gitolite_hooks'

@@ -15,6 +15,7 @@ class ManageGitRepositoriesController < ApplicationController
   before_filter :find_credentials
   before_filter :find_post_receive_urls
   before_filter :find_mirrors
+  before_filter :find_git_config_keys
   
   #To highlight the menu option when selected
   menu_item :manage_git_repositories, only: [:index]
@@ -66,4 +67,7 @@ class ManageGitRepositoriesController < ApplicationController
     @repository_mirrors = @repository.repository_mirrors.all
   end
   
+  def find_git_config_keys
+    @repository_git_config_keys = @repository.repository_git_config_keys.all
+  end
 end
