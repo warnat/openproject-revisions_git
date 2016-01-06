@@ -23,7 +23,8 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     #
     def set_repo_config_keys(repo_conf, repository)
       # Set post-receive hook params
-      repo_conf.set_git_config('openproject.githosting.projectid', repository.project.identifier.to_s)
+      repo_conf.set_git_config('openprojectgitolite.projectid', repository.project.identifier.to_s)
+      repo_conf.set_git_config('openprojectgitolite.repositorykey', repository.extra[:key].to_s)
       repo_conf.set_git_config('http.uploadpack', (User.anonymous.allowed_to?(:view_changesets, repository.project) ||
         repository.extra[:git_http]))
 
