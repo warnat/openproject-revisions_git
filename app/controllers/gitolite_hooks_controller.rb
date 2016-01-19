@@ -5,10 +5,6 @@ class GitoliteHooksController < ApplicationController
   skip_before_filter :verify_authenticity_token, :check_if_login_required, :except => :test
   before_filter  :find_project_and_repository
 
-  helper :git_hosting
-  #include GitHostingHelper
-
-
   def stub
     # Stub method simply to generate correct urls, just return a 404 to any user requesting this
     render(:code => 404)
@@ -19,9 +15,6 @@ class GitoliteHooksController < ApplicationController
       render(:text => "The hook key provided is not valid. Please let your server admin know about it")
       return
     end
-
-    # Clear existing cache
-    #CachedShellRedirector.clear_cache_for_repository(@repository)
 
     render :text => Proc.new { |response, output|
       response.headers["Content-Type"] = "text/plain;"
