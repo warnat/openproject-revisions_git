@@ -40,7 +40,7 @@ module GitHosting
 
     # Time in seconds to wait before giving up on acquiring the lock
     def self.lock_wait_time
-	Setting.plugin_redmine_git_hosting['gitLockWaitTime'].to_i || LOCK_WAIT_IF_UNDEF
+	Setting.plugin_openproject_revisions_git['gitLockWaitTime'].to_i || LOCK_WAIT_IF_UNDEF
     end
 
     # Configuration file (relative to git conf directory)
@@ -50,21 +50,21 @@ module GitHosting
 
     # Repository base path (relative to git user home directory)
     def self.repository_base
-	Setting.plugin_redmine_git_hosting['gitRepositoryBasePath'] || REPOSITORY_IF_UNDEF
+	Setting.plugin_openproject_revisions_git['gitRepositoryBasePath'] || REPOSITORY_IF_UNDEF
     end
 
     # Redmine subdirectory path (relative to Repository base path
     def self.repository_redmine_subdir
-	Setting.plugin_redmine_git_hosting['gitRedmineSubdir'] || REDMINE_SUBDIR
+	Setting.plugin_openproject_revisions_git['gitRedmineSubdir'] || REDMINE_SUBDIR
     end
 
     # Redmine repositories in hierarchy
     def self.repository_hierarchy
-	(Setting.plugin_redmine_git_hosting['gitRepositoryHierarchy'] || REDMINE_HIERARCHICAL) != "false"
+	(Setting.plugin_openproject_revisions_git['gitRepositoryHierarchy'] || REDMINE_HIERARCHICAL) != "false"
     end
 
     def self.http_server_subdir
-	Setting.plugin_redmine_git_hosting['httpServerSubdir'] || HTTP_SERVER_SUBDIR
+	Setting.plugin_openproject_revisions_git['httpServerSubdir'] || HTTP_SERVER_SUBDIR
     end
 
     # This is the file portion of the url used when talking through ssh to the repository.
@@ -83,7 +83,7 @@ module GitHosting
 	# Remove any path from httpServer in case they are leftover from previous installations.
 	# No trailing /.
 	my_root_path = Redmine::Utils::relative_url_root
-	File.join(Setting.plugin_redmine_git_hosting['httpServer'][/^[^\/]*/],my_root_path,"/")[0..-2]
+	File.join(Setting.plugin_openproject_revisions_git['httpServer'][/^[^\/]*/],my_root_path,"/")[0..-2]
     end
 
     @@logger = nil
@@ -104,19 +104,19 @@ module GitHosting
     end
 
     def self.git_user
-	Setting.plugin_redmine_git_hosting['gitUser']
+	Setting.plugin_openproject_revisions_git['gitolite_user']
     end
 
     @@mirror_pubkey = nil
     def self.mirror_push_public_key
 	if @@mirror_pubkey.nil?
 
-	    %x[cat '#{Setting.plugin_redmine_git_hosting['gitoliteIdentityFile']}' | #{GitHosting.git_user_runner} 'cat > ~/.ssh/gitolite_admin_id_rsa ' ]
-	    %x[cat '#{Setting.plugin_redmine_git_hosting['gitoliteIdentityPublicKeyFile']}' | #{GitHosting.git_user_runner} 'cat > ~/.ssh/gitolite_admin_id_rsa.pub ' ]
+	    %x[cat '#{Setting.plugin_openproject_revisions_git['gitolite_ssh_private_key']}' | #{GitHosting.git_user_runner} 'cat > ~/.ssh/gitolite_admin_id_rsa ' ]
+	    %x[cat '#{Setting.plugin_openproject_revisions_git['gitolite_ssh_public_key']}' | #{GitHosting.git_user_runner} 'cat > ~/.ssh/gitolite_admin_id_rsa.pub ' ]
 	    %x[ #{GitHosting.git_user_runner} 'chmod 600 ~/.ssh/gitolite_admin_id_rsa' ]
 	    %x[ #{GitHosting.git_user_runner} 'chmod 644 ~/.ssh/gitolite_admin_id_rsa.pub' ]
 
-	    pubk =	( %x[cat '#{Setting.plugin_redmine_git_hosting['gitoliteIdentityPublicKeyFile']}' ]  ).chomp.strip
+	    pubk =	( %x[cat '#{Setting.plugin_openproject_revisions_git['gitolite_ssh_public_key']}' ]  ).chomp.strip
 	    git_user_dir = ( %x[ #{GitHosting.git_user_runner} "cd ~ ; pwd" ] ).chomp.strip
 	    %x[ #{GitHosting.git_user_runner} 'echo "#{pubk}"  > ~/.ssh/gitolite_admin_id_rsa.pub ' ]
 	    %x[ echo '#!/bin/sh' | #{GitHosting.git_user_runner} 'cat > ~/.ssh/run_gitolite_admin_ssh']
@@ -127,9 +127,9 @@ module GitHosting
 
 	    @@mirror_pubkey = pubk.split(/[\t ]+/)[0].to_s + " " + pubk.split(/[\t ]+/)[1].to_s
 
-	    #settings = Setting["plugin_redmine_git_hosting"]
+	    #settings = Setting["plugin_openproject_revisions_git"]
 	    #settings["gitMirrorPushPublicKey"] = publicKey
-	    #Setting["plugin_redmine_git_hosting"] = settings
+	    #Setting["plugin_openproject_revisions_git"] = settings
 	end
 	@@mirror_pubkey
     end
@@ -210,7 +210,7 @@ module GitHosting
     @@git_hosting_tmp_dir = nil
     @@previous_git_tmp_dir = nil
     def self.get_tmp_dir
-	tmp_dir = (Setting.plugin_redmine_git_hosting['gitTempDataDir'] || TEMP_DATA_DIR)
+	tmp_dir = (Setting.plugin_openproject_revisions_git['gitTempDataDir'] || TEMP_DATA_DIR)
 	if (@@previous_git_tmp_dir != tmp_dir)
 	    @@previous_git_tmp_dir = tmp_dir
 	    @@git_hosting_tmp_dir = File.join(tmp_dir,git_user) + "/"
@@ -226,7 +226,7 @@ module GitHosting
     @@git_hosting_bin_dir = nil
     @@previous_git_script_dir = nil
     def self.get_bin_dir
-	script_dir = Setting.plugin_redmine_git_hosting['gitScriptDir'] || SCRIPT_DIR
+	script_dir = Setting.plugin_openproject_revisions_git['gitScriptDir'] || SCRIPT_DIR
 	if @@previous_git_script_dir != script_dir
 	    @@previous_git_script_dir = script_dir
 	    @@git_bin_dir_writeable = nil
@@ -307,7 +307,7 @@ module GitHosting
 
     def self.update_git_exec
 	logger.info "Setting up #{get_bin_dir}"
-	gitolite_key=Setting.plugin_redmine_git_hosting['gitoliteIdentityFile']
+	gitolite_key=Setting.plugin_openproject_revisions_git['gitolite_ssh_private_key']
 
 	File.open(gitolite_ssh_path(), "w") do |f|
 	    f.puts "#!/bin/sh"
@@ -473,7 +473,7 @@ module GitHosting
 	begin
 	    logger.info "Cloning gitolite-admin repository to #{repo_dir}"
 	    shell %[rm -rf "#{repo_dir}"]
-	    shell %[env GIT_SSH=#{gitolite_ssh()} git clone ssh://#{git_user}@#{Setting.plugin_redmine_git_hosting['gitServer']}/gitolite-admin.git #{repo_dir}]
+	    shell %[env GIT_SSH=#{gitolite_ssh()} git clone ssh://#{git_user}@#{Setting.plugin_openproject_revisions_git['ssh_server_domain']}/gitolite-admin.git #{repo_dir}]
 	    shell %[chmod 700 "#{repo_dir}" ]
 	    # Make sure we have our hooks setup
 	    GitAdapterHooks.check_hooks_installed
@@ -486,7 +486,7 @@ module GitHosting
 
 		logger.info "Recloning gitolite-admin repository to #{repo_dir}"
 		shell %[rm -rf "#{repo_dir}"]
-		shell %[env GIT_SSH=#{gitolite_ssh()} git clone ssh://#{git_user}@#{Setting.plugin_redmine_git_hosting['gitServer']}/gitolite-admin.git #{repo_dir}]
+		shell %[env GIT_SSH=#{gitolite_ssh()} git clone ssh://#{git_user}@#{Setting.plugin_openproject_revisions_git['ssh_server_domain']}/gitolite-admin.git #{repo_dir}]
 		shell %[chmod 700 "#{repo_dir}" ]
 		# Make sure we have our hooks setup
 		GitAdapterHooks.check_hooks_installed
@@ -548,7 +548,7 @@ module GitHosting
 	    conf = GitoliteConfig.new(tmp_conf_file)
 
 	    # copy key into home directory...
-	    shell %[cat #{Setting.plugin_redmine_git_hosting['gitoliteIdentityPublicKeyFile']} | #{GitHosting.git_user_runner} 'cat > ~/id_rsa.pub']
+	    shell %[cat #{Setting.plugin_openproject_revisions_git['gitolite_ssh_public_key']} | #{GitHosting.git_user_runner} 'cat > ~/id_rsa.pub']
 
 	    # Locate any keys that match redmine_git_hosting key
 	    raw_admin_key_matches = %x[#{GitHosting.git_user_runner} 'find #{keydir} -type f -exec cmp -s ~/id_rsa.pub {} \\; -print'].chomp.split("\n")
@@ -1010,7 +1010,7 @@ module GitHosting
 
 		    # Next, delete redmine keys for this repository
 		    conf.delete_redmine_keys repo_name
-		    if (Setting.plugin_redmine_git_hosting['deleteGitRepositories'] == "true")
+		    if (Setting.plugin_openproject_revisions_git['deleteGitRepositories'] == "true")
 			if conf.repo_has_no_keys? repo_name
 			    logger.warn "Deleting #{orphanString}entry '#{repo_name}' from #{gitolite_conf}"
 			    conf.delete_repo repo_name

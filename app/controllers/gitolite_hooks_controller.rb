@@ -6,7 +6,7 @@ class GitoliteHooksController < ApplicationController
     before_filter  :find_project_and_repository
 
     helper :git_hosting
-    include GitHostingHelper
+    #include GitHostingHelper
 
 
     def stub
@@ -21,7 +21,7 @@ class GitoliteHooksController < ApplicationController
 	end
 
 	# Clear existing cache
-	CachedShellRedirector.clear_cache_for_repository(@repository)
+	#CachedShellRedirector.clear_cache_for_repository(@repository)
 
 	render :text => Proc.new { |response, output|
 	    response.headers["Content-Type"] = "text/plain;"
@@ -39,17 +39,18 @@ class GitoliteHooksController < ApplicationController
 	    output.flush
 
 	    payloads = []
-	    if @repository.repository_mirrors.has_explicit_refspec.any? or @repository.extra.notify_cia == 1 or @repository.repository_post_receive_urls.any?
+	    if @repository.repository_mirrors.has_explicit_refspec.any? or @repository.repository_post_receive_urls.any?
 		payloads = post_receive_payloads(params[:refs])
 	    end
 
+	    # Push to each repository mirror
 	    @repository.repository_mirrors.all(:order => 'active DESC, created_at ASC', :conditions => "active=1").each {|mirror|
 		if mirror.needs_push payloads
 		    GitHosting.logger.debug "Pushing changes to #{mirror.url} ... "
 		    output.write("Pushing changes to mirror #{mirror.url} ... ")
 		    output.flush
 
-		    (mirror_err,mirror_message) = mirror.push
+		    (mirror_err, mirror_message) = mirror.push
 
 		    result = mirror_err ? "Failed!\n" + mirror_message : "Done\n"
 		    output.write(result)
@@ -96,26 +97,6 @@ class GitoliteHooksController < ApplicationController
 		end
 		output.flush
 	    } if @repository.repository_post_receive_urls.any?
-
-	    # Notify CIA
-	    #Thread.abort_on_exception = true
-	    Thread.new(@repository, payloads) {|repository, payloads|
-		GitHosting.logger.debug "Notifying CIA"
-		output.write("Notifying CIA\n")
-		output.flush
-
-		payloads.each do |payload|
-		    branch = payload[:ref].gsub("refs/heads/", "")
-		    payload[:commits].each do |commit|
-			revision = repository.find_changeset_by_name(commit["id"])
-			next if repository.cia_notifications.notified?(revision)  # Already notified about this commit
-			GitHosting.logger.info "Notifying CIA: Branch => #{branch} REVISION => #{revision.revision}"
-			CiaNotificationMailer.deliver_notification(revision, branch)
-			repository.cia_notifications.notified(revision)
-		    end
-		end
-
-	    } if !params[:refs].nil? && @repository.extra.notify_cia==1
 	}, :layout => false
     end
 
@@ -131,7 +112,7 @@ class GitoliteHooksController < ApplicationController
 	return render(:text => l(:cia_not_enough_permissions), :status => 403) if not_enough_perms
 
 	# Grab the repository path
-	repo_path = GitHosting.repository_path(@repository)
+	repo_path = @repository.absolute_repository_path
 	# Get the last revision we have on the database for this project
 	revision = @repository.changesets.find(:first)
 	# Find out to which branch this commit belongs to
@@ -170,7 +151,7 @@ class GitoliteHooksController < ApplicationController
 	    end
 
 	    # Grab the repository path
-	    repo_path = GitHosting.repository_path(@repository)
+	    repo_path = @repository.absolute_repository_path
 	    revisions_in_range = %x[#{GitHosting.git_exec} --git-dir='#{repo_path}' rev-list --reverse #{range}]
 	    #GitHosting.logger.debug "Revisions in Range: #{revisions.split().join(' ')}"
 
@@ -181,7 +162,7 @@ class GitoliteHooksController < ApplicationController
 		    :id => revision.revision,
 		    :url => url_for(:controller => "repositories", :action => "revision",
 				    :id => @project, :rev => rev, :only_path => false,
-				    :host => Setting['host_name'], :protocol => Setting['protocol']
+				    :host => Setting['host_name'], :protocol => Setting['protocol'] #MabEntwickeltSich: Global settings of Openproject
 				    ),
 		    :author => {
 			:name => revision.committer.gsub(/^([^<]+)\s+.*$/, '\1'),
@@ -216,15 +197,15 @@ class GitoliteHooksController < ApplicationController
 		    :forks => 0,
 		    :homepage => @project.homepage,
 		    :name => @project.identifier,
-		    :open_issues => @project.issues.open.length,
+		    :open_issues => count_open_work_packages,
 		    :owner => {
-			:name => Setting["app_title"],
-			:email => Setting["mail_from"]
+			:name => Setting["app_title"], #MabEntwickeltSich: Global setting of Openproject
+			:email => Setting["mail_from"] #MabEntwickeltSich: Global setting of Openproject
 		    },
 		    :private => !@project.is_public,
 		    :url => url_for(:controller => "repositories", :action => "show",
 				    :id => @project, :only_path => false,
-				    :host => Setting["host_name"], :protocol => Setting["protocol"]
+				    :host => Setting["host_name"], :protocol => Setting["protocol"] #MabEntwickeltSich: Global settings of Openproject
 				    ),
 		    :watchers => 0
 		}
@@ -238,22 +219,27 @@ class GitoliteHooksController < ApplicationController
     def find_project_and_repository
 	@project = Project.find_by_identifier(params[:projectid])
 	if @project.nil?
-	    render(:text => l(:project_not_found, :identifier => params[:projectid])) if @project.nil?
+	    render(:text => "#{l(:project_not_found)} #{params[:projectid]}") if @project.nil?
 	    return
 	end
-	if GitHosting.multi_repos?
-	    if params[:repositoryid] && !params[:repositoryid].blank?
-		@repository = @project.repositories.find_by_identifier(params[:repositoryid])
-	    else
-		# return default or first repo with blank identifier
-		@repository = @project.repository || @project.repo_blank_ident
-	    end
-	else
-	    @repository = @project.repository  # Only repository if redmine < 1.4
-	end
-
+	@repository = @project.repository  # Only repository if redmine < 1.4
 	if @repository.nil?
 	    render_404
 	end
     end
+
+  private
+
+  def count_open_work_packages
+    open_wps = 0;
+    if @project.work_packages.any?
+      @project.work_packages.each do |wp|
+        if !wp.closed?
+          open_wps = open_wps + 1
+        end
+      end
+    end
+    open_wps
+  end
+
 end
