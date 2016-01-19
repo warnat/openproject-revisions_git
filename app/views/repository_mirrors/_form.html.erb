@@ -3,6 +3,9 @@
 
     <p>
       <%= f.text_field :url, label: 'URL', required: true, style: 'width: 97%;' %>
+      <em><%= "e.g., ssh://git@openproject.example.org/project1/project2/project3/project4.git" %></em>
+      <br>
+      <em><%= "e.g., ssh://git@openproject.example.org:2222/project1/project2/project3/project4.git" %></em>
     </p>
     
     <p>
@@ -25,6 +28,9 @@
 
     <p>
       <%= f.text_field :explicit_refspec, label: 'Explicit refspec', style: 'width: 97%;' %>
+      <em><%= "e.g., <src>:<dest>" %></em>
+      <br>
+      <em><%= "e.g., refs/<name>/<ref>:refs/<name>/<ref>" %></em>
     </p>
 
     <p>
