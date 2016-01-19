@@ -2,6 +2,8 @@ include ActionView::Helpers::TextHelper
 
 class GitoliteHooksController < ApplicationController
 
+  layout nil
+  
   skip_before_filter :verify_authenticity_token, :check_if_login_required, :except => :test
   before_filter  :find_project_and_repository
 
@@ -16,20 +18,21 @@ class GitoliteHooksController < ApplicationController
       return
     end
 
-    render :text => Proc.new { |response, output|
-      response.headers["Content-Type"] = "text/plain;"
+    self.response.headers["Content-Type"] = "text/plain;"
+    self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+    self.response.headers['Cache-Control'] = 'no-cache'
+    self.response.status = 200
+    self.response_body = Enumerator.new do |body|
 
       # Fetch commits from the repository
       GitHosting.logger.debug "Fetching changesets for #{@project.name}'s repository"
-      output.write("Fetching changesets for #{@project.name}'s repository ... ")
-      output.flush
+      body << "Fetching changesets for #{@project.name}'s repository ... "
       begin
         @repository.fetch_changesets
       rescue Redmine::Scm::Adapters::CommandFailed => e
-        logger.error "scm: error during fetching changesets: #{e.message}"
+        GitHosting.logger.error "scm: error during fetching changesets: #{e.message}"
       end
-      output.write("Done\n")
-      output.flush
+      body << "Done\n"
 
       payloads = []
       if @repository.repository_mirrors.has_explicit_refspec.any? or @repository.repository_post_receive_urls.any?
@@ -40,14 +43,12 @@ class GitoliteHooksController < ApplicationController
       @repository.repository_mirrors.all(:order => 'active DESC, created_at ASC', :conditions => "active=1").each {|mirror|
         if mirror.needs_push payloads
           GitHosting.logger.debug "Pushing changes to #{mirror.url} ... "
-          output.write("Pushing changes to mirror #{mirror.url} ... ")
-          output.flush
+          body << "Pushing changes to mirror #{mirror.url} ... "
 
           (mirror_err, mirror_message) = mirror.push
 
           result = mirror_err ? "Failed!\n" + mirror_message : "Done\n"
-          output.write(result)
-          output.flush
+          body << result
         end
       } if @repository.repository_mirrors.any?
 
@@ -58,8 +59,7 @@ class GitoliteHooksController < ApplicationController
         else
           msg = "Notifying #{prurl.url} ... "
         end
-        output.write msg
-        output.flush
+        body << msg
 
         uri = URI(prurl.url)
         http = Net::HTTP.new(uri.host, uri.port)
@@ -82,16 +82,15 @@ class GitoliteHooksController < ApplicationController
           break if errmsg || prurl.mode != :github
         }
         if errmsg
-          output.write "[failure] done\n"
+          body << "[failure] done\n"
           GitHosting.logger.error "[ #{msg}Failed!\n  #{errmsg} ]"
         else
-          output.write "[success] done\n"
+          body << "[success] done\n"
           GitHosting.logger.info "[ #{msg}Succeeded! ]"
         end
-        output.flush
       } if @repository.repository_post_receive_urls.any?
 
-    }, :layout => false
+    end
   end
 
   def test

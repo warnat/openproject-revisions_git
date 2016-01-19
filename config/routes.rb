@@ -27,4 +27,8 @@ OpenProject::Application.routes.draw do
   # Post Receive Hooks (jbox-web)
   #mount Hrack::Bundle.new({}), at: 'githooks/post-receive/:type/:projectid', via: [:post]
 
+  # Handle hooks and mirrors (kubitron)
+  #post 'githooks' => 'gitolite_hooks#stub'
+  post 'githooks/post-receive/:type/:projectid' => 'gitolite_hooks#post_receive'
+  #post 'githooks/test' => 'gitolite_hooks#test'
 end
