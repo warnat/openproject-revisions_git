@@ -87,9 +87,9 @@ module GitHosting
       # Directory for binaries includes 'SCRIPT_PARENT' at the end.
       # Further, absolute path adds additional 'git_user' component for multi-gitolite installations.
       if script_dir[0,1] == "/"
-        @@git_hosting_bin_dir = File.join(script_dir,git_user,SCRIPT_PARENT) + "/"
+        @@git_hosting_bin_dir = File.join(script_dir, git_user, SCRIPT_PARENT) + "/"
       else
-        @@git_hosting_bin_dir = Rails.root.join("vendor/plugins/redmine_git_hosting",script_dir,SCRIPT_PARENT).to_s+"/"
+        @@git_hosting_bin_dir = File.join(Gem.loaded_specs['openproject-revisions_git'].full_gem_path.to_s, script_dir, SCRIPT_PARENT).to_s+"/"
       end
     end
     if !File.directory?(@@git_hosting_bin_dir)
