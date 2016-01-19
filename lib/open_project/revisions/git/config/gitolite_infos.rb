@@ -37,7 +37,7 @@ module OpenProject::Revisions::Git
 
       def gitolite_version
         file_logger.debug('Getting Gitolite version...')
-        @gitolite_version ||= find_version(gitolite_infos)
+        @gitolite_version ||= OpenProject::Revisions::Git::GitoliteWrapper.gitolite_version
       end
 
 
