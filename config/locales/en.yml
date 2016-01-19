@@ -359,6 +359,8 @@ en:
   
   # GWDG
   label_manage_git_repository: Manage Git repository
+  project_not_found: No project was found with the identifier
+  label_mirrors_grant_access_public_key: Mirrors must grant write access to the following public key
 
   # Gitolite Hooks Config
   label_tab_hooks: Hooks

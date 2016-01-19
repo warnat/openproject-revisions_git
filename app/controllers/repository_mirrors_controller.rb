@@ -3,7 +3,7 @@ class RepositoryMirrorsController < ApplicationController
 
   before_filter :find_project
   before_filter :find_repository
-  before_filter :find_mirror, only: [:edit, :update, :destroy]
+  before_filter :find_mirror, only: [:edit, :update, :destroy, :push]
 
   def index
 #    @repository_mirrors = @repository.repository_mirrors.all
@@ -45,8 +45,8 @@ class RepositoryMirrorsController < ApplicationController
 
   
   def push
-    #flash[:notice] = 'Repository mirror saved'
-    redirect_to controller: 'manage_git_repositories', action: 'index'
+    #flash[:notice] = 'Repository mirror pushed'
+    (@push_failed,@shellout) = @mirror.push
   end
 
 

@@ -331,6 +331,8 @@ fr:
 
   # GWDG
   label_manage_git_repository: Gérer le dépôt Git
+  project_not_found: Aucun projet n'a été trouvé avec l'identifiant
+  label_mirrors_grant_access_public_key: Les miroirs doivent accorder l'accès en écriture à la clé publique suivante
    
   # Gitolite Hooks Config
   label_tab_hooks: Hooks

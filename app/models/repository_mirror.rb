@@ -69,6 +69,60 @@ class RepositoryMirror < ActiveRecord::Base
   end
 
 
+  def push
+    repo_path = repository.absolute_repository_path
+    
+    push_args = ""
+    if push_mode == PUSHMODE_MIRROR
+      push_args << "--mirror "
+    else
+      # Not mirroring -- other possible push_args
+      push_args << "--force " if push_mode == PUSHMODE_FORCE
+      push_args << "--all " if include_all_branches
+      push_args << "--tags " if include_all_tags
+    end
+    push_args << "\"#{dequote(url)}\" "
+    push_args << "\"#{dequote(explicit_refspec)}\" " unless explicit_refspec.blank?
+    
+    #  mycom = %[ echo 'cd "#{repo_path}" ; env GIT_SSH=~/.ssh/run_gitolite_admin_ssh git push #{push_args}2>&1' | #{GitHosting.git_user_runner} "bash" ]
+    #  GitHosting.logger.error "Pushing: #{mycom}"
+    shellout = %x[ echo 'cd "#{repo_path}" ; env GIT_SSH=~/.ssh/run_gitolite_admin_ssh git push #{push_args}2>&1' | #{GitHosting.git_user_runner} "bash" ].chomp
+    push_failed = ($?.to_i!=0) ? true : false
+    if (push_failed)
+      GitHosting.logger.error "[ Pushing changes to mirror: #{url} ... Failed!"
+      GitHosting.logger.error "  "+shellout.split("\n").join("\n  ")+" ]"
+    else
+      GitHosting.logger.info "[ Pushing changes to mirror: #{url} ... Succeeded! ]"
+    end
+    [push_failed,shellout]
+  end
+  
+  # If we have an explicit refspec, check it against incoming payloads
+  # Special case: if we do not pass in any payloads, return true
+  def needs_push(payloads=[])
+    return true if payloads.empty?
+    return true if push_mode==PUSHMODE_MIRROR
+    
+    refspec_parse = explicit_refspec.match(/^\+?([^:]*)(:[^:]*)?$/)
+    payloads.each do |payload|
+      if splitpath = refcomp_parse(payload[:ref])
+        return true if payload[:ref] == refspec_parse[1]  # Explicit Reference Spec complete path
+        return true if splitpath[:name] == refspec_parse[1] # Explicit Reference Spec no type
+        return true if include_all_branches && splitpath[:type] == "heads"
+        return true if include_all_tags && splitpath[:type] == "tags"
+      end
+    end
+    false
+  end
+
+  protected
+  
+  # Put backquote in front of crucial characters
+  def dequote(in_string)
+    in_string.gsub(/[$,"\\\n]/) {|x| "\\"+x}
+  end
+
+
   private
 
 
@@ -205,6 +259,32 @@ class RepositoryMirror < ActiveRecord::Base
   
   def author_email(committer)
     committer.gsub(/\A.*<([^>]+)>.*\z/, '\1')
+  end
+
+  # Parse a reference component.  Three possibilities:
+  #
+  # 1) refs/type/name
+  # 2) name
+  #
+  # here, name can have many components.
+  @@refcomp = "[\\.\\-\\w_\\*]+"
+  def refcomp_parse(spec)
+    if (refcomp_parse = spec.match(/^(refs\/)?((#{@@refcomp})\/)?(#{@@refcomp}(\/#{@@refcomp})*)$/))
+      if refcomp_parse[1]
+        # Should be first class.  If no type component, return fail
+        if refcomp_parse[3]
+            {:type=>refcomp_parse[3], :name=>refcomp_parse[4]}
+        else
+            nil
+        end
+      elsif refcomp_parse[3]
+        {:type=>nil, :name=>(refcomp_parse[3]+"/"+refcomp_parse[4])}
+      else
+        {:type=>nil, :name=>refcomp_parse[4]}
+      end
+    else
+      nil
+    end
   end
 
 end
