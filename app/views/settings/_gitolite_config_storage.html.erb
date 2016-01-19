@@ -29,7 +29,7 @@
   <%= content_tag('div', l(:label_gitolite_redmine_storage_dir_desc), class: 'form--field-instructions') %>
 </div>
 
-<% if OpenProject::Revisions::Git::Config.gitolite_version == 3%>
+<% if OpenProject::Revisions::Git::GitoliteWrapper.gitolite_version == 3%>
   <div class="form--field -required">
     <%= styled_label_tag("settings[gitolite_local_code_dir]", l(:label_gitolite_local_code_dir)) %>
     <%= styled_text_field_tag("settings[gitolite_local_code_dir]", gitolite_local_code_dir) %>
