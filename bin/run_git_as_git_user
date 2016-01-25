@@ -1,9 +1,0 @@
-#!/bin/sh
-if [ "$(whoami)" = "git" ] ; then
-    cmd=$(printf "\"%s\" " "$@")
-    cd ~
-    eval "git $cmd"
-else
-    cmd=$(printf "\"%s\" " "$@")
-    sudo -u git -i eval "git $cmd"
-fi

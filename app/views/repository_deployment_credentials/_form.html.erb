@@ -5,11 +5,13 @@
       <%= f.select :gitolite_public_key_id, build_list_of_keys(@gitolite_deploy_keys, @other_deployment_keys, @disabled_deployment_keys),
                               { required: true, label: 'Select deployment key' },
                               { class: 'select_key_type' } %>
-      <%= link_to 'Create new deployment key',
-               { controller: "my_public_keys", action: 'index', deploy: 'true'},
-               method: :get,
-               class: 'icon icon-add',
-               confirm: "You will be redirected to 'My account | Public keys'\nUnsaved data will be lost\nAre you sure?" %>
+      <% if User.current.admin? || User.current.allowed_to?(:create_deployment_keys, @project) %>
+        <%= link_to 'Create new deployment key',
+                 { controller: "my_public_keys", action: 'index', deploy: 'true'},
+                 method: :get,
+                 class: 'icon icon-add',
+                 confirm: "You will be redirected to 'My account | Public keys'\nUnsaved data will be lost\nAre you sure?" %>
+      <% end %>
     </p>
     
     <p>

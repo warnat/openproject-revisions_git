@@ -23,13 +23,13 @@
           <td class="center" style="text-align:center;"><%= post_receive_mode post_receive_url %></td>
           <td class="center" style="text-align:center;"><%= checked_image post_receive_url.active? %></td>
           <td class="buttons">
-            <% if User.current.admin? || User.current.allowed_to?(:create_repository_post_receive_urls, @project) %>
+            <% if User.current.admin? || User.current.allowed_to?(:edit_repository_post_receive_urls, @project) %>
               <%= link_to l(:button_delete),
                        { controller: "projects/#{@project.identifier}/repository_post_receive_urls", action: 'destroy', post_receive_url: post_receive_url},
                        method: :delete,
                        class: 'icon icon-delete',
                        confirm: "Are you sure you want to delete the URL '#{post_receive_url.url}'" %>
-  	        <% end %>       
+  	        <% end %>
           </td>
         </tr>
       <% end %>

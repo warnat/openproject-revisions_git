@@ -142,15 +142,26 @@ module OpenProject::Revisions::Git
       settings: settings
     ) do
       project_module :repository do
-        permission :create_repository_git_config_keys, repository_git_config_keys: :create
-        permission :view_repository_git_config_keys, repository_git_config_keys: :index
-        permission :edit_repository_git_config_keys, repository_git_config_keys: :edit
-
         permission :create_gitolite_ssh_key, my: :account
         permission :create_deployment_keys, my: :account
-        permission :create_repository_deployment_credentials, my: :account
-        permission :create_repository_post_receive_urls, my: :account
-        permission :create_repository_mirrors, my: :account
+
+        permission :create_repository_deployment_credentials, repository_deployment_credentials: [:new, :create]
+        permission :view_repository_deployment_credentials,   repository_deployment_credentials: [:index, :show]
+        permission :edit_repository_deployment_credentials,   repository_deployment_credentials: [:edit, :update, :destroy]
+
+        permission :create_repository_post_receive_urls, repository_post_receive_urls: [:new, :create]
+        permission :view_repository_post_receive_urls,   repository_post_receive_urls: [:index, :show]
+        permission :edit_repository_post_receive_urls,   repository_post_receive_urls: [:edit, :update, :destroy]
+
+        permission :create_repository_mirrors, repository_mirrors: [:new, :create]
+        permission :view_repository_mirrors,   repository_mirrors: [:index, :show]
+        permission :edit_repository_mirrors,   repository_mirrors: [:edit, :update, :destroy]
+        permission :push_repository_mirrors,   repository_mirrors: [:push]
+
+        permission :create_repository_git_config_keys, repository_git_config_keys: [:new, :create]
+        permission :view_repository_git_config_keys,   repository_git_config_keys: [:index, :show]
+        permission :edit_repository_git_config_keys,   repository_git_config_keys: [:edit, :update, :destroy]
+
         #Next line is not valid because there is not controller "download_git_revision"
         #permission :download_git_revision, download_git_revision: :index
       end
