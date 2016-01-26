@@ -68,7 +68,8 @@ class RepositoryMirror < ActiveRecord::Base
 
 
   def push
-    repo_path = repository.absolute_repository_path
+    gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
+    repo_path = File.join(gitolite_repos_root, repository.url)
     
     push_args = ""
     if push_mode == PUSHMODE_MIRROR

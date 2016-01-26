@@ -105,7 +105,8 @@ class GitoliteHooksController < ApplicationController
     return render(:text => l(:cia_not_enough_permissions), :status => 403) if not_enough_perms
 
     # Grab the repository path
-    repo_path = @repository.absolute_repository_path
+    gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
+    repo_path = File.join(gitolite_repos_root, @repository.url)
     # Get the last revision we have on the database for this project
     revision = @repository.changesets.find(:first)
     # Find out to which branch this commit belongs to
@@ -144,7 +145,8 @@ class GitoliteHooksController < ApplicationController
       end
 
       # Grab the repository path
-      repo_path = @repository.absolute_repository_path
+      gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
+      repo_path = File.join(gitolite_repos_root, @repository.url)
       revisions_in_range = %x[#{GitHosting.git_exec} --git-dir='#{repo_path}' rev-list --reverse #{range}]
       #GitHosting.logger.debug "Revisions in Range: #{revisions.split().join(' ')}"
 
