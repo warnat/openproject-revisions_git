@@ -1,7 +1,7 @@
 module OpenProject
   module Revisions
     module Git
-      VERSION = '5.0.0-alpha'
+      VERSION = '1.0.0'
     end
   end
 end
