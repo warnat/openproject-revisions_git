@@ -4,8 +4,6 @@ module OpenProject::Revisions::Git
       def self.included(base)
         base.send(:include, InstanceMethods)
         base.class_eval do
-          unloadable
-
           alias_method_chain :user_settings_tabs, :git
         end
       end

@@ -3,8 +3,6 @@ module OpenProject::Revisions::Git
     module MyControllerPatch
       def self.included(base)
         base.class_eval do
-          unloadable
-
           include InstanceMethods
 
           alias_method_chain :account, :revisions_git

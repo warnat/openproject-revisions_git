@@ -1,14 +1,10 @@
 class RepositoryDeploymentCredential < ActiveRecord::Base
-  unloadable
-
   VALID_PERMS  = ['R', 'RW+']
   DEFAULT_PERM = 'RW+'
 
   belongs_to :repository
   belongs_to :gitolite_public_key
   belongs_to :user
-
-  attr_accessible :perm, :active
 
   validates_presence_of :repository, :gitolite_public_key, :user, :perm
 

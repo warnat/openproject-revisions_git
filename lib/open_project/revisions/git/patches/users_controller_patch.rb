@@ -5,8 +5,6 @@ module OpenProject::Revisions::Git
 
       def self.included(base)
         base.class_eval do
-          unloadable
-
           include InstanceMethods
 
           alias_method_chain :edit,   :revisions_git

@@ -5,8 +5,6 @@ module OpenProject::Revisions::Git
     module SettingPatch
       def self.included(base)
         base.class_eval do
-          unloadable
-
           include InstanceMethods
 
           before_save :validate_settings

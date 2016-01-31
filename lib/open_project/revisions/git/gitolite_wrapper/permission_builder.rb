@@ -11,7 +11,9 @@ module OpenProject::Revisions::Git::GitoliteWrapper
 
     # Select eligible users
     def prepare
-      @users   = @project.member_principals.map(&:user).compact.uniq
+      @users   = @project.member_principals
+                         .references(:users)
+                         .map(&:user).compact.uniq
       build_op_permissions
     end
 

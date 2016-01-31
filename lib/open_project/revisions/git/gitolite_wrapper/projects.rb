@@ -3,58 +3,68 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     include RepositoriesHelper
 
     def update_projects
-      perform_update([@object_id])
+      @admin.transaction do
+        perform_update(@object_id)
+      end
     end
 
     def update_all_projects
-      projects = Project.active.includes(:repository).all
-      perform_update(projects)
+      @admin.transaction do
+        perform_update(Project)
+      end
+    end
+
+    ##
+    # Forces resynchronization with the gitolite config for all repositories
+    # with a current configuration.
+    #
+    # Truncates the +openproject.conf+ file prior to synchronization
+    # so that all configurations made from the plugin are reset.
+    def sync_with_gitolite
+      @admin.transaction do
+        byebug
+        admin.truncate!
+        gitolite_admin_repo_commit("Truncated configuration")
+        perform_update(@object_id)
+      end
     end
 
     def move_repositories
       projects = Project.find_by_id(@object_id).self_and_descendants
 
       # Only take projects that have Git repos.
-      git_projects = projects.map { |p| p.repository if p.repository.is_a?(Repository::Git) }.compact
-      return if git_projects.empty?
+      gitolite_projects = filter_gitolite(projects)
+      return if gitolite_projects.empty?
 
       @admin.transaction do
-        handle_repositories_move(git_projects)
-      end
-    end
-
-    def move_repositories_tree
-      projects = Project.active.includes(:repository).all.select { |x| x.parent_id.nil? }
-
-      @admin.transaction do
-        projects.each do |project|
-          # Only take projects that have Git repos.
-          git_projects =
-            project
-            .self_and_descendants
-            .map { |p| p.repository if p.repository.is_a?(Repository::Git) }.compact
-
-          next if git_projects.empty?
-
-          handle_repositories_move(git_projects)
-        end
+        handle_repositories_move(gitolite_projects)
       end
     end
 
     private
 
+    ##
+    # Find gitolite projects
+    def filter_gitolite(projects)
+      projects.includes(:repository)
+              .where('repositories.type = ?', 'Repository::Gitolite')
+              .references('repositories')
+    end
+
     # Updates a set of projects by re-adding
     # them to gitolite.
     #
     def perform_update(projects)
-      @admin.transaction do
-        projects.each do |project|
-          next unless project.repository.is_a?(Repository::Git)
+      repos = filter_gitolite(projects)
+      return unless repos.size > 0
 
-          handle_repository_add(project.repository)
-          gitolite_admin_repo_commit("#{project.identifier}")
-        end
+      message = "Updated projects:\n"
+      repos.each do |project|
+        handle_repository_add(project.repository)
+        message << " - #{project.identifier}\n"
       end
+
+      gitolite_admin_repo_commit(message)
     end
   end
 end
