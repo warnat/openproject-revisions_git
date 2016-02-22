@@ -14,9 +14,6 @@ class RepositoryMirror < ActiveRecord::Base
   # [+]refs/<name>/<ref>:refs/<name>/<ref>
   GIT_REFSPEC_REGEX = /\A\+?([^:]*)(:([^:]*))?\z/
   
-  ## Attributes
-  attr_accessible :repository_id, :url, :push_mode, :include_all_branches, :include_all_tags, :explicit_refspec, :active
-
   ## Relations
   belongs_to :repository
 

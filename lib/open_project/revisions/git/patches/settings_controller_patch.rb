@@ -7,7 +7,6 @@ module OpenProject::Revisions::Git
 
           include InstanceMethods
 
-          helper :revisions_git
           helper :gitolite_plugin_settings
         end
       end

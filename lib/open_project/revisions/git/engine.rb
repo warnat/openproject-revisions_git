@@ -184,7 +184,7 @@ module OpenProject::Revisions::Git
         caption: 'Manage Git repository',
         param: :project_id,
         parent: :repository,
-        if: Proc.new { |p| p.repository && p.repository.is_a?(Repository::Git) },
+        if: Proc.new { |p| p.repository && p.repository.is_a?(Repository::Gitolite) },
         html: { class: 'icon2 icon-locked-folder' }
       )
         
@@ -209,7 +209,7 @@ module OpenProject::Revisions::Git
     config.to_prepare do
       # act_as_op_engine doesn't like the hierarchical plugin/engine name :)
       [
-        :user, :setting,
+        :repository, :user, :setting, :settings_controller,
         :users_controller, :my_controller,
         :users_helper,
       ].each do |sym|

@@ -142,7 +142,7 @@ module OpenProject::Revisions::Git
             )
 
             projects.each do |project|
-              next unless project.repository.is_a?(Repository::Git)
+              next unless project.repository.is_a?(Repository::Gitolite)
     
               if project.repository.extra.nil?
                 total_project_fixed += 1

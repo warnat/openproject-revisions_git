@@ -10,9 +10,8 @@
   gitolite_daemon_by_default        = OpenProject::Revisions::Git::Config.get_setting(:gitolite_daemon_by_default, true)
 %>
 
-
-
 <h3><%= l(:label_gitolite_access_config) %></h3>
+
 <div class="form--field -required">
   <%= styled_label_tag("settings[https_server_domain]", l(:label_https_server_domain)) %>
   <%= styled_text_field_tag("settings[https_server_domain]", https_server_domain) %>
@@ -26,8 +25,10 @@
 
 <div class="form--field">
   <%= styled_label_tag("settings[gitolite_daemon_by_default]", l(:label_gitolite_daemon_by_default)) %>
-  <%= hidden_field_tag "settings[gitolite_daemon_by_default]", "false" %>
-  <%= styled_check_box_tag("settings[gitolite_daemon_by_default]", true, gitolite_daemon_by_default) %>
+  <span class="bootstrap-switch switch-small" data-on="primary" data-off="default" data-on-label="<%= l(:label_yes) %>" data-off-label="<%= l(:label_no) %>">
+    <%= hidden_field_tag "settings[gitolite_daemon_by_default]", "false" %>
+    <%= styled_check_box_tag("settings[gitolite_daemon_by_default]", true, gitolite_daemon_by_default) %>
+  </span>
 </div>
 
 <div class="form--field -required">
