@@ -40,7 +40,7 @@ class GitoliteHooksController < ApplicationController
       end
 
       # Push to each repository mirror
-      @repository.repository_mirrors.all(:order => 'active DESC, created_at ASC', :conditions => "active=1").each {|mirror|
+      @repository.repository_mirrors.where(active: 1).order(active: :desc, created_at: :asc).each {|mirror|
         if mirror.needs_push payloads
           GitHosting.logger.debug "Pushing changes to #{mirror.url} ... "
           body << "Pushing changes to mirror #{mirror.url} ... "
@@ -53,7 +53,7 @@ class GitoliteHooksController < ApplicationController
       } if @repository.repository_mirrors.any?
 
       # Post to each post-receive URL
-      @repository.repository_post_receive_urls.all(:order => "active DESC, created_at ASC", :conditions => "active=1").each {|prurl|
+      @repository.repository_post_receive_urls.where(active: 1).order(active: :desc, created_at: :asc).each {|prurl|
         if prurl.mode == :github
           msg = "Sending #{pluralize(payloads.length,'notification')} to #{prurl.url} ... "
         else
@@ -106,7 +106,7 @@ class GitoliteHooksController < ApplicationController
 
     # Grab the repository path
     gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
-    repo_path = File.join(gitolite_repos_root, @repository.url)
+    repo_path = @repository.url #MabEntwickeltSich: Not sure if it will stay like this
     # Get the last revision we have on the database for this project
     revision = @repository.changesets.find(:first)
     # Find out to which branch this commit belongs to
@@ -146,7 +146,7 @@ class GitoliteHooksController < ApplicationController
 
       # Grab the repository path
       gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
-      repo_path = File.join(gitolite_repos_root, @repository.url)
+      repo_path = @repository.url #MabEntwickeltSich: Not sure if it will stay like this
       revisions_in_range = %x[#{GitHosting.git_exec} --git-dir='#{repo_path}' rev-list --reverse #{range}]
       #GitHosting.logger.debug "Revisions in Range: #{revisions.split().join(' ')}"
 
@@ -190,7 +190,7 @@ class GitoliteHooksController < ApplicationController
                                    :description => @project.description,
                                    :fork => false,
                                    :forks => 0,
-                                   :homepage => @project.homepage,
+                                   :homepage => "Field removed from project settings",
                                    :name => @project.identifier,
                                    :open_issues => count_open_work_packages,
                                    :owner => {

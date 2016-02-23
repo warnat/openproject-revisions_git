@@ -48,7 +48,7 @@ module OpenProject::Revisions::Git
       # Detect whether the repository URL is different now that the project has been changed.
       # For example, this is the case when the project identifier is changed.
       def project_url_changed?(repository)
-        repository.url != repository.git_path || repository.url != repository.root_url
+        repository.url != repository.repository_identifier || repository.url != repository.root_url
       end
 
       def update_repo_daemon(project)

@@ -7,8 +7,6 @@ class RevisionsGitControllerBase < ApplicationController
 
   layout Proc.new { |controller| controller.request.xhr? ? 'popup' : 'base' }
 
-  helper :revisions_git
-
   def show
     render_404
   end

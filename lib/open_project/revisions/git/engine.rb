@@ -209,7 +209,7 @@ module OpenProject::Revisions::Git
     config.to_prepare do
       # act_as_op_engine doesn't like the hierarchical plugin/engine name :)
       [
-        :repository, :user, :setting, :settings_controller,
+        :user, :setting, :settings_controller,
         :users_controller, :my_controller,
         :users_helper,
       ].each do |sym|
