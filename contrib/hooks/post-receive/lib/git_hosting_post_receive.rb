@@ -25,7 +25,7 @@ module GitHosting
 
       def notify_redmine
         logger.info('')
-        logger.info("Notifying Redmine about changes to this repository : '#{git_config.repository_name}' ...")
+        logger.info("Notifying OpenProject about changes to this repository : '#{git_config.repository_name}' ...")
 
         http_post(git_config.project_url, { params: http_post_data }) do |http, request|
           begin
@@ -60,7 +60,7 @@ module GitHosting
             body_frag.split("\n").each { |line| logger.info(line) }
           end
         else
-          logger.error("  - Error while notifying Redmine ! (status code: #{response.code})")
+          logger.error("  - Error while notifying OpenProject! (status code: #{response.code})")
         end
       end
 

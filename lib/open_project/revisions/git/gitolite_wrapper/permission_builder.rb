@@ -19,7 +19,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
 
     def build_op_permissions
       @rewind_users = @users.select { |user| user.allowed_to?(:manage_repository, @project) }
-      @rewind_deploy_keys = GitolitePublicKey.find(@repository.repository_deployment_credentials.where(perm: 'RW+').pluck(:gitolite_public_key_id))
+      @rewind_deploy_keys = GitolitePublicKey.find(@repository.repository_deployment_credentials.where(perm: 'RW+', active: 1).pluck(:gitolite_public_key_id))
 
       @write_users =
         @users.select { |user| user.allowed_to?(:commit_access, @project) } -
@@ -29,7 +29,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
         @users.select { |user| user.allowed_to?(:view_changesets, @project) } -
         @rewind_users -
         @write_users
-      @read_deploy_keys = GitolitePublicKey.find(@repository.repository_deployment_credentials.where(perm: 'R').pluck(:gitolite_public_key_id))
+      @read_deploy_keys = GitolitePublicKey.find(@repository.repository_deployment_credentials.where(perm: 'R', active: 1).pluck(:gitolite_public_key_id))
 
       @rewind = []
       @write  = []

@@ -1,6 +1,9 @@
 <p>
   <% if User.current.admin? || User.current.allowed_to?(:view_repository_git_config_keys, @project) %>
-    <%= render template: 'repository_git_config_keys/show' %>
+    <fieldset class="repository_git_config_keys_view">
+      <legend><%= "Current Git config keys" %></legend>
+      <%= render template: 'repository_git_config_keys/show' %>
+    </fieldset>
   <% end %>
 </p>
 
@@ -9,4 +12,3 @@
     <%= render template: "repository_git_config_keys/new" %>
   <% end %>
 </p>
-

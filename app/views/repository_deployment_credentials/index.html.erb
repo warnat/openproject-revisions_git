@@ -1,6 +1,9 @@
 <p>
   <% if User.current.admin? || User.current.allowed_to?(:view_repository_deployment_credentials, @project) %>
-    <%= render template: 'repository_deployment_credentials/show' %>
+    <fieldset class="repository_deployment_credentials_view">
+      <legend><%= "Current deployment credentials" %></legend>
+      <%= render template: 'repository_deployment_credentials/show' %>
+    </fieldset>
   <% end %>
 </p>
 
@@ -9,4 +12,3 @@
     <%= render template: "repository_deployment_credentials/new" %>
   <% end %>
 </p>
-

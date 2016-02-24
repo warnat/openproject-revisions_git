@@ -6,8 +6,8 @@ class RepositoryMirror < ActiveRecord::Base
   PUSHMODE_FAST_FORWARD = 2
   
   ## Only allow SSH format
-  ## ssh://git@redmine.example.org/project1/project2/project3/project4.git
-  ## ssh://git@redmine.example.org:2222/project1/project2/project3/project4.git
+  ## ssh://git@openproject.example.org/project1/project2/project3/project4.git
+  ## ssh://git@openproject.example.org:2222/project1/project2/project3/project4.git
   GIT_SSH_URL_REGEX = /\A(ssh:\/\/)([\w\-\.@]+)(\:[\d]+)?([\w\/\-\.~]+)(\.git)?\z/i
   # Validate a Git refspec
   # [+]<src>:<dest>
@@ -22,8 +22,8 @@ class RepositoryMirror < ActiveRecord::Base
   validates_associated :repository
 
   ## Only allow SSH format
-  ## ssh://git@redmine.example.org/project1/project2/project3/project4.git
-  ## ssh://git@redmine.example.org:2222/project1/project2/project3/project4.git
+  ## ssh://git@openproject.example.org/project1/project2/project3/project4.git
+  ## ssh://git@openproject.example.org:2222/project1/project2/project3/project4.git
 #  validates_format_of :url, with: URI::regexp(%w(ssh)), allow_blank: false
   validates_format_of :url, with: GIT_SSH_URL_REGEX, allow_blank: false
   validates_uniqueness_of :url, scope: [:repository_id]
@@ -177,8 +177,8 @@ class RepositoryMirror < ActiveRecord::Base
     
       
   # Validate a Git SSH urls
-  # ssh://git@redmine.example.org/project1/project2/project3/project4.git
-  # ssh://git@redmine.example.org:2222/project1/project2/project3/project4.git
+  # ssh://git@openproject.example.org/project1/project2/project3/project4.git
+  # ssh://git@openproject.example.org:2222/project1/project2/project3/project4.git
   #
   #GIT_SSH_URL_REGEX = /\A(ssh:\/\/)([\w\-\.@]+)(\:[\d]+)?([\w\/\-\.~]+)(\.git)?\z/i
   

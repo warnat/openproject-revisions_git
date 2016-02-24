@@ -36,6 +36,18 @@ class RepositoryMirrorsController < ApplicationController
   end
 
   
+  def update
+    if @mirror.active?
+      @mirror.active = 0
+    else
+      @mirror.active = 1
+    end
+    
+    save_and_flash
+    redirect_to controller: 'manage_git_repositories', action: 'index'
+  end
+
+  
   def destroy
     if @mirror.destroy
       flash[:notice] = 'Mirror deleted'

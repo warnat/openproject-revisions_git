@@ -181,7 +181,7 @@ module OpenProject::Revisions::Git
         :project_menu,
         :manage_git_repositories,
         { controller: 'manage_git_repositories', action: 'index' },
-        caption: 'Manage Git repository',
+        caption: 'Manage Gitolite repository',
         param: :project_id,
         parent: :repository,
         if: Proc.new { |p| p.repository && p.repository.is_a?(Repository::Gitolite) },

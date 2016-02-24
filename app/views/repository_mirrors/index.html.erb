@@ -1,6 +1,9 @@
 <p>
   <% if User.current.admin? || User.current.allowed_to?(:view_repository_mirrors, @project) %>
-    <%= render template: 'repository_mirrors/show' %>
+    <fieldset class="repository_mirrors_view">
+      <legend><%= "Current repository mirrors" %></legend>
+      <%= render template: 'repository_mirrors/show' %>
+    </fieldset>
   <% end %>
 </p>
 
@@ -15,4 +18,3 @@
     <%= render template: "repository_mirrors/gitolite_public_key" %>
   <% end %>
 </p>
-

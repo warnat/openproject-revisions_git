@@ -69,7 +69,7 @@ end
 # You must set the source directory of the files with the *source_dir* method and
 # declare your hooks with *gitolite_hook* method. (see above)
 #
-# *RedmineGitHosting::GitoliteHooks.register_hooks* can be called multiple times
+# *OpenProject::Revisions::Git::GitoliteHooks.register_hooks* can be called multiple times
 # with a different *source_dir*.
 #
 # *name*        : the hook name (to identify the hook)
@@ -82,7 +82,7 @@ end
 # Gitolite v3 : <gitolite_home_dir>/local/hooks/common/
 # Gitolite v2 : <gitolite_home_dir>/.gitolite/hooks/common
 #
-# RedmineGitHosting::GitoliteHooks.register_hooks do
+# OpenProject::Revisions::Git::GitoliteHooks.register_hooks do
 #   # Set source directory : /tmp/foo
 #   source_dir    File.join('/', 'tmp', 'foo')
 #

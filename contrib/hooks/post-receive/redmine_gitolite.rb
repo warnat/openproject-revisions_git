@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# This file was placed here by Redmine Git Hosting. It makes sure that your pushed commits
+# This file was placed here by OpenProject Revisions Git. It makes sure that your pushed commits
 # will be processed properly.
 
 refs = ARGF.read

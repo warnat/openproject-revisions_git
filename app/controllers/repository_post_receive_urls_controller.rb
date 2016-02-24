@@ -36,6 +36,18 @@ class RepositoryPostReceiveUrlsController < ApplicationController
   end
 
   
+  def update
+    if @post_receive_url.active?
+      @post_receive_url.active = 0
+    else
+      @post_receive_url.active = 1
+    end
+    
+    save_and_flash
+    redirect_to controller: 'manage_git_repositories', action: 'index'
+  end
+
+  
   def destroy
     if @post_receive_url.destroy
       flash[:notice] = 'Post receive URL deleted'
