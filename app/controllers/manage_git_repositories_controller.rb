@@ -52,10 +52,10 @@ class ManageGitRepositoriesController < ApplicationController
   end
   
   def other_deployment_keys
-    users_allowed_to_create_deployment_keys.map { |user| user.gitolite_public_keys.deploy_key.order('title ASC') }.flatten
+    users_allowed_to_create_public_deployment_ssh_keys.map { |user| user.gitolite_public_keys.deploy_key.order('title ASC') }.flatten
   end
 
-  def users_allowed_to_create_deployment_keys
+  def users_allowed_to_create_public_deployment_ssh_keys
     @project.users.select { |user| user != User.current && user.allowed_to?(:create_repository_deployment_credentials, @project) }
   end
 

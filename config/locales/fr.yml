@@ -168,7 +168,7 @@ fr:
   permission_view_repository_git_config_keys: Voir des clés de configuration Git
   permission_edit_repository_git_config_keys: Modifier des clés de configuration Git
 
-  permission_create_gitolite_ssh_key: Créer des clés SSH
+  permission_create_public_user_ssh_keys: Créer des clés SSH
 
   permission_download_git_revision: Télécharger les révisions Git sous forme d'archive
 

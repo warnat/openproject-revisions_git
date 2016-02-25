@@ -25,6 +25,6 @@ class GitolitePublicKeysController < ApplicationController
   private
 
   def gitolite_keys_allowed_params
-    params.require(:gitolite_public_key).permit(:user_id, :title, :key, :key_type)
+    params.require(:gitolite_public_key).permit(:user_id, :title, :key, :key_type, :delete_when_unused)
   end
 end

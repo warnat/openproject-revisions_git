@@ -4,9 +4,9 @@ OpenProject::Application.routes.draw do
     resources :public_keys, controller: 'my_public_keys', except: [:edit, :show, :update]
   end
 
-  namespace 'admin' do
+  #namespace 'admin' do
     resources :public_keys, controller: 'gitolite_public_keys', except: [:edit, :show, :update]
-  end
+  #end
   
   #The route will have the prefix "projects/:project_id/" plus our controller "manage_git_repository"
   scope 'projects/:project_id' do

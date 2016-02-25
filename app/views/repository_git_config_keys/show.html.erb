@@ -44,7 +44,7 @@
                              { controller: "projects/#{@project.identifier}/repository_git_config_keys", action: 'destroy', git_config_key: git_config_key },
                              method: :delete,
                              class: 'icon icon-delete',
-                             data: { confirm: "Are you sure you want to delete the key '#{git_config_key.key}'" } %>
+                             data: { confirm: "The key will ONLY be deleted from the database, NOT FROM THE REPOSITORY!\n\nAre you sure you want to delete the key '#{git_config_key.key}'" } %>
         	      <% end %>
                 </td>
               </tr>

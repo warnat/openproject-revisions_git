@@ -63,16 +63,15 @@ class RepositoryDeploymentCredentialsController < ApplicationController #Revisio
 
   
   def destroy
-    #Commented code to prevent deleting the unused keys, there is no field in table to indicate if key should be deleted
-#    will_delete_key = @key.deploy_key? && @key.delete_when_unused && @key.repository_deployment_credentials.count == 1
+    will_delete_key = @key.deploy_key? && @key.delete_when_unused && @key.repository_deployment_credentials.count == 1
     @credential.destroy
-#    if will_delete_key && @key.repository_deployment_credentials.empty?
-#      # Key no longer used -- delete it!
-#      @key.destroy
-#      flash[:notice] = 'Deployment credential and key deleted'
-#    else
+    if will_delete_key && @key.repository_deployment_credentials.empty?
+      # Key no longer used -- delete it!
+      @key.destroy
+      flash[:notice] = 'Deployment credential and Deployment key deleted'
+    else
       flash[:notice] = 'Deployment credential deleted'
-#    end
+    end
 
     redirect_to controller: 'manage_git_repositories', action: 'index'
   end

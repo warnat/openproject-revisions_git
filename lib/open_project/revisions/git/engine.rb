@@ -142,8 +142,10 @@ module OpenProject::Revisions::Git
       settings: settings
     ) do
       project_module :repository do
-        permission :create_gitolite_ssh_key, my: :account
-        permission :create_deployment_keys, my: :account
+        permission :view_manage_gitolite_repositories, manage_git_repositories: [:index, :show]
+
+        permission :create_public_user_ssh_keys,       my: :account
+        permission :create_public_deployment_ssh_keys, my: :account
 
         permission :create_repository_deployment_credentials, repository_deployment_credentials: [:new, :create]
         permission :view_repository_deployment_credentials,   repository_deployment_credentials: [:index, :show]
@@ -172,7 +174,12 @@ module OpenProject::Revisions::Git
         :public_keys,
         { controller: 'my_public_keys', action: 'index' },
         html: { class: 'icon2 icon-folder-locked' },
-        caption: :label_public_keys
+        caption: :label_public_keys,
+        if: Proc.new { |authorized = false| authorized = true if User.current.admin?
+                                            User.current.projects_by_role.each_key do |role|
+                                                 authorized = true if role.allowed_to?(:create_public_user_ssh_keys) || role.allowed_to?(:create_public_deployment_ssh_keys)
+                                            end
+                       authorized }
       )
 
       #Extends "project_menu": add the "manage_git_repositories" tab (menu option) to the project menu
@@ -184,7 +191,7 @@ module OpenProject::Revisions::Git
         caption: 'Manage Gitolite repository',
         param: :project_id,
         parent: :repository,
-        if: Proc.new { |p| p.repository && p.repository.is_a?(Repository::Gitolite) },
+        if: Proc.new { |p| (p.repository && p.repository.is_a?(Repository::Gitolite)) && (User.current.admin? || User.current.allowed_to?(:view_manage_gitolite_repositories, p)) },
         html: { class: 'icon2 icon-locked-folder' }
       )
         
@@ -193,15 +200,15 @@ module OpenProject::Revisions::Git
       #The permission is not public (with ", :public => true"), so we have to anable it to every role we want in the settings of OpenProject
       #We wrap the permissions declaration inside a call to "project_module" to create a module, now we have to enable the module "repository" (already existing) for the projects we want to use it in
       #In other words, "manage_git_repository" will be enabled if "repository" is enabled
-      project_module :repository do
-        #permission :view_manage_git_repositories, manage_git_repositories: :index #This seems not to work with ", :public => true"
-        permission :manage_git_repositories, { :manage_git_repositories => [:index] }, :public => true #MabEntwickeltSich: Public for testing
-        #Template for one general permission that may involve many controllers and actions: 
-        #permission :permission_name, {:controller => [:action, :action, ...]}, :public => true
-        permission :repository_deployment_credentials, { :repository_deployment_credentials => [:index] }, :public => true #MabEntwickeltSich: Public for testing
-        permission :repository_post_receive_urls, { :repository_post_receive_urls => [:index] }, :public => true #MabEntwickeltSich: Public for testing
-        permission :repository_mirrors, { :repository_mirrors => [:index] }, :public => true #MabEntwickeltSich: Public for testing
-      end  
+#      project_module :repository do
+#        #permission :view_manage_git_repositories, manage_git_repositories: :index #This seems not to work with ", :public => true"
+#        permission :manage_git_repositories, { :manage_git_repositories => [:index] }#, :public => true #MabEntwickeltSich: Public for testing
+#        #Template for one general permission that may involve many controllers and actions: 
+#        #permission :permission_name, {:controller => [:action, :action, ...]}, :public => true
+#        permission :repository_deployment_credentials, { :repository_deployment_credentials => [:index] }#, :public => true #MabEntwickeltSich: Public for testing
+#        permission :repository_post_receive_urls, { :repository_post_receive_urls => [:index] }#, :public => true #MabEntwickeltSich: Public for testing
+#        permission :repository_mirrors, { :repository_mirrors => [:index] }#, :public => true #MabEntwickeltSich: Public for testing
+#      end  
 
     end
 
