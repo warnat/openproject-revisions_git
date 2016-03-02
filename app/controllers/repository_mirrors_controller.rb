@@ -1,20 +1,14 @@
 class RepositoryMirrorsController < ApplicationController
-  unloadable
 
   before_filter :find_project
   before_filter :find_repository
   before_filter :find_mirror, only: [:edit, :update, :destroy, :push]
 
   def index
-#    @repository_mirrors = @repository.repository_mirrors.all
-#    render layout: false
   end
 
 
   def show
-#    @repository_mirrors = @repository.repository_mirrors.all
-#    render layout: false
-#    render_404
   end
 
 
@@ -65,8 +59,6 @@ class RepositoryMirrorsController < ApplicationController
   private
 
     def find_project
-      #To make the project menu visible, you have to initialize the controller's instance variable @project.
-      # @project variable must be set before calling the authorize filter
       @project = Project.find(params[:project_id])
     end
   

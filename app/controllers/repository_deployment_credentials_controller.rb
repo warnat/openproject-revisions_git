@@ -1,9 +1,6 @@
-class RepositoryDeploymentCredentialsController < ApplicationController #RevisionsGitControllerBase
-  unloadable
-
+class RepositoryDeploymentCredentialsController < ApplicationController
 
   before_filter :find_project
-  #before_filter :find_project_by_project_id
   before_filter :find_repository
   before_filter :set_my_keys
   before_filter :find_credentials
@@ -11,15 +8,12 @@ class RepositoryDeploymentCredentialsController < ApplicationController #Revisio
   before_filter :find_key,                   only: [:edit, :update, :destroy]
 
   def index
-#    @repository_deployment_credentials = @repository.repository_deployment_credentials.all
-#    render layout: false
+
   end
 
 
   def show
-#    @repository_deployment_credentials = @repository.repository_deployment_credentials.all
-#    render layout: false
-#    render_404
+
   end
 
 
@@ -88,8 +82,6 @@ class RepositoryDeploymentCredentialsController < ApplicationController #Revisio
     
 
   def find_project
-    #To make the project menu visible, you have to initialize the controller's instance variable @project.
-    # @project variable must be set before calling the authorize filter
     @project = Project.find(params[:project_id])
   end
 

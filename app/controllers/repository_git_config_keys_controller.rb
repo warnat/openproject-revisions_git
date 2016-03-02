@@ -5,15 +5,12 @@ class RepositoryGitConfigKeysController < ApplicationController
   before_filter :find_git_config_key, only: [:edit, :update, :destroy]
 
   def index
-#    @repository_git_config_keys = @repository.repository_git_config_keys.all
-#    render layout: false
+
   end
 
 
   def show
-#    @repository_git_config_keys = @repository.repository_git_config_keys.all
-#    render layout: false
-#    render_404
+
   end
 
 
@@ -45,8 +42,6 @@ class RepositoryGitConfigKeysController < ApplicationController
   private
 
     def find_project
-      #To make the project menu visible, you have to initialize the controller's instance variable @project.
-      # @project variable must be set before calling the authorize filter
       @project = Project.find(params[:project_id])
     end
 

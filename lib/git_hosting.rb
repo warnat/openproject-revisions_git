@@ -53,9 +53,6 @@ module GitHosting
 
       @@mirror_pubkey = pubk.split(/[\t ]+/)[0].to_s + " " + pubk.split(/[\t ]+/)[1].to_s
 
-      #settings = Setting["plugin_openproject_revisions_git"]
-      #settings["gitMirrorPushPublicKey"] = publicKey
-      #Setting["plugin_openproject_revisions_git"] = settings
     end
     @@mirror_pubkey
   end

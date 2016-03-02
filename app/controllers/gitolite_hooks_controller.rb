@@ -7,11 +7,6 @@ class GitoliteHooksController < ApplicationController
   skip_before_filter :verify_authenticity_token, :check_if_login_required, :except => :test
   before_filter  :find_project_and_repository
 
-  def stub
-    # Stub method simply to generate correct urls, just return a 404 to any user requesting this
-    render(:code => 404)
-  end
-
   def post_receive
     if not @repository.extra.validate_encoded_time(params[:clear_time], params[:encoded_time])
       render(:text => "The hook key provided is not valid. Please let your server admin know about it")
@@ -93,32 +88,6 @@ class GitoliteHooksController < ApplicationController
     end
   end
 
-  def test
-    # Deny access if the curreent user is not allowed to manage the project's repositoy
-    not_enough_perms = true
-    User.current.roles_for_project(@project).each{|role|
-      if role.allowed_to? :manage_repository
-        not_enough_perms = false
-        break
-      end
-    }
-    return render(:text => l(:cia_not_enough_permissions), :status => 403) if not_enough_perms
-
-    # Grab the repository path
-    gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
-    repo_path = @repository.url #MabEntwickeltSich: Not sure if it will stay like this
-    # Get the last revision we have on the database for this project
-    revision = @repository.changesets.find(:first)
-    # Find out to which branch this commit belongs to
-    branch = %x[#{GitHosting.git_exec} --git-dir='#{repo_path}' branch --contains  #{revision.scmid}].split('\n')[0].strip.gsub(/\* /, '')
-    GitHosting.logger.debug "Revision #{revision.scmid} found on branch #{branch}"
-
-    # Send the test notification
-    GitHosting.logger.info "Sending Test Notification to CIA: Branch => #{branch} RANGE => #{revision.revision}"
-#    CiaNotificationMailer.deliver_notification(revision, branch)
-    render(:text => l(:cia_notification_ok))
-  end
-
   protected
 
   # Returns an array of GitHub post-receive hook style hashes
@@ -146,7 +115,7 @@ class GitoliteHooksController < ApplicationController
 
       # Grab the repository path
       gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
-      repo_path = @repository.url #MabEntwickeltSich: Not sure if it will stay like this
+      repo_path = @repository.url
       revisions_in_range = %x[#{GitHosting.git_exec} --git-dir='#{repo_path}' rev-list --reverse #{range}]
       #GitHosting.logger.debug "Revisions in Range: #{revisions.split().join(' ')}"
 
@@ -157,7 +126,7 @@ class GitoliteHooksController < ApplicationController
                   :id => revision.revision,
                   :url => url_for(:controller => "repositories", :action => "revision",
                                   :id => @project, :rev => rev, :only_path => false,
-                                  :host => Setting['host_name'], :protocol => Setting['protocol'] #MabEntwickeltSich: Global settings of Openproject
+                                  :host => Setting['host_name'], :protocol => Setting['protocol']
                                  ),
                   :author => {
                               :name => revision.committer.gsub(/^([^<]+)\s+.*$/, '\1'),
@@ -194,13 +163,13 @@ class GitoliteHooksController < ApplicationController
                                    :name => @project.identifier,
                                    :open_issues => count_open_work_packages,
                                    :owner => {
-                                              :name => Setting["app_title"], #MabEntwickeltSich: Global setting of Openproject
-                                              :email => Setting["mail_from"] #MabEntwickeltSich: Global setting of Openproject
+                                              :name => Setting["app_title"],
+                                              :email => Setting["mail_from"]
                                    },
                                    :private => !@project.is_public,
                                    :url => url_for(:controller => "repositories", :action => "show",
                                                    :id => @project, :only_path => false,
-                                                   :host => Setting["host_name"], :protocol => Setting["protocol"] #MabEntwickeltSich: Global settings of Openproject
+                                                   :host => Setting["host_name"], :protocol => Setting["protocol"]
                                                   ),
                                    :watchers => 0
                    }

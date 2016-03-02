@@ -1,20 +1,14 @@
 class RepositoryPostReceiveUrlsController < ApplicationController
-  unloadable
 
   before_filter :find_project
   before_filter :find_repository
   before_filter :find_post_receive_url, only: [:edit, :update, :destroy]
 
   def index
-#    @repository_post_receive_urls = @repository.repository_post_receive_urls.all
-#    render layout: false
   end
 
 
   def show
-#    @repository_post_receive_urls = @repository.repository_post_receive_urls.all
-#    render layout: false
-#    render_404
   end
 
 
@@ -59,8 +53,6 @@ class RepositoryPostReceiveUrlsController < ApplicationController
   private
 
     def find_project
-      #To make the project menu visible, you have to initialize the controller's instance variable @project.
-      # @project variable must be set before calling the authorize filter
       @project = Project.find(params[:project_id])
     end
   

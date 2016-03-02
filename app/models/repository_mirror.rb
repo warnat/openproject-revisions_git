@@ -1,5 +1,4 @@
 class RepositoryMirror < ActiveRecord::Base
-  unloadable
 
   PUSHMODE_MIRROR       = 0
   PUSHMODE_FORCE        = 1
@@ -21,10 +20,6 @@ class RepositoryMirror < ActiveRecord::Base
   validates :repository_id, presence: true
   validates_associated :repository
 
-  ## Only allow SSH format
-  ## ssh://git@openproject.example.org/project1/project2/project3/project4.git
-  ## ssh://git@openproject.example.org:2222/project1/project2/project3/project4.git
-#  validates_format_of :url, with: URI::regexp(%w(ssh)), allow_blank: false
   validates_format_of :url, with: GIT_SSH_URL_REGEX, allow_blank: false
   validates_uniqueness_of :url, scope: [:repository_id]
   validates :push_mode, presence: true
@@ -66,7 +61,7 @@ class RepositoryMirror < ActiveRecord::Base
 
   def push
     gitolite_repos_root = OpenProject::Revisions::Git::GitoliteWrapper.gitolite_global_storage_path
-    repo_path = repository.url #MabEntwickeltSich: Not sure if it will stay like this
+    repo_path = repository.url
     
     push_args = ""
     if push_mode == PUSHMODE_MIRROR
