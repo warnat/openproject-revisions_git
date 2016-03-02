@@ -165,14 +165,30 @@ en:
   label_hour: Hour
   button_ok: OK
 
+  ## Permissions
+
+  permission_view_manage_gitolite_repositories: View menu Manage Gitolite repositories
+
+  permission_create_public_user_ssh_keys: Create user public SSH keys
+  permission_create_public_deployment_ssh_keys: Create deployment public SSH keys
+
+  permission_create_repository_deployment_credentials: Create repository deployment credentials
+  permission_view_repository_deployment_credentials: View repository deployment credentials
+  permission_edit_repository_deployment_credentials: Edit repository deployment credentials
+
+  permission_create_repository_post_receive_urls: Create repository post-receive URLs
+  permission_view_repository_post_receive_urls: View repository post-receive URLs
+  permission_edit_repository_post_receive_urls: Edit repository post-receive URLs
+
+  permission_create_repository_mirrors: Create repository mirrors
+  permission_view_repository_mirrors: View repository mirrors
+  permission_edit_repository_mirrors: Edit repository mirrors
+  permission_push_repository_mirrors: Push to repository mirrors
+
   permission_create_repository_git_config_keys: Create Git config keys
   permission_view_repository_git_config_keys: View Git config keys
   permission_edit_repository_git_config_keys: Edit Git config keys
 
-
-  permission_create_public_user_ssh_keys: Create SSH keys
-
-  permission_download_git_revision: Download Git Revision Archive
 
   # Mangeable
   label_gitolite_manageable: Gitolite vendor is manageable?
