@@ -49,7 +49,12 @@ fr:
 
   # User SSH keys (labels)
   label_public_keys: Clés publiques
+  label_gitolite_public_key: Clés publiques
+  label_my_public_key: Mes clés publiques
   label_public_key: Clé publique
+  label_public_key_title: Public key title
+  label_public_key_fingerprint: Signature
+  label_public_key_delete_when_unused: Supprimer inutilisée
   label_public_key_edit: Modifier une clé publique existante
   label_current_public_keys: Clés publiques courantes
   label_current_user_keys: Clés de l'utilisateur courant
@@ -57,6 +62,7 @@ fr:
   label_no_public_keys: Aucune clé publique définie
   label_public_key_new: Entrez une nouvelle clé publique
   label_identifier_can_be_arbitrary: Identifiant
+  label_gitolite_identifier: Chemin de la clé
   label_identifier_can_be_arbitrary_desc: (Peut être significative)
   label_key_type: Type de clé publique
   label_user_key: Clé utilisateur

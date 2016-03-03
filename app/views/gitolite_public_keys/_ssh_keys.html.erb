@@ -9,6 +9,7 @@
             <col highlight-col>
             <col highlight-col>
             <col highlight-col>
+            <col highlight-col>
             <col>
           </colgroup>
           <thead>
@@ -40,6 +41,15 @@
                   </div>
                 </div>
               </th>
+              <th>
+                <div class="generic-table--sort-header-outer">
+                  <div class="generic-table--sort-header">
+                    <span>
+                      <%= l(:label_public_key_delete_when_unused) %>
+                    </span>
+                  </div>
+                </div>
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -49,6 +59,7 @@
                 <td class="center" style="text-align:left;"><%= h(key) %></td>
                 <td class="center" style="text-align:left;"><%= raw("#{key.title}/<br/>#{key.identifier}.pub") %></td>
                 <td class="center" style="text-align:left;"><%= "#{key.fingerprint}"[-8,8] %></td>
+                <td class="center" style="text-align:left;"><%= checked_image key.delete_when_unused %></td>
                 <td class="buttons">
                   <%= link_to l(:button_delete),
                            { controller: target, action: 'destroy', id: key.id },
