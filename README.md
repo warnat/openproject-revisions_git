@@ -6,7 +6,7 @@
 This plugin aims to provide extensive features for managing Git repositories within [OpenProject](http://www.openproject.org).
 Forked from [jbox-web's version](https://jbox-web.github.io/redmine_git_hosting/) of the long-lived, often-forked redmine-git_hosting plugin (formerly redmine-gitosis).
 
-As OpenProject has diverted quite a bit in terms of project management (e.g., redmine allows multiple repositories per project), some features have been removed in the fork.
+As OpenProject has diverted quite a bit in terms of project management (e.g., Redmine allows multiple repositories per project), some features have been removed in the fork.
 
 **Disclaimer**: This fork is still in progress. While some things work, it is by no means stable - Features may change anytime.
 
@@ -24,7 +24,7 @@ As OpenProject has diverted quite a bit in terms of project management (e.g., re
 
 **Gitolite Repository Management**
 
-✓ Managing repositories with Gitolite upon creation, update/deletion. (Async w/ delayed_jobs)
+✓ Managing repositories with Gitolite upon creation, update/deletion (Async w/ delayed_jobs)
 
 ✓ Members/Roles access written to Gitolite
 
@@ -49,7 +49,7 @@ As OpenProject has diverted quite a bit in terms of project management (e.g., re
 * Sidekiq (OpenProject uses delayed_jobs instead)
 * SELinux (unfamiliar, can't provide a good fork)
 * GitHub features (Issues), should be separate plugin
-* Git access cache ( belongs in the core )
+* Git access cache (belongs in the core)
 * Repository Recycle bin after deletion (Just use your filesystem backups)
 * Notifications / Mailing lists
 
@@ -80,7 +80,7 @@ Thus, you need to add the following line to ``conf/gitolite.conf`` under the git
 The ``openproject.conf`` is created and updated from this plugin and contains all projects with Git repositories later defined within OpenProject. Thus, the ``<gitolite-admin.git>/conf/`` folder will contain two files:
 
 * ``gitolite.conf``: If you want to manually add projects outside the scope of OpenProject to Gitolite, define them here.
-* ``openproject.conf``: Contains all projects defined from OpenProject, is generated automatically. (*Non-existant until this plugin creates it*)
+* ``openproject.conf``: Contains all projects defined from OpenProject, is generated automatically. (*Non-existent until this plugin creates it*)
 
 **0.b. Change .gitolite.rc configuration**
 
@@ -92,7 +92,7 @@ OpenProject identifies project identifiers in Gitolite through Git config keys, 
   
   b. Change the configuration ``GIT_CONFIG_KEYS`` to ``'.*',``
 
-  c. Change the configuration for ``UMASK`` to ``0007,`` to add group rxw permissions
+  c. Change the configuration for ``UMASK`` to ``0007,`` to add group rwx permissions
 
   d. Change local code directory ``LOCAL_CODE`` to ``"$ENV{HOME}/local"`` in Gitolite 3
 
@@ -132,7 +132,7 @@ Add a Gemfile.plugins to your OpenProject root with the following contents:
 
 #### 2. Gitolite access rights
 
-Ensure the user running OpenProject can read and write to the Gitolite repostories directory.
+Ensure the user running OpenProject can read and write to the Gitolite repositories directory.
 This is required for two reasons:
 
  1. Read the Git tree for browsing the repository
@@ -140,7 +140,7 @@ This is required for two reasons:
 
 
 We have already changed the configuration file ``gitolite.rc`` to set future permissions on repositories to 0770.
-To set the permissions of the existing repositories folder.
+To set the permissions of the existing repositories folder:
 
     chmod -R 770 <git home>/repositories
 
@@ -155,7 +155,7 @@ Make sure you can access the repositories from openproject:
 
 #### 3. Gitolite access
 
-Make sure you can ssh into Gitolite from the openproject user. If you run the following command, the output below (or similar for gitolite2) should appear. **If it does not, this is a Gitolite configuration error.**
+Make sure you can ssh into Gitolite from the openproject user. If you run the following command, the output below (or similar for Gitolite 2) should appear. **If it does not, this is a Gitolite configuration error.**
 
 	openproject$ ssh -i <gitolite-admin SSH key> git@localhost info
 	hello openproject, this is git@dev running gitolite3 v3.x-x on git x.x.x
@@ -187,7 +187,7 @@ RAILS_ENV=production script/delayed_job start
 #### 6. Config Test
 
 Check that the output on the tab 'Config Test' looks good.
-Note that many of the settings are not yet functional, and some values on config test are thus irrelevant.
+Note that many of the settings are not yet functional, and some values on Config Test are thus irrelevant.
 
 
 ## Basic Usage
@@ -215,7 +215,7 @@ Note that many of the settings are not yet functional, and some values on config
 1. Select 'Manage Gitolite repository' in the menu on the left, under 'Repository'.
 2. Add/manage deployment credentials.
 3. Add/manage post-receive URLs.
-4. Add/manage repository mirrirs.
+4. Add/manage repository mirrors.
 5. Add/Manage Git config keys.
 
 ## Copyrights & License
