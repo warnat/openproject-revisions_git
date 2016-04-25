@@ -39,7 +39,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     def handle_repository_delete(repos)
       @admin.transaction do
         repos.each do |repo|
-          byebug
           if @gitolite_config.repos[repo[:name]]
 
             # Delete from in-memory gitolite
