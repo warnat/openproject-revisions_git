@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*'] + %w(README.md)
 
-  s.add_dependency 'rails', '~> 3.2.14'
+  s.add_dependency 'rails', '~> 4.2.4'
   s.add_dependency 'openproject-revisions'
   s.add_dependency 'gitolite-rugged'
 end
