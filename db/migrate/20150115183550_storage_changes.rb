@@ -16,11 +16,11 @@ class StorageChanges < ActiveRecord::Migration
 
   def self.down
     # Use legacy path
-    storage = Setting.plugin_openproject_revisions_git[:gitolite_global_storage_dir] || 'repositories'
-    Repository::Git.find_each do |repo|
-      repo.url = File.join(storage, repo.git_path)
-      repo.root_url = File.join(storage, repo.git_path)
-      repo.save
-    end
+    # storage = Setting.plugin_openproject_revisions_git[:gitolite_global_storage_dir] || 'repositories'
+    # Repository::Git.find_each do |repo|
+    #  repo.url = File.join(storage, repo.git_path)
+    #  repo.root_url = File.join(storage, repo.git_path)
+    #  repo.save
+    # end
   end
 end
