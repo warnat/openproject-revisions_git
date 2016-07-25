@@ -22,7 +22,6 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # so that all configurations made from the plugin are reset.
     def sync_with_gitolite
       @admin.transaction do
-        byebug
         admin.truncate!
         gitolite_admin_repo_commit("Truncated configuration")
         perform_update(@object_id)

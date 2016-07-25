@@ -53,6 +53,7 @@ en:
   label_public_key: Public key
   label_public_key_title: Public key title
   label_public_key_fingerprint: Fingerprint
+  label_public_key_delete_when_unused: Delete unused
   label_public_key_edit: Edit existing public key
   label_current_public_keys: Current public keys
   label_current_user_keys: Current user keys
@@ -64,7 +65,7 @@ en:
   label_identifier_can_be_arbitrary_desc: (Can be any meaningful string)
   label_key_type: Public key type
   label_user_key: User key
-  label_deploy_key: Deploy key
+  label_deploy_key: Deployment key
   label_cut_and_paste: Cut and paste entire .pub file.
   label_identifier_cannot_be_changed: Identifier<br/><em>(Cannot be changed)</em>
   label_key_cannot_be_changed_please_create_new_key: 'The key cannot be altered anymore. However, you can delete it and create a new one.'
@@ -165,14 +166,30 @@ en:
   label_hour: Hour
   button_ok: OK
 
+  ## Permissions
+
+  permission_view_manage_gitolite_repositories: View menu Manage Gitolite repositories
+
+  permission_create_public_user_ssh_keys: Create user public SSH keys
+  permission_create_public_deployment_ssh_keys: Create deployment public SSH keys
+
+  permission_create_repository_deployment_credentials: Create repository deployment credentials
+  permission_view_repository_deployment_credentials: View repository deployment credentials
+  permission_edit_repository_deployment_credentials: Edit repository deployment credentials
+
+  permission_create_repository_post_receive_urls: Create repository post-receive URLs
+  permission_view_repository_post_receive_urls: View repository post-receive URLs
+  permission_edit_repository_post_receive_urls: Edit repository post-receive URLs
+
+  permission_create_repository_mirrors: Create repository mirrors
+  permission_view_repository_mirrors: View repository mirrors
+  permission_edit_repository_mirrors: Edit repository mirrors
+  permission_push_repository_mirrors: Push to repository mirrors
+
   permission_create_repository_git_config_keys: Create Git config keys
   permission_view_repository_git_config_keys: View Git config keys
   permission_edit_repository_git_config_keys: Edit Git config keys
 
-
-  permission_create_gitolite_ssh_key: Create SSH keys
-
-  permission_download_git_revision: Download Git Revision Archive
 
   # Mangeable
   label_gitolite_manageable: Gitolite vendor is manageable?
@@ -261,6 +278,7 @@ en:
   label_show_repositories_url: Show checkout URL's?
 
   label_gitolite_daemon_by_default: Enable Git Daemon mode for new repositories by default?
+  label_gitolite_http_by_default: Enable Smart HTTP mode for new repositories by default?
 
   label_http_only: HTTP Only
   label_https_only: HTTPS Only
@@ -315,6 +333,9 @@ en:
   label_gitolite_version: Gitolite version
   label_gitolite_banner: Gitolite banner
   label_path_directories: PATH directories
+  label_gitolite_hooks_params_installed: Hooks parameters installed?
+  label_gitolite_mailer_params_installed: Mailer parameters installed?
+  label_gitolite_hooks_installed: Hooks installed?
   label_openproject_user: OpenProject username
   label_git_version: Git version
   label_found_repositories: Repositories found
@@ -332,8 +353,11 @@ en:
   label_tab_gitolite_rescue: Rescue
   label_gitolite_rescue: Gitolite Rescue
 
-  label_resync_all_projects: Resync all projects ?
-  label_resync_all_projects_desc: Check this box and apply to rewrite the whole gitolite config file.
+  label_resync_all_projects: Resync all projects?
+  label_resync_all_projects_desc: Check this box and apply to rewrite the whole gitolite config file (this may take several minutes).
+
+  label_configure_projects: Find projects without proper settings?
+  label_configure_projects_desc: Check this box and apply to find projects without proper configuration settings and fix them.
 
   # Misc
   label_select_all: Select all
@@ -349,3 +373,37 @@ en:
     checkout:
       default_instructions:
         gitolite: 'You can access this repository through Git with Gitolite.'
+  
+  # GWDG
+  label_manage_git_repository: Manage Git repository
+  project_not_found: No project was found with the identifier
+  label_mirrors_grant_access_public_key: Mirrors must grant write access to the following public key
+
+  # Gitolite Hooks Config
+  label_tab_hooks: Hooks
+  label_gitolite_hooks_config: Gitolite Hooks Configuration
+
+  label_gitolite_overwrite_existing_hooks: Overwrite existing hooks
+  label_gitolite_hooks_are_asynchronous: Run hooks asynchronously
+  label_gitolite_hooks_debug: Run hooks in Debug mode
+  label_gitolite_hooks_url: Hooks URL
+  label_gitolite_hooks_namespace: Hooks Git namespace
+  label_default_gitolite_hooks_url: Default URL
+  label_install_gitolite_hooks: Install hooks !
+  label_gitolite_hook_untouched: hook left untouched
+  label_gitolite_install_hooks_result: Report of installation
+
+  # Gitolite Storage Config
+  label_tab_storage: Storage
+  label_gitolite_storage_config: Gitolite Storage Configuration
+
+  label_gitolite_global_storage_dir: Gitolite repositories base path
+  label_gitolite_global_storage_dir_desc: Relative to Gitolite user home
+  label_gitolite_recycle_bin_dir: Gitolite recycle bin base path
+  label_gitolite_recycle_bin_dir_desc: Relative to Gitolite user home
+  label_gitolite_redmine_storage_dir: Subdirectory for Redmine-managed repositories
+  label_gitolite_redmine_storage_dir_desc: Relative to Gitolite repositories base path
+  label_gitolite_local_code_dir: Gitolite non-core hooks directory
+  label_gitolite_local_code_dir_desc: Relative to Gitolite user home
+  label_gitolite_lib_dir: Gitolite librairies directory
+  label_gitolite_lib_dir_desc: /usr/share/gitolite3/lib under Debian, bin/lib/ if installed by hand

@@ -5,6 +5,9 @@ class Repository::Gitolite < Repository::Git
   has_one :extra, foreign_key: 'repository_id', class_name: 'RepositoryGitExtra', dependent: :destroy
   accepts_nested_attributes_for :extra
 
+  has_many :repository_deployment_credentials, dependent: :destroy, foreign_key: 'repository_id'
+  has_many :repository_post_receive_urls, dependent: :destroy, foreign_key: 'repository_id'
+  has_many :repository_mirrors, dependent: :destroy, foreign_key: 'repository_id'
   has_many :repository_git_config_keys, dependent: :destroy, foreign_key: 'repository_id'
 
   # Parse a path of the form <proj1>/<proj2>/<proj3>/<projekt>.git and return the specified

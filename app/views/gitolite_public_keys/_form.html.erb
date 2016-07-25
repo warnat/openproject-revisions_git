@@ -1,39 +1,56 @@
-<%= stylesheet_link_tag 'application', plugin: 'openproject_revisions_git' %>
+<% if params[:deploy] != nil && params[:deploy] == 'true'%>
+  <% default_key_type = 1 %>
+<% else %>
+  <% default_key_type = -1 %>
+<% end %>
+
+<% disable_deploy_keys = 1 %>
+<% disable_user_keys = 0 %>
+<% if User.current.admin? || can_create_public_deployment_ssh_keys_for_some_project(@user) %>
+  <% disable_deploy_keys = -1 %>
+<% end %>
+<% if User.current.admin? || can_create_public_user_ssh_keys_for_some_project(@user) %>
+  <% disable_user_keys = -1 %>
+<% end %>
 
 <%# Controller is overriden for user key management /my/account/keys %>
 <% target ||= 'gitolite_public_keys' %>
 
-<fieldset class="box">
+<fieldset class="public_key_view">
   <legend><%= l(:label_public_keys) %></legend>
 
-  <fieldset class="public_key_view">
-    <legend><%= l(:label_current_user_keys) %></legend>
-    <%= render partial: 'gitolite_public_keys/ssh_keys', locals: { ssh_keys: @gitolite_user_keys, target: target } %>
-  </fieldset>
+  <% if User.current.admin? || can_create_public_user_ssh_keys_for_some_project(@user) %>
+    <fieldset class="public_user_key_view">
+      <legend><%= l(:label_current_user_keys) %></legend>
+      <%= render partial: 'gitolite_public_keys/ssh_keys', locals: { ssh_keys: @gitolite_user_keys, target: target } %>
+    </fieldset>
+  <% end %>
 
   <br/>
 
-  <fieldset class="public_key_view">
-    <legend><%= l(:label_current_deploy_keys) %></legend>
-    <%= render partial: 'gitolite_public_keys/ssh_keys', locals: { ssh_keys: @gitolite_deploy_keys, target: target } %>
-  </fieldset>
+  <% if User.current.admin? || can_create_public_deployment_ssh_keys_for_some_project(@user) %>
+    <fieldset class="public_deploy_key_view">
+      <legend><%= l(:label_current_deploy_keys) %></legend>
+      <%= render partial: 'gitolite_public_keys/ssh_keys', locals: { ssh_keys: @gitolite_deploy_keys, target: target } %>
+    </fieldset>
+  <% end %>
 
   <br/>
 
-  <fieldset class="public_key_view">
+  <fieldset class="public_key_new">
     <legend><%= l(:label_public_key_new) %></legend>
 
     <div id="validation_messages"><%= error_messages_for 'gitolite_public_key' %></div>
 
     <%= labelled_tabular_form_for(:gitolite_public_key,
-          url: { controller: target, action: 'create' },
-          method: :post ) do |f| %>
+              url: { controller: target, action: 'create' },
+              method: :post ) do |f| %>
 
       <p>
         <%= f.text_field :title, label: :label_identifier_can_be_arbitrary, required: true, style: 'width: 97%;' %>
-        <br/>
         <em><%= l(:label_identifier_can_be_arbitrary_desc) %></em>
       </p>
+
       <% if target == 'gitolite_public_keys' %>
         <p>
           <%= f.hidden_field :user_id, value: @user.id %>
@@ -41,56 +58,51 @@
         </p>
       <% end %>
 
-      <% if User.current.admin? || can_create_deployment_keys_for_some_project(@user) %>
-        <p>
-          <%= f.select :key_type, options_for_select(
-                                    [
-                                      [ l(:label_user_key), 0 ],
-                                      [ l(:label_deploy_key), 1 ]
-                                    ],
-                                  ),
-                                  { required: true, label: :label_key_type },
-                                  { class: 'select_key_type' } %>
-
-
-        </p>
-      <% end %>
+      <p>
+        <%= f.select :key_type, options_for_select([["Select a key type", -1], [l(:label_user_key), 0], [l(:label_deploy_key), 1]], selected: default_key_type, disabled: [-1] + [disable_deploy_keys] + [disable_user_keys]),
+                                { required: true, label: :label_key_type },
+                                { class: 'select_key_type' } %>
+      </p>
 
       <p>
-        <%= f.text_area :key, label: :label_public_key, required: true,
-              style: 'width: 97%; height: 200px; overflow: auto;',
-              cols: nil,
-              rows: nil %>
-        <br/>
+        <%= f.check_box :delete_when_unused, label: 'Delete key when unused', checked: true %>
+      </p>
+
+      <p>
+        <%= f.text_area :key, label: :label_public_key, required: true, style: 'width: 97%; height: 200px; overflow: auto;',
+                                  cols: nil, rows: nil %>
         <em><%= l(:label_cut_and_paste) %></em>
       </p>
 
-      <%= submit_tag l(:button_create) %>
-    <% end %>
+      <%= styled_button_tag 'Create', class: '-highlight -with-icon icon-yes' %>
 
+    <% end %>
   </fieldset>
 </fieldset>
 
 
-<%= javascript_tag do %>
-  function load_form_actions() {
-    $('#gitolite_public_key_key_type').on('change', function() {
-      key_type_change(this)
-    });
-  }
 
-  function key_type_change(element) {
-    if (!element) return;
-    var idx = element.selectedIndex;
-    if (idx == 0) {
-      $('#key_type_options').hide();
-      $('#gitolite_public_key_delete_when_unused').prop("checked", true);
-    } else {
-      $('#key_type_options').show();
+<script type="text/javascript">
+  var delete_when_unused = document.getElementById('gitolite_public_key_delete_when_unused');
+  var key_type = document.getElementById('gitolite_public_key_key_type');
+
+  function enable_disable(key_type){
+    if (key_type.value == 1) {
+      delete_when_unused.checked = true;
+      delete_when_unused.disabled = false;
     }
-  }
+    else {
+      delete_when_unused.checked = false;
+      delete_when_unused.disabled = true;
+    }
+  };
 
-  $(document).ready(function() {
-    load_form_actions();
-  });
-<% end %>
+  window.onload = function() {
+    enable_disable(key_type)
+  };
+
+  key_type.onchange = function() {
+    enable_disable(this)
+  };  
+
+</script>

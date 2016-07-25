@@ -19,6 +19,7 @@ module OpenProject::Revisions::Git::GitoliteWrapper
 
     def build_op_permissions
       @rewind_users = @users.select { |user| user.allowed_to?(:manage_repository, @project) }
+      @rewind_deploy_keys = GitolitePublicKey.find(@repository.repository_deployment_credentials.where(perm: 'RW+', active: 1).pluck(:gitolite_public_key_id))
 
       @write_users =
         @users.select { |user| user.allowed_to?(:commit_access, @project) } -
@@ -28,14 +29,24 @@ module OpenProject::Revisions::Git::GitoliteWrapper
         @users.select { |user| user.allowed_to?(:view_changesets, @project) } -
         @rewind_users -
         @write_users
+      @read_deploy_keys = GitolitePublicKey.find(@repository.repository_deployment_credentials.where(perm: 'R', active: 1).pluck(:gitolite_public_key_id))
 
       @rewind = []
       @write  = []
       @read   = []
+        
+      @rewind_deploy          = []
+      @read_deploy            = []
+      @all_rewind_identifiers = []
+      @all_read_identifiers   = []
     end
 
     def get_identifier(set)
       set.map(&:gitolite_identifier)
+    end
+
+    def get_deploy_identifier(set)
+      set.map(&:identifier)
     end
 
     def gitweb_enabled?
@@ -58,6 +69,10 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # users and deploy keys of the repository
     #
     def build_permissions!
+      #Deployment keys will keep the permissions even with non active projects
+      @rewind_deploy = get_deploy_identifier(@rewind_deploy_keys)
+      @read_deploy   = get_deploy_identifier(@read_deploy_keys)
+
       if @project.active?
         @rewind = get_identifier(@rewind_users)
         @write  = get_identifier(@write_users)
@@ -66,14 +81,14 @@ module OpenProject::Revisions::Git::GitoliteWrapper
       else
         all_read = @rewind_users + @write_users + @read_users
         @read     = get_identifier(all_read)
-        @read << 'REDMINE_CLOSED_PROJECT' if @read.empty?
+        @read << 'REDMINE_CLOSED_PROJECT' if @read.empty? && @read_deploy.empty?
       end
 
       convert_to_gitolite_format
     end
 
     def active_project_gitolite_access
-      @read << 'DUMMY_REDMINE_KEY' if @read.empty? && @write.empty? && @rewind.empty?
+      @read << 'DUMMY_REDMINE_KEY' if @read.empty? && @write.empty? && @rewind.empty? && @rewind_deploy.empty? && @read_deploy.empty?
       @read << 'gitweb' if gitweb_enabled?
       @read << 'daemon' if git_daemon_enabled?
     end
@@ -81,10 +96,12 @@ module OpenProject::Revisions::Git::GitoliteWrapper
     # Turn the internal hash into the gitolite
     # accepted format
     def convert_to_gitolite_format
+      @all_rewind_identifiers = @rewind + @rewind_deploy
+      @all_read_identifiers = @read + @read_deploy
       permissions = {}
-      permissions['RW+'] = { '' => @rewind.uniq.sort } unless @rewind.empty?
+      permissions['RW+'] = { '' => @all_rewind_identifiers.uniq.sort } unless @all_rewind_identifiers.empty?
       permissions['RW'] = { '' => @write.uniq.sort } unless @write.empty?
-      permissions['R'] = { '' => @read.uniq.sort } unless @read.empty?
+      permissions['R'] = { '' => @all_read_identifiers.uniq.sort } unless @all_read_identifiers.empty?
 
       [permissions]
     end

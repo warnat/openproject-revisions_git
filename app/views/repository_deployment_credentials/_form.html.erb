@@ -1,0 +1,26 @@
+
+    <div id="validation_messages"><%= error_messages_for 'credential' %></div>
+
+    <p>
+      <%= f.select :gitolite_public_key_id, build_list_of_keys(@gitolite_deploy_keys, @other_deployment_keys, @disabled_deployment_keys),
+                              { required: true, label: 'Select deployment key' },
+                              { class: 'select_key_type' } %>
+      <% if User.current.admin? || User.current.allowed_to?(:create_public_deployment_ssh_keys, @project) %>
+        <%= link_to 'Create new deployment key',
+                 { controller: "my_public_keys", action: 'index', deploy: 'true'},
+                 method: :get,
+                 class: 'icon icon-add',
+                 confirm: "You will be redirected to 'My account | Public keys'\nUnsaved data will be lost\nAre you sure?" %>
+      <% end %>
+    </p>
+    
+    <p>
+      <%= f.hidden_field :repository_id, value: @repository.id %>
+      <%= f.hidden_field :user_id, value: @user.id %>
+    </p>
+
+    <p>
+      <%= f.select :perm, options_for_select(RepositoryDeploymentCredential::VALID_PERMS, RepositoryDeploymentCredential::DEFAULT_PERM),
+                              { required: true, label: 'Access permissions' },
+                              { class: 'select_key_type' } %>
+    </p>

@@ -1,107 +1,81 @@
-class RepositoryGitConfigKeysController < RevisionsGitControllerBase
-  before_filter :set_current_tab
-  before_filter :can_view_config_keys,   only: [:index]
-  before_filter :can_create_config_keys, only: [:new, :create]
-  before_filter :can_edit_config_keys,   only: [:edit, :update, :destroy]
-  before_filter :create_config_key,      only: [:create]
+class RepositoryGitConfigKeysController < ApplicationController
 
-  before_filter :find_repository_git_config_key, except: [:index, :new, :create]
+  before_filter :find_project
+  before_filter :find_repository
+  before_filter :find_git_config_key, only: [:edit, :update, :destroy]
 
   def index
-    @repository_git_config_keys = RepositoryGitConfigKey.find_all_by_repository_id(@repository.id)
 
-    respond_to do |format|
-      format.html { render layout: 'popup' }
-      format.js
-    end
   end
+
+
+  def show
+
+  end
+
 
   def new
-    @git_config_key = RepositoryGitConfigKey.new
+    @git_config_key = RepositoryGitConfigKey.new(repository_git_config_keys_allowed_params)
   end
+
 
   def create
-    if @git_config_key.save
-      flash[:notice] = l(:notice_git_config_key_created)
-      key_change_success
-    else
-      fail_key_change(:notice_git_config_key_create_failed, 'create')
-    end
+    @git_config_key = RepositoryGitConfigKey.new(repository_git_config_keys_allowed_params)
+
+    save_and_flash
+    redirect_to controller: 'manage_git_repositories', action: 'index'
   end
 
-  def update
-    if @git_config_key.update_attributes(params[:repository_git_config_keys])
-      flash[:notice] = l(:notice_git_config_key_updated)
-      key_change_success
-    else
-      fail_key_change(:notice_git_config_key_update_failed, 'edit')
-    end
+
+  def edit
+    
   end
+
 
   def destroy
-    respond_to do |format|
-      if @git_config_key.destroy
-        flash[:notice] = l(:notice_git_config_key_deleted)
-        format.js { render js: 'window.location = #{success_url.to_json};' }
-      else
-        format.js { render layout: false }
-      end
+    if @git_config_key.destroy
+      flash[:notice] = 'Git config key deleted'
+      redirect_to controller: 'manage_git_repositories', action: 'index'
     end
   end
 
   private
 
-  def fail_unless_allowed_to(permission)
-    render_403 unless view_context.user_allowed_to(permission, @project)
-  end
-
-  def can_view_config_keys
-    fail_unless_allowed_to(:view_repository_git_config_keys)
-  end
-
-  def can_create_config_keys
-    fail_unless_allowed_to(:create_repository_git_config_keys)
-  end
-
-  def can_edit_config_keys
-    fail_unless_allowed_to(:edit_repository_git_config_keys)
-  end
-
-  def find_repository_git_config_key
-    git_config_key = RepositoryGitConfigKey.find_by_id(params[:id])
-
-    if git_config_key && git_config_key.repository_id == @repository.id
-      @git_config_key = git_config_key
-    elsif git_config_key
-      render_403
-    else
-      render_404
+    def find_project
+      @project = Project.find(params[:project_id])
     end
-  end
 
-  def set_current_tab
-    @tab = 'repository_git_config_keys'
-  end
-
-  def create_config_key
-    @git_config_key = RepositoryGitConfigKey.new(params[:repository_git_config_keys])
-    @git_config_key.repository = @repository
-  end
-
-  def key_change_success
-    respond_to do |format|
-      format.html { redirect_to success_url }
-      format.js   { render js: "window.location = #{success_url.to_json};" }
+    def find_repository
+      @repository = @project.repository
+      if @repository.nil?
+        render_404
+      end
     end
-  end
 
-  def fail_key_change(action, label)
-    respond_to do |format|
-      format.html {
-        flash[:error] = l(label)
-        render action: action
-      }
-      format.js { render 'form_error', layout: false }
+    def repository_git_config_keys_allowed_params
+      params.require(:repository_git_config_key).permit(:repository_id, :key, :value)
     end
-  end
+
+    def save_and_flash
+      if @git_config_key.save
+        flash[:notice] = 'Git config key saved'
+      else
+        flash[:error] = @git_config_key.errors.full_messages.to_sentence
+      end
+    end
+
+    def find_git_config_key
+      begin
+        gckey = @repository.repository_git_config_keys.find(params[:git_config_key])
+      rescue ActiveRecord::RecordNotFound => e
+        render_404
+      else
+        if User.current.admin? || User.current.allowed_to?(:create_repository_git_config_keys, @project)
+          @git_config_key = gckey
+        else
+            render_403
+        end
+      end
+    end
+  
 end

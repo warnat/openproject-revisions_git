@@ -1,0 +1,38 @@
+
+    <div id="validation_messages"><%= error_messages_for 'mirror' %></div>
+
+    <p>
+      <%= f.text_field :url, label: 'URL', required: true, style: 'width: 97%;' %>
+      <em><%= "e.g., ssh://git@openproject.example.org/project1/project2/project3/project4.git" %></em>
+      <br>
+      <em><%= "e.g., ssh://git@openproject.example.org:2222/project1/project2/project3/project4.git" %></em>
+    </p>
+    
+    <p>
+      <%= f.hidden_field :repository_id, value: @repository.id %>
+    </p>
+
+    <p>
+      <%= f.select :push_mode, options_for_select([['Complete mirroring', 0], ['Force update remote', 1], ['Fast forward (unforced)', 2]], 0),
+                              { required: true, label: 'Mirror update mode' },
+                              { class: 'select_key_type' } %>
+    </p>
+
+    <p>
+      <%= f.check_box :include_all_branches, label: 'Include all branches', checked: false %>
+    </p>
+
+    <p>
+      <%= f.check_box :include_all_tags, label: 'Include all tags', checked: false %>
+    </p>
+
+    <p>
+      <%= f.text_field :explicit_refspec, label: 'Explicit refspec', style: 'width: 97%;' %>
+      <em><%= "e.g., <src>:<dest>" %></em>
+      <br>
+      <em><%= "e.g., refs/<name>/<ref>:refs/<name>/<ref>" %></em>
+    </p>
+
+    <p>
+      <%= f.check_box :active, label: 'Active', checked: true %>
+    </p>
